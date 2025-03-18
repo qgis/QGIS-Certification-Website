@@ -52,9 +52,7 @@ def sustaining_member_context(request):
         return context_data
     if hasattr(request, 'resolver_match'):
         try:
-            project_slug = request.resolver_match.kwargs.get('project_slug')
-            if not project_slug:
-                project_slug = request.resolver_match.kwargs.get('slug')
+            project_slug = 'qgis'
             try:
                 project = Project.objects.get(
                     slug=project_slug

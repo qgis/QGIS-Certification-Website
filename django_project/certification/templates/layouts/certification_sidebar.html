@@ -1,16 +1,6 @@
 {% load static i18n %}
 <nav id="sidebar" class="sidebar">
   <ul class="content-wrapper">
-      {% if user.is_authenticated and is_sustaining_member %}
-      {% url 'sustaining-membership' as sustaining_membership_url %}
-        <li class="{% if request.path == sustaining_membership_url %}is-active{% endif %}">
-          <a href="{{ sustaining_membership_url }}">
-            <i class="fas fa-users mr-3"></i>
-            Membership
-          </a>
-        </li>
-
-      {% else %}
       <li>
         <a 
         class="button is-success is-medium has-tooltip-bottom has-tooltip-arrow" 
@@ -21,7 +11,6 @@
         </a>
       </li>
       <hr/>
-      {% endif %}
     {% if user.is_staff or user in the_project.certification_managers.all %}
       {% url 'certification-management-view' as management_url %}
       <li class="{% if request.path == management_url %}is-active{% endif %}">
