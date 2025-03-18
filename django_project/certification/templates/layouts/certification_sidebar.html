@@ -1,26 +1,27 @@
 {% load static i18n %}
 <nav id="sidebar" class="sidebar">
   <ul class="content-wrapper">
-    <li>
-      <a href="/">
-        <i class="fas fa-home mr-3"></i>
-        QGIS Certification Home
-      </a>
-    </li>
-    {% url 'about' as about_url %}
-    <li class="{% if request.path == about_url %}is-active{% endif %}">
-      <a href="{{ about_url }}">
-        <i class="fas fa-info-circle mr-3"></i>
-        Learn about Certification
-      </a>
-    </li>
-    {% url 'certifyingorganisation-create' as create_url %}
-    <li class="{% if request.path == create_url %}is-active{% endif %}">
-      <a href="{{ create_url }}">
-        <i class="fas fa-user-plus mr-3"></i>
-        {% trans 'Sign Up for Certification!' %}
-      </a>
-    </li>
+      {% if user.is_authenticated and is_sustaining_member %}
+      {% url 'sustaining-membership' as sustaining_membership_url %}
+        <li class="{% if request.path == sustaining_membership_url %}is-active{% endif %}">
+          <a href="{{ sustaining_membership_url }}">
+            <i class="fas fa-users mr-3"></i>
+            Membership
+          </a>
+        </li>
+
+      {% else %}
+      <li>
+        <a 
+        class="button is-success is-medium has-tooltip-bottom has-tooltip-arrow" 
+        data-tooltip="Sign up for Certification!"
+        href="{% url 'certifyingorganisation-create' %}">
+          <i class="fas fa-certificate"></i>
+          {% trans "Sign Up!" %}
+        </a>
+      </li>
+      <hr/>
+      {% endif %}
     {% if user.is_staff or user in the_project.certification_managers.all %}
       {% url 'certification-management-view' as management_url %}
       <li class="{% if request.path == management_url %}is-active{% endif %}">
@@ -89,6 +90,12 @@
           </a>
         </li>
       </ul>
+    </li>
+    <li>
+      <a href="https://qgis.org/community/certification/" target="_blank">
+        <i class="fas fa-info-circle mr-3"></i>
+        Learn about Certification
+      </a>
     </li>
   </ul>
 </nav>

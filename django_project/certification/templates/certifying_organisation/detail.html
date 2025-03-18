@@ -282,7 +282,7 @@
         <div class="column buttons has-text-right">
             <a class="button is-light has-tooltip-arrow has-tooltip-bottom icon about-link"
                data-tooltip="About Certification"
-               href="{% url 'about' %}">
+               href="https://qgis.org/community/certification/" target="_blank">
                 <i class="fas fa-info-circle"></i>
             </a>
             {% if certifyingorganisation.approved %}
@@ -696,9 +696,11 @@
                         <div id="map"></div>
                     </div>
                     {% if num_trainingcenter == 0 %}
-                        <div class="notification is-warning">
-                            <p>No training centers are defined, but you can <a class="button is-link is-small"
-                                href='{% url "trainingcenter-create" organisation_slug=certifyingorganisation.slug %}'>register one</a>.</p>
+                        <div class="notification is-warning is-light mt-3">
+                            <p>No training centers are defined, but you can 
+                                <a class="button is-link is-small"
+                                href='{% url "trainingcenter-create" organisation_slug=certifyingorganisation.slug %}'>register one</a>.
+                            </p>
                         </div>
                     {% else %}
                         <table class="table is-fullwidth">
@@ -757,7 +759,7 @@
             <div class="card-content">
                 <div class="content">
                     {% if num_coursetype == 0 %}
-                        <div class="notification is-warning">
+                        <div class="notification is-warning is-light">
                             <p>No course types are defined, but you can <a class="button is-link is-small"
                                 href='{% url 'coursetype-create' organisation_slug=certifyingorganisation.slug %}'>create one</a>.</p>
                         </div>
@@ -818,7 +820,7 @@
             <div class="card-content">
                 <div class="content">
                     {% if num_courseconvener == 0 %}
-                        <div class="notification is-warning">
+                        <div class="notification is-warning is-light">
                             <p>No course conveners are defined, but you can <a class="button is-link is-small"
                                 href='{% url "courseconvener-create" organisation_slug=certifyingorganisation.slug %}'>register one</a>.</p>
                         </div>

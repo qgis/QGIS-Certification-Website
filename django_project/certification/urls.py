@@ -79,8 +79,6 @@ from .views import (
     ValidateCertificate,
     ValidateCertificateOrganisation,
 
-    # About.
-    AboutView,
     TopUpView,
 
     CheckoutSessionSuccessView,
@@ -105,10 +103,6 @@ from .api_views.external_reviewer import UpdateExternalReviewerText
 urlpatterns = [
     # Home page
     url(r'^$', view=homepage_view, name='home'),
-    # About page
-    url(r'^about/$',
-        view=AboutView.as_view(),
-        name='about'),
 
     # Certifying Organisation management
     url(r'^pending-certifyingorganisation/list/$',
