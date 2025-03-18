@@ -7,14 +7,14 @@
         QGIS Certification Home
       </a>
     </li>
-    {% url 'about' the_project.slug as about_url %}
+    {% url 'about' as about_url %}
     <li class="{% if request.path == about_url %}is-active{% endif %}">
       <a href="{{ about_url }}">
         <i class="fas fa-info-circle mr-3"></i>
         Learn about Certification
       </a>
     </li>
-    {% url 'certifyingorganisation-create' the_project.slug as create_url %}
+    {% url 'certifyingorganisation-create' as create_url %}
     <li class="{% if request.path == create_url %}is-active{% endif %}">
       <a href="{{ create_url }}">
         <i class="fas fa-user-plus mr-3"></i>
@@ -22,7 +22,7 @@
       </a>
     </li>
     {% if user.is_staff or user in the_project.certification_managers.all %}
-      {% url 'certification-management-view' the_project.slug as management_url %}
+      {% url 'certification-management-view' as management_url %}
       <li class="{% if request.path == management_url %}is-active{% endif %}">
         <a href="{{ management_url }}">
           <i class="fas fa-tasks mr-3"></i>
@@ -30,7 +30,7 @@
         </a>
       </li>
     {% endif %}
-    {% url 'certifyingorganisation-list' the_project.slug as organisation_list_url %}
+    {% url 'certifyingorganisation-list' as organisation_list_url %}
     <li class="{% if request.path == organisation_list_url %}is-active{% endif %}">
       <a href="{{ organisation_list_url }}">
         <i class="fas fa-users mr-3"></i>
@@ -48,7 +48,7 @@
         </span>
       </div>
       <ul id="pending-organisations" class="collapsed">
-        {% url 'pending-certifyingorganisation-list' the_project.slug as pending_url %}
+        {% url 'pending-certifyingorganisation-list' as pending_url %}
         <li>
           <a href="{{ pending_url }}?ready=False">
             <i class="fas fa-clock mr-3"></i>
@@ -74,14 +74,14 @@
         </span>
       </div>
       <ul id="verify-certificates" class="collapsed">
-        {% url 'validate-certificate-organisation' the_project.slug as validate_org_url %}
+        {% url 'validate-certificate-organisation' as validate_org_url %}
         <li>
           <a href="{{ validate_org_url }}">
             <i class="fas fa-certificate mr-3"></i>
             For Certifying Organisation
           </a>
         </li>
-        {% url 'validate-certificate' the_project.slug as validate_url %}
+        {% url 'validate-certificate' as validate_url %}
         <li>
           <a href="{{ validate_url }}">
             <i class="fas fa-certificate mr-3"></i>

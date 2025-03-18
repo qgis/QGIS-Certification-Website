@@ -1,4 +1,4 @@
-{% extends "layouts/certification_base.html" %}
+{% extends "base_with_sidebar.html" %}
 {% load custom_markup %}
 
 {% block title %}Course Attendee Deleted - {{ block.super }}{% endblock %}
@@ -25,7 +25,7 @@
                         <span class="glyphicon glyphicon-minus"></span>
                     </a>
                     <a class="btn btn-default btn-sm tooltip-toggle"
-                       href='{% url "course-detail" project_slug=courseattendee.course.certifying_organisation.project.slug organisation_slug=courseattendee.course.certifying_organisation.slug slug=courseattendee.course.slug%}'
+                       href='{% url "course-detail" organisation_slug=courseattendee.course.certifying_organisation.slug slug=courseattendee.course.slug%}'
                        data-title="Cancel">
                         <span class="glyphicon glyphicon-arrow-left"></span>
                     </a>

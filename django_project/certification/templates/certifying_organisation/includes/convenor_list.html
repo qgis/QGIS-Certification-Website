@@ -34,13 +34,13 @@
                 </a>
               {% else %}
                 <a class="btn btn-default btn-xs btn-delete tooltip-toggle"
-                   href='{% url "courseconvener-delete" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=courseconvener.slug %}'
+                   href='{% url "courseconvener-delete" organisation_slug=certifyingorganisation.slug slug=courseconvener.slug %}'
                    data-title="Delete {{ courseconvener.user.first_name }} {{ courseconvener.user.last_name }} <{{ courseconvener.user }}>">
                     <span class="glyphicon glyphicon-minus"></span>
                 </a>
                 {% endif %}
                 <a class="btn btn-default btn-xs tooltip-toggle"
-                   href='{% url "courseconvener-update" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=courseconvener.slug %}'
+                   href='{% url "courseconvener-update" organisation_slug=certifyingorganisation.slug slug=courseconvener.slug %}'
                    data-title="Edit {{ courseconvener.user.first_name }} {{ courseconvener.user.last_name }} <{{ courseconvener.user }}>">
                     <span class="glyphicon glyphicon-pencil"></span>
                 </a>

@@ -1,4 +1,4 @@
-{% extends "layouts/certification_base.html" %}
+{% extends "base_with_sidebar.html" %}
 {% load static %}
 
 {% block extra_js %}
@@ -16,7 +16,7 @@
         $(function() {
             $("#submit-button").on("click", function() {
                 var query = $("#InputID").val();
-                location.href = '/en/' + '{{ project_slug }}' + '/organisationcertificate/' + query + '/';
+                location.href = '/en/organisationcertificate/' + query + '/';
             });
         });
     </script>

@@ -22,7 +22,7 @@
     width: 3em
     height: 3em
 
-  .navbar-start, .navbar-end
+  .navbar-start
     .navbar-item
       color: white
       border-radius: 5px
@@ -66,7 +66,7 @@
       background: $white
 
   @media screen and (min-width: 1024px)
-    .navbar-start, .navbar-end
+    .navbar-start
       padding: 10px 0
       .navbar-dropdown
         background-color: #002033
@@ -109,13 +109,11 @@
         transform: translateX(-100%)
         opacity: 0
 
-    .context-container
-      .navbar-start, .navbar-end
-      a.navbar-item.is-active:hover,
-      .navbar-link.is-active:hover,
-      .navbar-item:hover
-        background-color: unset !important
-        color: white !important
+    .context-container .navbar-start a.navbar-item.is-active:hover,
+    .context-container .navbar-start .navbar-link.is-active:hover,
+    .context-container .navbar-start .navbar-item:hover
+      background-color: unset !important
+      color: white !important
 
     .content > .columns .content
       width: 100%

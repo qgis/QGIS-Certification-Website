@@ -97,7 +97,6 @@ class UpdateChecklistReviewer(CertifyingOrganisationUserTestMixin):
             organisation.save()
 
             redirect_url = reverse('certifyingorganisation-detail', kwargs={
-                'project_slug': organisation.project.slug,
                 'slug': organisation.slug
             })
 

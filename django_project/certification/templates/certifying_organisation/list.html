@@ -1,4 +1,4 @@
-{% extends "layouts/certification_base.html" %}
+{% extends "base_with_sidebar.html" %}
 {% load thumbnail %}
 {% load custom_markup %}
 
@@ -18,7 +18,7 @@
     </h1>
     <div class="buttons">
         <a class="button is-success has-tooltip-bottom has-tooltip-arrow has-tooltip-multiline"
-           href='{% url "certifyingorganisation-create" project_slug %}'
+           href='{% url "certifyingorganisation-create" %}'
            data-tooltip="Sign Up for Certification!">
             <span class="icon">
                 <i class="fas fa-plus"></i>
@@ -26,21 +26,21 @@
             <span>Sign Up</span>
         </a>
         <a class="button is-light has-tooltip-bottom has-tooltip-arrow has-tooltip-multiline"
-           href='{% url "feed-training-center-project" project_slug %}' target="_blank"
+           href='{% url "feed-training-center-project" %}' target="_blank"
            data-tooltip="Feed for List of All Training Centers">
             <span class="icon">
                 <i class="fa fa-rss-square"></i>
             </span>
         </a>
         <a class="button is-light has-tooltip-bottom has-tooltip-arrow has-tooltip-multiline"
-           href='{% url "feed-upcoming-project-course" project_slug %}' target="_blank"
+           href='{% url "feed-upcoming-project-course" %}' target="_blank"
            data-tooltip="Feed for List of All Upcoming Courses">
             <span class="icon">
                 <i class="fa fa-rss"></i>
             </span>
         </a>
         <a class="button is-light has-tooltip-bottom has-tooltip-arrow has-tooltip-multiline"
-           href='{% url "feed-past-project-course" project_slug %}' target="_blank"
+           href='{% url "feed-past-project-course" %}' target="_blank"
            data-tooltip="Feed for List of All Past Courses">
             <span class="icon">
                 <i class="fa fa-rss" style="color: grey"></i>
@@ -48,7 +48,7 @@
         </a>
         {% if user.is_staff or user == the_project.owner or user in the_project.certification_managers.all %}
             <a class="button is-light has-tooltip-bottom has-tooltip-arrow has-tooltip-multiline"
-               href='{% url "certifyingorganisation-create" project_slug %}'
+               href='{% url "certifyingorganisation-create" %}'
                data-tooltip="Create New Certifying Organisation">
                 <span class="icon">
                     <i class="fas fa-plus"></i>
@@ -56,7 +56,7 @@
             </a>
             {% if not unapproved %}
                 <a class="button is-light has-tooltip-bottom has-tooltip-arrow has-tooltip-multiline"
-                   href='{% url "pending-certifyingorganisation-list" project_slug %}'
+                   href='{% url "pending-certifyingorganisation-list" %}'
                    data-tooltip="View Pending Certifying Organisations">
                     <span class="icon">
                         <i class="fas fa-clock"></i>
@@ -64,7 +64,7 @@
                 </a>
             {% else %}
                 <a class="button is-light has-tooltip-bottom has-tooltip-arrow has-tooltip-multiline"
-                   href='{% url "certifyingorganisation-list" project_slug %}'
+                   href='{% url "certifyingorganisation-list" %}'
                    data-tooltip="View Certifying Organisations">
                     <span class="icon">
                         <i class="fas fa-list"></i>
@@ -73,7 +73,7 @@
             {% endif %}
         {% endif %}
         <a class="button is-light has-tooltip-bottom has-tooltip-arrow has-tooltip-multiline"
-           href='{% url 'about' the_project.slug %}'
+           href='{% url 'about' %}'
            data-tooltip="About Certification">
             <span class="icon">
                 <i class="fas fa-info-circle"></i>

@@ -1,4 +1,4 @@
-{% extends "layouts/certification_base.html" %}
+{% extends "base_with_sidebar.html" %}
 {% load custom_markup %}
 {% load static %}
 
@@ -28,18 +28,18 @@
             <div class="btn-group pull-right">
                 {% if user in certifyingorganisation.organisation_owners.all or user.is_staff or user == project.owner or user in project.certification_manager.all %}
                 <a class="btn btn-default btn-sm btn-delete tooltip-toggle"
-                   href='{% url "coursetype-delete" project_slug=coursetype.certifying_organisation.project.slug organisation_slug=coursetype.certifying_organisation.slug pk=coursetype.pk %}'
+                   href='{% url "coursetype-delete" organisation_slug=coursetype.certifying_organisation.slug pk=coursetype.pk %}'
                    data-title="Delete {{ coursetype.name }}">
                     <span class="glyphicon glyphicon-minus"></span>
                 </a>
                 <a class="btn btn-default btn-sm tooltip-toggle"
-                   href='{% url "coursetype-update" project_slug=coursetype.certifying_organisation.project.slug organisation_slug=coursetype.certifying_organisation.slug pk=coursetype.pk %}'
+                   href='{% url "coursetype-update" organisation_slug=coursetype.certifying_organisation.slug pk=coursetype.pk %}'
                    data-title="Edit {{ coursetype.name }}">
                     <span class="glyphicon glyphicon-pencil"></span>
                 </a>
                 {% endif %}
                  <a class="btn btn-default btn-sm tooltip-toggle"
-                    href='{% url "certifyingorganisation-detail" coursetype.certifying_organisation.project.slug coursetype.certifying_organisation.slug %}'
+                    href='{% url "certifyingorganisation-detail" coursetype.certifying_organisation.slug %}'
                     data-title="Back">
                      <span class="glyphicon glyphicon-arrow-left"></span>
                  </a>

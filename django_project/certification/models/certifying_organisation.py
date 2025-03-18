@@ -226,5 +226,4 @@ class CertifyingOrganisation(models.Model):
         """
         return reverse('certifyingorganisation-detail', kwargs={
                 'slug': self.slug,
-                'project_slug': self.project.slug
         })
