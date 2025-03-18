@@ -59,7 +59,7 @@ class CertificateChecklistCreateView(
     template_name = 'certificate_checklist/create.html'
 
     def test_func(self):
-        project_slug = self.kwargs.get('project_slug', None)
+        project_slug = 'qgis'
         self.project = Project.objects.get(slug=project_slug)
         return self.project.certification_managers.filter(
             id=self.request.user.id
@@ -75,9 +75,7 @@ class CertificateChecklistCreateView(
        :rtype: HttpResponse
        """
 
-        return reverse('certification-management-view', kwargs={
-            'project_slug': self.project_slug
-        })
+        return reverse('certification-management-view', kwargs={})
 
     def get_context_data(self, **kwargs):
         ctx = super(
@@ -94,7 +92,7 @@ class CertificateChecklistCreateView(
         """
 
         kwargs = super(CertificateChecklistCreateView, self).get_form_kwargs()
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.project = Project.objects.get(slug=self.project_slug)
         kwargs.update({
             'user': self.request.user,

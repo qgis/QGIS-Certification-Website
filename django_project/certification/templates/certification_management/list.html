@@ -3,7 +3,7 @@
 {% block title %}Certification Management{% endblock %}
 {% block js_head %}
     <script>
-        $(function () {
+        {% comment %} $(function () {
             $(".checklist-sortable").sortable({
                 update: function (event, ui) {
                     let idsInOrder = $(event.target).sortable("toArray");
@@ -24,7 +24,7 @@
                     })
                 }
             });
-        });
+        }); {% endcomment %}
 
         function activate(checklistId, elm) {
             let div = $(elm);

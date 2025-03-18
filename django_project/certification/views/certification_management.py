@@ -105,7 +105,7 @@ class ActivateChecklist(APIView):
 class ArchiveChecklist(APIView):
     permission_classes = [IsAdminUser | IsCertificationManager]
 
-    def post(self, request, project_slug):
+    def post(self, request):
         """
         Archive a checklist, only managers and superuser can do this action.
         """

@@ -8,8 +8,8 @@ from certification.models.certificate_type import (
 )
 
 
-def update_project_certificate_view(request, project_slug):
-    project = get_object_or_404(Project, slug=project_slug)
+def update_project_certificate_view(request):
+    project = get_object_or_404(Project, slug='qgis')
     manager = project.certification_managers.all()
     if request.user.is_staff or request.user in manager:
         certificate_types = request.POST.getlist('certificate_types', [])
@@ -28,5 +28,5 @@ def update_project_certificate_view(request, project_slug):
                 ).delete()
     return HttpResponseRedirect(
         reverse('certification-management-view',
-                kwargs={'project_slug': project_slug})
+                kwargs={})
     )
