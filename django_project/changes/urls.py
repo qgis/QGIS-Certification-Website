@@ -19,7 +19,6 @@ from .feeds.sponsor import (
 )
 from changes.api_views.lock_version import LockVersion, UnlockVersion
 from .views import (
-    redirect_root,
     # Category
     CategoryDetailView,
     CategoryDeleteView,
@@ -103,8 +102,6 @@ from changes.views.sustaining_member import (
 )
 
 urlpatterns = [
-    # Root
-    url(r'^$', redirect_root, name='homepage'),
     # Category management
 
     # This view is only accessible via ajax

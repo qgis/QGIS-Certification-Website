@@ -21,7 +21,7 @@ ALLOWED_HOSTS = [
     'localhost:9000',
     'changelog.linfiniti.com',
     'changelog.inasafe.org',
-    'changelog.qgis.org',
+    'certification.qgis.org',
     'changelog.kartoza.com']
 
 # Pipeline - for production we want to compress resources

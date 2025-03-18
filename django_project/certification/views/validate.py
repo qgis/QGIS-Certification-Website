@@ -16,7 +16,7 @@ class ValidateCertificate(TemplateView):
         :rtype: dict
         """
 
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         context = super(
             ValidateCertificate, self).get_context_data(**kwargs)
         context['project_slug'] = self.project_slug
@@ -40,7 +40,7 @@ class ValidateCertificateOrganisation(TemplateView):
         :rtype: dict
         """
 
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         context = super(
             ValidateCertificateOrganisation, self).get_context_data(**kwargs)
         context['project_slug'] = self.project_slug

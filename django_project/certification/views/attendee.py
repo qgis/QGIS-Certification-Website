@@ -41,13 +41,11 @@ class AttendeeCreateView(LoginRequiredMixin, AttendeeMixin, CreateView):
         add_to_course = self.request.POST.get('add_to_course')
         if add_to_course is None:
             success_url = reverse('courseattendee-create', kwargs={
-                'project_slug': self.project_slug,
                 'organisation_slug': self.organisation_slug,
                 'slug': self.course_slug,
             })
         else:
             success_url = reverse('course-detail', kwargs={
-                'project_slug': self.project_slug,
                 'organisation_slug': self.organisation_slug,
                 'slug': self.course_slug,
             })
@@ -75,7 +73,7 @@ class AttendeeCreateView(LoginRequiredMixin, AttendeeMixin, CreateView):
         """
 
         kwargs = super(AttendeeCreateView, self).get_form_kwargs()
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.organisation_slug = self.kwargs.get('organisation_slug', None)
         self.course_slug = self.kwargs.get('slug', None)
         self.certifying_organisation = \
@@ -125,7 +123,6 @@ class CsvUploadView(FormMessagesMixin, LoginRequiredMixin, FormView):
        """
 
         return reverse('course-detail', kwargs={
-            'project_slug': self.project_slug,
             'organisation_slug': self.organisation_slug,
             'slug': self.slug,
         })
@@ -155,7 +152,7 @@ class CsvUploadView(FormMessagesMixin, LoginRequiredMixin, FormView):
         """
 
         kwargs = super(CsvUploadView, self).get_form_kwargs()
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.organisation_slug = self.kwargs.get('organisation_slug', None)
         self.slug = self.kwargs.get('slug', None)
         self.course = Course.objects.get(slug=self.slug)
@@ -265,7 +262,6 @@ class AttendeeUpdateView(LoginRequiredMixin, UpdateView):
        """
 
         return reverse('course-detail', kwargs={
-            'project_slug': self.project_slug,
             'organisation_slug': self.organisation_slug,
             'slug': self.course_slug,
         })
@@ -292,7 +288,7 @@ class AttendeeUpdateView(LoginRequiredMixin, UpdateView):
         """
 
         kwargs = super(AttendeeUpdateView, self).get_form_kwargs()
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.organisation_slug = self.kwargs.get('organisation_slug', None)
         self.course_slug = self.kwargs.get('course_slug', None)
         self.certifying_organisation = \

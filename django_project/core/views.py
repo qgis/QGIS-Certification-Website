@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect
 from base.models import Project, ProjectFlatpage
 
+from django.shortcuts import render
 
 from django.http import JsonResponse
 from django.contrib.auth.models import User
@@ -88,7 +89,7 @@ def index_view(request):
                      settings.LANGUAGE_CODE or 'en')
     translation.activate(user_language)
     # look up the view name in base.urls
-    return redirect(reverse('version-list'))
+    return redirect(reverse('home'))
 
 class UserAutocomplete(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):

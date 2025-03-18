@@ -157,9 +157,7 @@ class OrganisationCertificateCreateView(LoginRequiredMixin, CreateView):
        :rtype: HttpResponse
        """
 
-        return reverse('certifyingorganisation-list', kwargs={
-            'project_slug': self.project_slug,
-        })
+        return reverse('certifyingorganisation-list', kwargs={})
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
@@ -185,7 +183,7 @@ class OrganisationCertificateCreateView(LoginRequiredMixin, CreateView):
 
         kwargs = super(
             OrganisationCertificateCreateView, self).get_form_kwargs()
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.organisation_slug = self.kwargs.get('organisation_slug', None)
         self.certifying_organisation = \
             CertifyingOrganisation.objects.get(slug=self.organisation_slug)
@@ -197,7 +195,7 @@ class OrganisationCertificateCreateView(LoginRequiredMixin, CreateView):
 
 
 def organisation_certificate_pdf_view(request, **kwargs):
-    project_slug = kwargs.pop('project_slug')
+    project_slug = 'qgis'
     organisation_slug = kwargs.pop('organisation_slug')
     project = Project.objects.get(slug=project_slug)
     certifying_organisation = \
@@ -254,7 +252,7 @@ class OrganisationCertificateDetailView(DetailView):
         """
 
         self.certificateID = self.kwargs.get('id', None)
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         context = super(
             OrganisationCertificateDetailView, self).get_context_data(**kwargs)
         context['project_slug'] = self.project_slug

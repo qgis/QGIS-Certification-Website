@@ -81,7 +81,6 @@ class CertificateCreateView(
        """
 
         return reverse('course-detail', kwargs={
-            'project_slug': self.project_slug,
             'organisation_slug': self.organisation_slug,
             'slug': self.course_slug
         })
@@ -110,7 +109,7 @@ class CertificateCreateView(
         """
 
         kwargs = super(CertificateCreateView, self).get_form_kwargs()
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.organisation_slug = self.kwargs.get('organisation_slug', None)
         self.course_slug = self.kwargs.get('course_slug', None)
         self.pk = self.kwargs.get('pk', None)
@@ -171,7 +170,7 @@ class CertificateDetailView(DetailView):
         """
 
         self.certificateID = self.kwargs.get('id', None)
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         context = super(
             CertificateDetailView, self).get_context_data(**kwargs)
         issued_id = \
@@ -437,7 +436,7 @@ def generate_pdf(
 
 
 def certificate_pdf_view(request, **kwargs):
-    project_slug = kwargs.pop('project_slug')
+    project_slug = 'qgis'
     course_slug = kwargs.pop('course_slug')
     pk = kwargs.pop('pk')
     project = Project.objects.get(slug=project_slug)
@@ -478,7 +477,7 @@ def certificate_pdf_view(request, **kwargs):
 def download_certificates_zip(request, **kwargs):
     """Download all certificates in a course as one zip file."""
 
-    project_slug = kwargs.pop('project_slug')
+    project_slug = 'qgis'
     course_slug = kwargs.pop('course_slug')
     course = Course.objects.get(slug=course_slug)
     organisation_slug = kwargs.pop('organisation_slug')
@@ -520,7 +519,7 @@ def download_certificates_zip(request, **kwargs):
 def update_paid_status(request, **kwargs):
     """View to update the is_paid status of certificate in a course."""
 
-    project_slug = kwargs.pop('project_slug')
+    project_slug = 'qgis'
     organisation_slug = kwargs.pop('organisation_slug')
     course_slug = kwargs.pop('course_slug')
     attendee_pk = kwargs.pop('pk')
@@ -528,7 +527,6 @@ def update_paid_status(request, **kwargs):
     attendee = Attendee.objects.get(pk=attendee_pk)
     project = Project.objects.get(slug=project_slug)
     url = reverse('course-detail', kwargs={
-        'project_slug': project_slug,
         'organisation_slug': organisation_slug,
         'slug': course_slug
     })
@@ -593,7 +591,6 @@ def email_all_attendees(request, **kwargs):
         has_pending = True
 
     url = reverse('course-detail', kwargs={
-        'project_slug': project_slug,
         'organisation_slug': organisation_slug,
         'slug': course_slug
     })
@@ -657,7 +654,7 @@ def email_all_attendees(request, **kwargs):
 def regenerate_certificate(request, **kwargs):
     """Regenerate a pdf certificate for an attendee."""
 
-    project_slug = kwargs.pop('project_slug', None)
+    project_slug = 'qgis'
     organisation_slug = kwargs.pop('organisation_slug', None)
     course_slug = kwargs.pop('course_slug', None)
     pk = kwargs.pop('pk')
@@ -724,7 +721,7 @@ def regenerate_certificate(request, **kwargs):
 def generate_all_certificate(request, **kwargs):
     """Generate all certificates within a course."""
 
-    project_slug = kwargs.pop('project_slug', None)
+    project_slug = 'qgis'
     course_slug = kwargs.pop('course_slug', None)
     organisation_slug = kwargs.get('organisation_slug', None)
     course = Course.objects.get(slug=course_slug)
@@ -773,7 +770,6 @@ def generate_all_certificate(request, **kwargs):
                 certifying_organisation.save()
 
     url = reverse('course-detail', kwargs={
-        'project_slug': project_slug,
         'organisation_slug': organisation_slug,
         'slug': course_slug
     })
@@ -785,7 +781,7 @@ def generate_all_certificate(request, **kwargs):
 def regenerate_all_certificate(request, **kwargs):
     """Regenerate all certificates within a course."""
 
-    project_slug = kwargs.pop('project_slug', None)
+    project_slug = 'qgis'
     course_slug = kwargs.pop('course_slug', None)
     organisation_slug = kwargs.get('organisation_slug', None)
     course = Course.objects.get(slug=course_slug)
@@ -817,7 +813,6 @@ def regenerate_all_certificate(request, **kwargs):
         has_pending = True
 
     url = reverse('course-detail', kwargs={
-        'project_slug': project_slug,
         'organisation_slug': organisation_slug,
         'slug': course_slug
     })
@@ -923,7 +918,7 @@ def preview_certificate(request, **kwargs):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'filename="preview.pdf"'
 
-    project_slug = kwargs.pop('project_slug')
+    project_slug = 'qgis'
     project = Project.objects.get(slug=project_slug)
     organisation_slug = kwargs.pop('organisation_slug')
 
@@ -1009,7 +1004,7 @@ class TopUpView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(TopUpView, self).get_context_data(**kwargs)
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.organisation_slug = self.kwargs.get('organisation_slug', None)
 
         certifying_organisation = (
@@ -1078,7 +1073,7 @@ class TopUpView(TemplateView):
         total_credits = self.request.POST.get('total-credits', None)
         stripe_source_id = self.request.POST.get('stripe-source-id', None)
 
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.organisation_slug = self.kwargs.get('organisation_slug', None)
 
         project = Project.objects.get(
@@ -1151,7 +1146,6 @@ class TopUpView(TemplateView):
 
         return HttpResponseRedirect(
             reverse('certifyingorganisation-detail', kwargs={
-                'project_slug': self.project_slug,
                 'slug': self.organisation_slug
             })
         )
@@ -1246,7 +1240,7 @@ class CertificateRevokeView(
         :rtype: HttpResponse
         """
 
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.organisation_slug = self.kwargs.get('organisation_slug', None)
         self.course_slug = self.kwargs.get('course_slug', None)
         self.course = Course.objects.get(slug=self.course_slug)
@@ -1265,7 +1259,6 @@ class CertificateRevokeView(
         """
 
         return reverse('course-detail', kwargs={
-            'project_slug': self.project_slug,
             'organisation_slug': self.organisation_slug,
             'slug': self.course_slug
         })
@@ -1380,7 +1373,6 @@ class CheckoutSessionSuccessView(TemplateView):
                     payment_intent.save()
                     return HttpResponseRedirect(
                         reverse("certifyingorganisation-detail", kwargs={
-                            'project_slug': organisation.project.slug,
                             'slug': organisation.slug
                         }))
             except PaymentIntent.DoesNotExist:
@@ -1434,7 +1426,6 @@ class CreateCheckoutSessionView(LoginRequiredMixin, TemplateView):
         success_url += '?session_id={CHECKOUT_SESSION_ID}'
 
         cancel_url = self.request.build_absolute_uri(reverse("top-up", kwargs={
-            'project_slug': org.project.slug,
             'organisation_slug': org.slug
         }))
 

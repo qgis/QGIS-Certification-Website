@@ -51,7 +51,7 @@ class TestFurtherReadingInvalidLink(TestCase):
         self.test_further_reading.text = (
             'Test for link: <a href="https://changelog.kartoza.com/en/">'
             'https://changelog.kartoza.com/en/</a> and '
-            '<a href="https://changelog.qgis.org/should-error">link</a>. '
+            '<a href="https://certification.qgis.org/should-error">link</a>. '
             'But this one won\'t included')
         self.test_further_reading.save()
         self.client.login(username='sumsum', password='password')
@@ -68,7 +68,7 @@ class TestFurtherReadingInvalidLink(TestCase):
         )
         self.assertEqual(
             data[1]['further_reading_url'],
-            'https://changelog.qgis.org/should-error'
+            'https://certification.qgis.org/should-error'
         )
         self.assertEqual(
             data[0]['worksheet'],

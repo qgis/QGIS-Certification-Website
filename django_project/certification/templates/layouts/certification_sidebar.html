@@ -1,6 +1,12 @@
 {% load static i18n %}
 <nav id="sidebar" class="sidebar">
   <ul class="content-wrapper">
+    <li>
+      <a href="/">
+        <i class="fas fa-home mr-3"></i>
+        QGIS Certification Home
+      </a>
+    </li>
     {% url 'about' the_project.slug as about_url %}
     <li class="{% if request.path == about_url %}is-active{% endif %}">
       <a href="{{ about_url }}">

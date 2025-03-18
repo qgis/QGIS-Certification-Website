@@ -46,7 +46,6 @@ class CourseCreateView(LoginRequiredMixin, CourseMixin, CreateView):
        """
 
         return reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.object.certifying_organisation.project.slug,
             'slug': self.object.certifying_organisation.slug
         })
 
@@ -69,7 +68,7 @@ class CourseCreateView(LoginRequiredMixin, CourseMixin, CreateView):
             CertifyingOrganisation.objects.get(
                 slug=context['organisation_slug'])
         )
-        context['project_slug'] = self.kwargs.pop('project_slug')
+        context['project_slug'] = 'qgis'
         return context
 
     def get_form_kwargs(self):
@@ -128,7 +127,6 @@ class CourseUpdateView(LoginRequiredMixin, CourseMixin, UpdateView):
             # is denied.
             return HttpResponseRedirect(
                 reverse('certifyingorganisation-detail', kwargs={
-                    'project_slug': self.certifying_organisation.project.slug,
                     'slug': self.certifying_organisation.slug
                 }))
 
@@ -169,7 +167,7 @@ class CourseUpdateView(LoginRequiredMixin, CourseMixin, UpdateView):
             CertifyingOrganisation.objects.get(
                 slug=context['organisation_slug'])
         )
-        context['project_slug'] = self.kwargs.pop('project_slug')
+        context['project_slug'] = 'qgis'
         return context
 
     def get_queryset(self):
@@ -195,7 +193,6 @@ class CourseUpdateView(LoginRequiredMixin, CourseMixin, UpdateView):
         """
 
         return reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.object.certifying_organisation.project.slug,
             'slug': self.object.certifying_organisation.slug
         })
 
@@ -294,7 +291,6 @@ class CourseDeleteView(LoginRequiredMixin, CourseMixin, DeleteView):
             # is denied.
             return HttpResponseRedirect(
                 reverse('certifyingorganisation-detail', kwargs={
-                    'project_slug': self.certifying_organisation.project.slug,
                     'slug': self.certifying_organisation.slug
                 }))
 
@@ -332,7 +328,6 @@ class CourseDeleteView(LoginRequiredMixin, CourseMixin, DeleteView):
         """
 
         return reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.object.certifying_organisation.project.slug,
             'slug': self.object.certifying_organisation.slug
         })
 
@@ -436,7 +431,6 @@ class CourseDetailView(CourseMixin, DetailView):
             # is denied.
             return HttpResponseRedirect(
                 reverse('certifyingorganisation-detail', kwargs={
-                    'project_slug': self.certifying_organisation.project.slug,
                     'slug': self.certifying_organisation.slug
                 }))
 
@@ -488,7 +482,7 @@ class CourseDetailView(CourseMixin, DetailView):
             Certificate.objects.filter(
                 course=self.course, is_paid=True).values_list(
                 'attendee', flat=True)
-        project_slug = self.kwargs.get('project_slug', None)
+        project_slug = 'qgis'
         context['project_slug'] = project_slug
         if project_slug:
             context['the_project'] = Project.objects.get(slug=project_slug)

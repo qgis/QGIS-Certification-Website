@@ -38,7 +38,6 @@ class CourseAttendeeCreateView(
        """
 
         return reverse('course-detail', kwargs={
-            'project_slug': self.project_slug,
             'organisation_slug': self.organisation_slug,
             'slug': self.slug
         })
@@ -68,7 +67,7 @@ class CourseAttendeeCreateView(
         """
 
         kwargs = super(CourseAttendeeCreateView, self).get_form_kwargs()
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.organisation_slug = self.kwargs.get('organisation_slug', None)
         self.slug = self.kwargs.get('slug', None)
         self.course = Course.objects.get(slug=self.slug)
@@ -130,7 +129,7 @@ class CourseAttendeeDeleteView(
         :rtype: HttpResponse
         """
 
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.organisation_slug = self.kwargs.get('organisation_slug', None)
         self.course_slug = self.kwargs.get('course_slug', None)
         self.course = Course.objects.get(slug=self.course_slug)
@@ -148,7 +147,6 @@ class CourseAttendeeDeleteView(
         """
 
         return reverse('course-detail', kwargs={
-            'project_slug': self.project_slug,
             'organisation_slug': self.organisation_slug,
             'slug': self.course_slug
         })

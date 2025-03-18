@@ -38,7 +38,6 @@ class CourseConvenerCreateView(
        """
 
         return reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.object.certifying_organisation.project.slug,
             'slug': self.object.certifying_organisation.slug
         })
 
@@ -160,7 +159,6 @@ class CourseConvenerDeleteView(
         """
 
         return reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.object.certifying_organisation.project.slug,
             'slug': self.object.certifying_organisation.slug
         })
 
@@ -242,7 +240,6 @@ class CourseConvenerUpdateView(
         """
 
         return reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.object.certifying_organisation.project.slug,
             'slug': self.object.certifying_organisation.slug
         })
 

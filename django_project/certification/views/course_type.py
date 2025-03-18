@@ -42,7 +42,6 @@ class CourseTypeCreateView(
        """
 
         return reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.object.certifying_organisation.project.slug,
             'slug': self.object.certifying_organisation.slug
         })
 
@@ -147,7 +146,6 @@ class CourseTypeDeleteView(
         """
 
         return reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.object.certifying_organisation.project.slug,
             'slug': self.object.certifying_organisation.slug
         })
 
@@ -233,7 +231,6 @@ class CourseTypeUpdateView(
         """
 
         return reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.object.certifying_organisation.project.slug,
             'slug': self.object.certifying_organisation.slug
         })
 
@@ -272,7 +269,7 @@ class CourseTypeDetailView(
             CourseTypeDetailView, self).get_context_data(**kwargs)
         context['coursetypes'] = CourseType.objects.filter(
             certifying_organisation=self.certifying_organisation)
-        project_slug = self.kwargs.get('project_slug', None)
+        project_slug = 'qgis'
         context['project_slug'] = project_slug
         if project_slug:
             context['the_project'] = Project.objects.get(slug=project_slug)

@@ -16,10 +16,10 @@ class GetUpcomingCourseProject(APIView):
 
     """
 
-    def get(self, request, project_slug):
+    def get(self, request):
         try:
             today = datetime.today()
-            project = Project.objects.get(slug=project_slug)
+            project = Project.objects.get(slug='qgis')
             courses = Course.objects.filter(
                 certifying_organisation__project=project, start_date__gte=today
             ).order_by(
@@ -41,10 +41,10 @@ class GetUpcomingCourseOrganisation(APIView):
 
     """
 
-    def get(self, request, project_slug, organisation_slug):
+    def get(self, request, organisation_slug):
         today = datetime.today()
         try:
-            project = Project.objects.get(slug=project_slug)
+            project = Project.objects.get(slug='qgis')
         except Project.DoesNotExist:
             return HttpResponse(
                 'Project does not exist.',
@@ -82,10 +82,10 @@ class GetPastCourseProject(APIView):
 
     """
 
-    def get(self, request, project_slug):
+    def get(self, request ):
         try:
             today = datetime.today()
-            project = Project.objects.get(slug=project_slug)
+            project = Project.objects.get(slug='qgis')
             courses = Course.objects.filter(
                 certifying_organisation__project=project, end_date__lte=today
             ).order_by(
@@ -107,10 +107,10 @@ class GetPastCourseOrganisation(APIView):
 
     """
 
-    def get(self, request, project_slug, organisation_slug):
+    def get(self, request, organisation_slug):
         today = datetime.today()
         try:
-            project = Project.objects.get(slug=project_slug)
+            project = Project.objects.get(slug='qgis')
         except Project.DoesNotExist:
             return HttpResponse(
                 'Project does not exist.',

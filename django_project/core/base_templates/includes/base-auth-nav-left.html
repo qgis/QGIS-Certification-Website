@@ -2,11 +2,51 @@
 {% load i18n %}
 
 
-<a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'version-list' %}">
+<a class="navbar-item has-text-weight-semibold is-size-7" href="/">
   <i class="fas fa-home mr-3"></i>
-  QGIS Changelog Home
+  QGIS Certification Home
 </a>
-<a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'category-list' %}">
-  <i class="fas fa-list mr-3"></i>
-  Categories
+<a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'about' %}">
+  <i class="fas fa-info-circle mr-3"></i>
+  Learn about Certification
 </a>
+<a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'certifyingorganisation-create' %}">
+  <i class="fas fa-user-plus mr-3"></i>
+  {% trans 'Sign Up for Certification!' %}
+</a>
+<a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'certifyingorganisation-list' %}">
+  <i class="fas fa-users mr-3"></i>
+  Approved Organisations
+</a>
+<div class="navbar-item has-dropdown is-hoverable">
+  <a class="navbar-link has-text-weight-semibold is-size-7">
+    <i class="fas fa-clock mr-3"></i>
+    Pending Organisations
+  </a>
+  <div class="navbar-dropdown">
+    <a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'pending-certifyingorganisation-list' %}?ready=False">
+      <i class="fas fa-clock mr-3"></i>
+      Not Ready
+    </a>
+    <a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'pending-certifyingorganisation-list' %}?ready=True">
+      <i class="fas fa-check-circle mr-3"></i>
+      Ready
+    </a>
+  </div>
+</div>
+<div class="navbar-item has-dropdown is-hoverable">
+  <a class="navbar-link has-text-weight-semibold is-size-7">
+    <i class="fas fa-certificate mr-3"></i>
+    Verify Certificates
+  </a>
+  <div class="navbar-dropdown">
+    <a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'validate-certificate-organisation' %}">
+      <i class="fas fa-certificate mr-3"></i>
+      For Certifying Organisation
+    </a>
+    <a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'validate-certificate' %}">
+      <i class="fas fa-certificate mr-3"></i>
+      For Attendee
+    </a>
+  </div>
+</div>

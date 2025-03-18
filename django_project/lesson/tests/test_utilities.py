@@ -85,7 +85,7 @@ class AllFurtherReadingURL(TestCase):
         self.test_further_reading.text = (
             'Test for link: <a href="https://changelog.kartoza.com/en/">'
             'https://changelog.kartoza.com/en/</a> and '
-            '<a href="https://changelog.qgis.org/en/qgis/lessons/'
+            '<a href="https://certification.qgis.org/en/qgis/lessons/'
             '#introduction-qgis-1">link</a>. But this one won\'t included')
         self.test_further_reading.save()
         obj = GetAllFurtherReadingLink(self.test_project)
@@ -93,7 +93,7 @@ class AllFurtherReadingURL(TestCase):
         self.assertEqual(
             result,
             ['https://changelog.kartoza.com/en/',
-             'https://changelog.qgis.org/en/qgis/lessons/#introduction-qgis-1'
+             'https://certification.qgis.org/en/qgis/lessons/#introduction-qgis-1'
              ], msg=result
         )
 
