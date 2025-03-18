@@ -48,12 +48,10 @@ from ..models import (
 )
 from ..forms import CertificateForm
 from base.models.project import Project
-from changes import (
-    NOTICE_TOP_UP_SUCCESS
-)
 from helpers.notification import send_notification
 
 stripe.api_key = djstripe_settings.STRIPE_SECRET_KEY
+NOTICE_TOP_UP_SUCCESS = 'top_up_success'
 
 
 class CertificateMixin(object):
