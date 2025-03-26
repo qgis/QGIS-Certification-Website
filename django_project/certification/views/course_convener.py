@@ -96,10 +96,10 @@ class CourseConvenerCreateView(
 
 class CourseConvenerDeleteView(
         LoginRequiredMixin,
-        CourseConvenerMixin,
         DeleteView):
     """Delete view for Course Convener."""
 
+    model = CourseConvener
     context_object_name = 'convener'
     template_name = 'course_convener/delete.html'
 

@@ -169,10 +169,10 @@ class TrainingCenterDetailView(
 
 class TrainingCenterDeleteView(
         LoginRequiredMixin,
-        TrainingCenterMixin,
         DeleteView):
     """Delete view for Training Center."""
 
+    model = TrainingCenter
     context_object_name = 'trainingcenter'
     template_name = 'training_center/delete.html'
 

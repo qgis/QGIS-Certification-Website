@@ -253,9 +253,10 @@ class CourseUpdateView(LoginRequiredMixin, CourseMixin, UpdateView):
                 raise Http404('Sorry! We could not find your course!')
 
 
-class CourseDeleteView(LoginRequiredMixin, CourseMixin, DeleteView):
+class CourseDeleteView(LoginRequiredMixin, DeleteView):
     """Delete view for Course."""
 
+    model = Course
     context_object_name = 'course'
     template_name = 'course/delete.html'
 

@@ -428,10 +428,10 @@ class CertifyingOrganisationDetailView(
 # noinspection PyAttributeOutsideInit
 class CertifyingOrganisationDeleteView(
     LoginRequiredMixin,
-    CertifyingOrganisationMixin,
     DeleteView):
     """Delete view for Certifying Organisation."""
 
+    model = CertifyingOrganisation
     context_object_name = 'certifyingorganisation'
     template_name = 'certifying_organisation/delete.html'
 

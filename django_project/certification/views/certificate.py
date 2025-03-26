@@ -1151,10 +1151,10 @@ class TopUpView(TemplateView):
 
 class CertificateRevokeView(
         LoginRequiredMixin,
-        CertificateMixin,
         DeleteView):
     """Revoke view for Certificate."""
 
+    model = Certificate
     context_object_name = 'certificate'
     template_name = 'certificate/delete.html'
 

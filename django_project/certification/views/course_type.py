@@ -84,10 +84,10 @@ class CourseTypeCreateView(
 
 class CourseTypeDeleteView(
         LoginRequiredMixin,
-        CourseTypeMixin,
         DeleteView):
     """Delete view for Course Type."""
 
+    model = CourseType
     context_object_name = 'coursetype'
     template_name = 'course_type/delete.html'
 
