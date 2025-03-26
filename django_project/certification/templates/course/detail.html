@@ -10,21 +10,11 @@
 
 {% block content %}
     {% if messages %}
-        <div class="notification is-primary">
-            {% for message in messages %}
-                <p class="message">{{ message }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if messages %}
-    <div class="notification is-success">
         {% for message in messages %}
-            {% if 'email_sent' in message.tags or 'regenerate' in message.tags %}
-                <p class="message">{{ message }}</p>
-            {% endif %}
+            <div class="notification is-light {% if 'email_sent' in message.tags or 'regenerate' in message.tags %}is-success{% else %}is-primary3{% endif %}">
+                <p>{{ message }}</p>
+            </div>
         {% endfor %}
-    </div>
     {% endif %}
 
     <div class="columns">
@@ -165,7 +155,7 @@
                             <i class="fas fa-plus"></i>
                         </span>
                     </a>
-                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom btn-download-table-csv" data-tooltip="Download table as CSV" href="#">
+                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" id="download-table-csv" data-tooltip="Download table as CSV" href="#">
                         <span class="icon is-small">
                             <i class="fas fa-file-csv"></i>
                         </span>
@@ -201,7 +191,7 @@
             <div class="card-content">
                 <div class="content">
                     {% if user in course.certifying_organisation.organisation_owners.all or user.is_staff or user == course.course_convener.user or user == project.owner or user in course.certifying_organisation.project.certification_managers.all %}
-                    <table class="table is-fullwidth is-hoverable">
+                    <table id="course-attendees-table" class="table is-fullwidth is-hoverable">
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -353,48 +343,8 @@
             $('.messages').fadeOut('fast')
         });
 
-        $('#download-zip, .btn-print, .btn-info-focus').hover(
-            function (){
-                $(this).removeClass('btn-default').addClass('btn-info')
-            },
-            function () {
-                $(this).removeClass('btn-info').addClass('btn-default')
-            }
-        );
-        $('.btn-delete').hover(
-            function (){
-                $(this).removeClass('btn-default').addClass('btn-danger')
-            },
-            function (){
-                $(this).removeClass('btn-danger').addClass('btn-default')
-            }
-        );
-        $('.btn-primary-focus').hover(
-            function (){
-                $(this).removeClass('btn-default').addClass('btn-primary')
-            },
-            function (){
-                $(this).removeClass('btn-primary').addClass('btn-default')
-            }
-        );
-        $('.btn-issue').hover(
-            function (){
-                $(this).removeClass('btn-default').addClass('btn-warning')
-            },
-            function (){
-                $(this).removeClass('btn-warning').addClass('btn-default')
-            }
-        );
-        $('.btn-top-up').hover(
-            function (){
-                $(this).removeClass('btn-default').addClass('btn-success')
-            },
-            function (){
-                $(this).removeClass('btn-success').addClass('btn-default')
-            }
-        );
-        $('.btn-download-table-csv').click(function (e) {
-            const table = document.querySelector('.course-attendees-table');
+        $('#download-table-csv').click(function (e) {
+            const table = document.querySelector('#course-attendees-table');
             const arr = [...table.rows].map(r => [...r.querySelectorAll('td, th')].map(td => td.textContent.replace(/\n/g, "").trim()));
             let csv = '';
             for (let array of arr) {

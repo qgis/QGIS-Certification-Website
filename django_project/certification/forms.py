@@ -681,7 +681,7 @@ class CsvAttendeeForm(forms.Form):
 
     file = forms.FileField(
         label="Choose Attendee CSV File:",
-        widget=forms.FileInput(
+        widget=FileUploadInput(
             attrs={
                 'accept': ".csv"
             }
