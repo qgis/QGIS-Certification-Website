@@ -20,7 +20,6 @@ from crispy_forms.layout import (
     Submit,
     Field,
 )
-from crispy_bulma.widgets import FileUploadInput
 
 from .models import (
     CertifyingOrganisation,
@@ -34,6 +33,10 @@ from .models import (
     Certificate,
     CertifyingOrganisationCertificate, Checklist, OrganisationChecklist
 )
+
+from crispy_bulma.widgets import FileUploadInput
+
+FileUploadInput.template_name = 'widgets/file_upload_input.html'
 
 class MultiSelectWidget(forms.SelectMultiple):
     template_name = 'widgets/multiselect.html'
@@ -233,6 +236,7 @@ class CourseTypeForm(forms.ModelForm):
 
 class CourseConvenerForm(forms.ModelForm):
 
+    signature = forms.ImageField(widget=FileUploadInput)
     user = forms.ModelChoiceField(
         queryset=User.objects.order_by('username'),
         widget=forms.Select)

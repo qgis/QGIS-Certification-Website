@@ -32,7 +32,7 @@
             {% else %}
               <a class="button is-danger is-light has-tooltip-bottom has-tooltip-arrow"
                  href='{% url "courseconvener-delete" organisation_slug=certifyingorganisation.slug slug=courseconvener.slug %}'
-                 data-tooltip="Delete {{ courseconvener.user.first_name }} {{ courseconvener.user.last_name }} <{{ courseconvener.user }}">">
+                 data-tooltip="Delete {{ courseconvener.user.first_name }} {{ courseconvener.user.last_name }} <{{ courseconvener.user }}">
                 <span class="icon is-small">
                   <i class="fas fa-trash"></i>
                 </span>

@@ -160,7 +160,7 @@
                 </p>
                 {% if user in course.certifying_organisation.organisation_owners.all or user.is_staff or user == course.course_convener.user or user == project.owner or user in course.certifying_organisation.project.certification_managers.all %}
                 <div class="buttons card-header-icon">
-                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Add Course Attendees" href='{% url 'courseattendee-create' organisation_slug=course.certifying_organisation.slug slug=course.slug %}'>
+                    <a class="button is-success is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Add Course Attendees" href='{% url 'courseattendee-create' organisation_slug=course.certifying_organisation.slug slug=course.slug %}'>
                         <span class="icon is-small">
                             <i class="fas fa-plus"></i>
                         </span>

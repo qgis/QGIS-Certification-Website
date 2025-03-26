@@ -7,47 +7,45 @@
 {% endblock %}
 
 {% block page_title %}
-    <h1>Course Deleted</h1>
+    <h1 class="title">Course Deleted</h1>
 {% endblock page_title %}
 
 {% block content %}
-    <form action="" id="delete-confirmation" method="post">{% csrf_token %}
-        <div class="alert row">
-            <div class="col-lg-10">
-                <p class="lead">Are you sure you want to delete the course below?</p>
-            </div>
-            <div class="col-lg-2">
-                <div class="btn-group pull-right">
-                    <a class="btn btn-danger btn-sm tooltip-toggle"
-                       href="#"
-                       onClick="$('#delete-confirmation').submit()"
-                       data-title="Delete {{ course.name }}">
-                        <span class="glyphicon glyphicon-minus"></span>
-                    </a>
-                    <a class="btn btn-default btn-sm tooltip-toggle"
-                       href='{% url "certifyingorganisation-detail" slug=course.certifying_organisation.slug%}'
-                       data-title="Cancel">
-                        <span class="glyphicon glyphicon-arrow-left"></span>
-                    </a>
+    <form action="" id="delete-confirmation" method="post" class="box-content">{% csrf_token %}
+        <div class="notification is-danger is-light">
+            <p>Are you sure you want to delete the course below?</p>
+        </div>
+        <div>
+            <h3 class="title is-4">Course: {{ course.name }}</h3>
+            <div class="columns">
+                <div class="column is-8">
+                    <p><strong>Organisation Name:</strong> {{ course.certifying_organisation.name }}</p>
+                    <p><strong>Course Type:</strong> {{ course.course_type.name }}</p>
+                    <p><strong>Course Convener:</strong> {{ course.course_convener.user }}</p>
+                    <p><strong>Training Center:</strong> {{ course.training_center.name }}</p>
+                    <p><strong>Start Date:</strong> {{ course.start_date }}</p>
+                    <p><strong>End Date:</strong> {{ course.end_date }}</p>
                 </div>
             </div>
         </div>
-        <div>
-        <div class="row">
-            <div class="col-lg-12">
-                <h3>Course: {{ course.name }}</h3>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-8" style="font-size: 12pt">
-                <span class="col-lg-3">Organisation name</span><span class="col-lg-9">: {{ course.certifying_organisation.name }}<br/></span>
-                <span class="col-lg-3">Course type</span><span class="col-lg-9">: {{ course.course_type.name }}<br/></span>
-                <span class="col-lg-3">Course convener</span><span class="col-lg-9">: {{ course.course_convener.user }}<br/></span>
-                <span class="col-lg-3">Training center</span><span class="col-lg-9">: {{ course.training_center.name }}<br/></span>
-                <span class="col-lg-3">Start date</span><span class="col-lg-9">: {{ course.start_date }}<br/></span>
-                <span class="col-lg-3">End date</span><span class="col-lg-9">: {{ course.end_date }}<br/></span>
-            </div>
-        </div>
+        <div class="buttons is-right">
+            <a class="button is-danger"
+               href="#"
+               onClick="document.getElementById('delete-confirmation').submit()"
+               title="Delete {{ course.name }}">
+                <span class="icon">
+                    <i class="fas fa-trash"></i>
+                </span>
+                <span>Delete</span>
+            </a>
+            <a class="button is-light"
+               href='{% url "certifyingorganisation-detail" slug=course.certifying_organisation.slug %}'
+               title="Cancel">
+                <span class="icon">
+                    <i class="fas fa-arrow-left"></i>
+                </span>
+                <span>Cancel</span>
+            </a>
         </div>
     </form>
 {% endblock %}

@@ -23,10 +23,11 @@
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ form|crispy }}
-                <div class="vertical-space" style="margin-top: 400px;"></div>
-                <div class="form-actions">
-                    <input type="submit" name="submit" value="Submit"
-                           class="btn btn-primary">
+                <div class="vertical-space" style="margin-top: 450px;"></div>
+                <div class="field is-grouped mt-5">
+                    <div class="control">
+                        <button type="submit" name="submit" class="button is-success">Submit</button>
+                    </div>
                 </div>
             </form>
         </div>
