@@ -14,7 +14,7 @@ class UpdateChecklistReviewer(CertifyingOrganisationUserTestMixin):
     that was done by reviewer.
     """
 
-    def post(self, request, project_slug, slug):
+    def post(self, request, slug):
         post_data = request.POST.dict()
         organisation = CertifyingOrganisation.objects.get(
             slug=slug

@@ -382,23 +382,25 @@
                         </div>
                     </div>
                 </div>
-                <hr/>
-                <div>
-                    {% for question in submitted_checklist %}
-                        {% if question.checklist_target == 'organization_owner' %}
-                            <p>{{ question.checklist_question }}:
-                                {% if question.checked %}
-                                    <i class="fas fa-check-circle has-text-success"></i>
-                                {% else %}
-                                    <i class="fas fa-times-circle has-text-danger"></i>
+                {% if not certifyingorganisation.approved %}
+                    <hr/>
+                    <div>
+                        {% for question in submitted_checklist %}
+                            {% if question.checklist_target == 'organization_owner' %}
+                                <p>{{ question.checklist_question }}:
+                                    {% if question.checked %}
+                                        <i class="fas fa-check-circle has-text-success"></i>
+                                    {% else %}
+                                        <i class="fas fa-times-circle has-text-danger"></i>
+                                    {% endif %}
+                                </p>
+                                {% if question.text_box_content %}
+                                    <p>{{ question.text_box_content | base_markdown }}</p>
                                 {% endif %}
-                            </p>
-                            {% if question.text_box_content %}
-                                <p>{{ question.text_box_content | base_markdown }}</p>
                             {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
         </div>
         {% if certifyingorganisation.approved %}
