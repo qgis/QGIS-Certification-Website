@@ -32,7 +32,7 @@
                 'checklist_id': checklistId
             }, function (data) {
                 $('.badge-updated').stop(true, true).show().fadeOut(2000);
-                div.removeClass('btn-success').addClass('btn-warning').html('Archive').attr("onclick", `archive(${checklistId}, this)`);
+                div.removeClass('is-success').addClass('is-warning').html('Archive').attr("onclick", `archive(${checklistId}, this)`);
             })
         }
 
@@ -42,7 +42,7 @@
                 'checklist_id': checklistId
             }, function (data) {
                 $('.badge-updated').stop(true, true).show().fadeOut(2000);
-                div.removeClass('btn-warning').addClass('btn-success').html('Activate').attr("onclick", `activate(${checklistId}, this)`);
+                div.removeClass('is-warning').addClass('is-success').html('Activate').attr("onclick", `activate(${checklistId}, this)`);
             })
         }
     </script>
