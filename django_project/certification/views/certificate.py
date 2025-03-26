@@ -553,7 +553,7 @@ def update_paid_status(request, **kwargs):
 
 
 def top_up_unavailable(request, **kwargs):
-    project_slug = kwargs.get('project_slug', None)
+    project_slug = 'qgis'
     project = Project.objects.get(slug=project_slug)
     organisation = CertifyingOrganisation.objects.filter(approved=False)
     has_pending = False
@@ -570,7 +570,7 @@ def top_up_unavailable(request, **kwargs):
 def email_all_attendees(request, **kwargs):
     """Send email to all attendees in a course."""
 
-    project_slug = kwargs.get('project_slug', None)
+    project_slug = 'qgis'
     course_slug = kwargs.get('course_slug', None)
     organisation_slug = kwargs.get('organisation_slug', None)
     project = Project.objects.get(slug=project_slug)
