@@ -5,7 +5,7 @@ from django.urls import re_path as url
 
 from .api_views.checklist import UpdateChecklistReviewer
 from .views import (
-    homepage_view,
+    HomepageView,
     # Certifying Organisation.
     CertifyingOrganisationCreateView,
     CertifyingOrganisationDeleteView,
@@ -102,7 +102,7 @@ from .api_views.external_reviewer import UpdateExternalReviewerText
 
 urlpatterns = [
     # Home page
-    url(r'^$', view=homepage_view, name='home'),
+    url(r'^$', view=HomepageView.as_view(), name='home'),
 
     # Certifying Organisation management
     url(r'^pending-certifyingorganisation/list/$',
