@@ -27,6 +27,15 @@ if (mode === 'development') {
   plugins.push(new LiveReloadPlugin({ appendScriptTag: true }));
 }
 
+
+// List of libraries to expose globally
+const exposeLibraries = [
+  { name: 'jquery', exposes: ['$', 'jQuery'] },
+  { name: 'datatables.net', exposes: ['DataTable'] },
+  { name: 'moment', exposes: ['moment'] },
+  { name: 'leaflet', exposes: ['Leaflet'] },
+];
+
 module.exports = {
   entry: './base/static/js/index',
   output: {
@@ -36,38 +45,15 @@ module.exports = {
   plugins: plugins,
   module: {
     rules: [
-      // Expose jQuery globally
-      {
-        test: require.resolve('jquery'),
+      // Auto-generate expose-loader rules
+      ...exposeLibraries.map(lib => ({
+        test: require.resolve(lib.name),
         loader: 'expose-loader',
         options: {
-          exposes: ['$', 'jQuery'],
+          exposes: lib.exposes,
         },
-      },
-      // Expose DataTables globally
-      {
-        test: require.resolve('datatables.net'),
-        loader: 'expose-loader',
-        options: {
-          exposes: ['DataTable'],
-        },
-      },
-      // Expose Moment.js globally
-      {
-        test: require.resolve('moment'),
-        loader: 'expose-loader',
-        options: {
-          exposes: ['moment'],
-        },
-      },
-      // Expose Leaflet globally
-      {
-        test: require.resolve('leaflet'),
-        loader: 'expose-loader',
-        options: {
-          exposes: ['Leaflet'],
-        },
-      },
+      })),
+
       // CSS and SCSS rules
       {
         test: /\.css$/,
