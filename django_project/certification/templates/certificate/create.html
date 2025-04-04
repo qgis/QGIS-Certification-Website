@@ -7,34 +7,27 @@
 {% endblock page_title %}
 
 {% block content %}
+    <div class="box-content">
+        <h3 class="title is-4">Are you sure you want to issue this certificate?</h3>
+        <p><strong class="has-text-grey">Attendee:</strong> {{ attendee }}</p>
+        <p><strong class="has-text-grey">Course:</strong> {{ course.name }}</p>
+        <h4 class="subtitle is-5">Your organisation credits will be deducted by {{ course.certifying_organisation.project.certificate_credit }}</h4>
 
-    <div class="col-lg-10">
-    <div class="container">
-        <h3>Are you sure you want to issue this certificate?</h3>
-        <div style="border: 2px solid #f5f5f5; padding: 15px; width: 60%; font-size: 12pt">
-            <span class="col-lg-2" style="color: grey">Attendee</span><span class="col-lg-10"> {{ attendee }}</span></br>
-            <span class="col-lg-2" style="color: grey">Course</span><span class="col-lg-10"> {{ course.name }}</span></br>
-        </div>
-        <h4>Your organisation credits will be deducted by {{ course.certifying_organisation.project.certificate_credit }}</h4>
-    </div>
-
-
-    <section id="forms">
-        <div class='box-content' style="margin-top: 30px">
-            {% csrf_token %}
-            {% crispy form %}
-            {% for form in inlines %}
-                {% crispy form %}
-            {% endfor %}
-        </div>
-    </section>
-    </div>
-
-    <div class="col-lg-2" style="margin-top: 20px">
-        <a class="btn btn-default btn-sm tooltip-toggle pull-right"
-           href='{% url 'course-detail' organisation_slug=course.certifying_organisation.slug slug=course.slug %}'
-           data-title="Cancel">
-            <span class="glyphicon glyphicon-arrow-left"></span>
-        </a>
+        <section id="forms" style="margin-top: 30px;">
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="field is-grouped">
+                    <p class="control">
+                        <button type="submit" class="button is-success">Confirm</button>
+                    </p>
+                    <p class="control">
+                        <a class="button is-light" href="{% url 'course-detail' organisation_slug=course.certifying_organisation.slug slug=course.slug %}">
+                            Cancel
+                        </a>
+                    </p>
+                </div>
+            </form>
+        </section>
     </div>
 {% endblock %}

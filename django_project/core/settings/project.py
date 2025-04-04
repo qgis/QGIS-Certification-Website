@@ -53,9 +53,6 @@ MIDDLEWARE += [
 PIPELINE['JAVASCRIPT']['project'] = {
     'source_filenames': (
         'js/csrf-ajax.js',
-        'js/changelog.js',
-        'js/github-issue.js',
-        'js/entry.js',
         'js/form.js',
     ),
     'output_filename': 'js/project.js',

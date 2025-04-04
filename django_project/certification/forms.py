@@ -645,14 +645,6 @@ class CertificateForm(forms.ModelForm):
         else:
             self.fields['is_paid'].initial = False
         self.fields['is_paid'].widget = forms.HiddenInput()
-        self.helper.layout.append(
-            HTML(
-                '<button type="submit" class="button is-success mt-5" name="submit">'
-                '  <span class="icon"><i class="fas fa-check"></i></span>'
-                '  <span>Issue Certificate</span>'
-                '</button>'
-            )
-        )
 
     def clean(self):
         clean_data = self.cleaned_data
@@ -706,14 +698,14 @@ class OrganisationCertificateForm(forms.ModelForm):
         self.fields['certifying_organisation'].initial = \
             self.certifying_organisation
         self.fields['certifying_organisation'].widget = forms.HiddenInput()
-        self.helper.layout.append(
-            HTML(
-                '<button type="submit" class="button is-success mt-5" name="submit">'
-                '  <span class="icon"><i class="fas fa-check"></i></span>'
-                '  <span>Issue Certificate</span>'
-                '</button>'
-            )
-        )
+        # self.helper.layout.append(
+        #     HTML(
+        #         '<button type="submit" class="button is-success mt-5" name="submit">'
+        #         '  <span class="icon"><i class="fas fa-check"></i></span>'
+        #         '  <span>Issue Certificate</span>'
+        #         '</button>'
+        #     )
+        # )
 
     def save(self, commit=True):
         instance = super(OrganisationCertificateForm, self).save(commit=False)
