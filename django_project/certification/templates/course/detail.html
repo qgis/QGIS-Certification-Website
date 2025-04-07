@@ -271,14 +271,14 @@
                                         {% endif %}
                                         {% if attendee.attendee.pk in certificates %}
                                         {% if attendee.attendee.pk in paid_certificates %}
-                                        {% if course.editable %}
+                                        {% if attendee.editable %}
                                         <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Revoke Certificate" href='{% url "revoke-certificate" organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.attendee.pk %}'>
                                             <span class="icon is-small">
                                                 <i class="fas fa-exclamation-triangle"></i>
                                             </span>
                                         </a>
                                         {% else %}
-                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Revoke Certificate is only available 7 days after the completion of the course." href='#' disabled>
+                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Revoke Certificate is only available 7 days after the certificate is issued." href="#" disabled>
                                             <span class="icon is-small">
                                                 <i class="fas fa-exclamation-triangle"></i>
                                             </span>
