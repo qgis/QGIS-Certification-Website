@@ -29,7 +29,15 @@
             <div class="field">
                 <label class="label" for="creditAmount">Credits</label>
                 <div class="control">
-                    <input class="input is-medium" id="creditAmount" type="number" placeholder="Credits" name="total-credits">
+                    <input 
+                        class="input is-medium" 
+                        id="creditAmount"
+                        type="number"
+                        placeholder="Credits" 
+                        name="total-credits" 
+                        min="0" 
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                    >
                 </div>
             </div>
             <div class="notification is-primary3 is-light">
