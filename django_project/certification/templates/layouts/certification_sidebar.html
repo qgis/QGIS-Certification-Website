@@ -53,6 +53,13 @@
         </li>
       </ul>
     </li>
+    {% url 'archived-certifyingorganisation-list' as archived_organisation_list_url %}
+    <li class="{% if request.path == archived_organisation_list_url %}is-active{% endif %}">
+      <a href="{{ archived_organisation_list_url }}">
+        <i class="fas fa-archive mr-3"></i>
+        Archived Organisations
+      </a>
+    </li>
     <li>
       <div class="has-child">
         <a onclick="toggleSubMenu('verify-certificates')">

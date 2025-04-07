@@ -21,8 +21,7 @@
     <div class="columns is-vcentered">
         <div class="column">
             <h1 class="m-0">
-                {% if pending %} Pending {% else %}Unapproved {% endif %}
-                Certifying Organisations
+                Archived Certifying Organisations
             </h1>
         </div>
         {% if user.is_authenticated %}
@@ -46,16 +45,5 @@
         </div>
         {% endif %}
     </div>
-    {% if num_certifyingorganisations == 0 %}
-        {% if unapproved %}
-            <h3 class="subtitle is-4 has-text-centered">All certifying organisations are approved.</h3>
-        {% else %}
-            <h3 class="subtitle is-4 has-text-centered">
-                No certifying organisations are defined, but you can 
-                <a class="button is-success is-small" href='{% url "certifyingorganisation-create" %}'>create one</a>.
-            </h3>
-        {% endif %}
-    {% endif %}
-
-    {% include 'certifying_organisation/includes/certifying-organisation-datatable.html' with approved=False %}
+    {% include 'certifying_organisation/includes/certifying-organisation-datatable.html' with is_archived=True %}
 {% endblock %}
