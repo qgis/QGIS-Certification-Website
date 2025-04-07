@@ -69,6 +69,7 @@ from .views import (
     generate_all_certificate,
     preview_certificate,
     CertificateRevokeView,
+    GetCertificateTypeList,
 
     # Certificate for certifying organisation.
     OrganisationCertificateCreateView,
@@ -237,7 +238,7 @@ urlpatterns = [
         name='update-external-reviewer-text'),
 
     # Certificate.
-    url(r'^certifyingorganisation/(?P<organisation_slug>[\w-]+)/course/(?P<course_slug>[\w-]+)/courseattendee/(?P<pk>[\w-]+)/create-certificate/$',
+    url(r'^certifyingorganisation/(?P<organisation_slug>[\w-]+)/course/(?P<course_slug>[\w-]+)/courseattendee/(?P<pk>[\w-]+)/create-certificate/(?P<certificate_type_pk>[\w-]+)/$',
         view=CertificateCreateView.as_view(),
         name='certificate-create'),
     url(r'^certifyingorganisation/(?P<organisation_slug>[\w-]+)/course/(?P<course_slug>[\w-]+)/courseattendee/(?P<pk>[\w-]+)/update-certificate-status/$',
@@ -265,6 +266,9 @@ urlpatterns = [
         generate_all_certificate, name='generate-all-certificate'),
     url(r'^certifyingorganisation/(?P<organisation_slug>[\w-]+)/preview-certificate/$',
         preview_certificate, name='preview-certificate'),
+    url(r'^certificate-types-list/$',
+        view=GetCertificateTypeList.as_view(),
+        name='certificate-types-list'),
 
     # Course.
     url(r'^certifyingorganisation/(?P<organisation_slug>[\w-]+)/create-course/',

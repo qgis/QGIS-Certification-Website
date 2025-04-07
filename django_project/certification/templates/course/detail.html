@@ -16,7 +16,7 @@
             </div>
         {% endfor %}
     {% endif %}
-
+    {% include 'attendee/choose_certificate_type.html' %}
     <div class="columns">
         <div class="column is-9">
             <h1 class="title">{{ course.course_type.name }} ({{ course.start_date }} to {{ course.end_date }})</h1>
@@ -197,6 +197,7 @@
                                 <th>Name</th>
                                 <th>Certificate Issued?</th>
                                 <th>Certificate Number</th>
+                                <th>Certificate Type</th>
                                 {% if user in course.certifying_organisation.organisation_owners.all or user.is_staff or user == course.course_convener.user or user == project.owner or user in course.certifying_organisation.project.certification_managers.all %}
                                 <th>Actions</th>
                                 {% endif %}
@@ -224,6 +225,17 @@
                                     {% else %}
                                     -
                                     {% endif %}
+                                </td>
+                                <td class="has-text-centered">
+                                    {% with certificate_type=certificates_types|get_item:attendee.attendee.pk %}
+                                        {% if certificate_type %}
+                                            {{ certificate_type }}
+                                        {% elif course.certificate_type.name %}
+                                            {{ course.certificate_type.name }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    {% endwith %}
                                 </td>
                                 {% endwith %}
                                 {% if user in course.certifying_organisation.organisation_owners.all or user.is_staff or user == course.course_convener.user or user == project.owner or user in course.certifying_organisation.project.certification_managers.all %}
@@ -284,7 +296,12 @@
                                         {% endif %}
                                         {% else %}
                                         {% if course.certifying_organisation.organisation_credits >= course.certifying_organisation.project.certificate_credit %}
-                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Issue Certificate using credits" href='{% url "certificate-create" organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.attendee.pk %}'>
+                                        <a id="issueCertificateButton"
+                                        class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Issue Certificate using credits" 
+                                        href='#' attendee_certificate="{{ attendee.attendee.certificate_type.id }}"
+                                        attendee_id="{{ attendee.attendee.pk }}"
+                                        attendee_name="{{ attendee.attendee }}"
+                                        >
                                             <span class="icon is-small">
                                                 <i class="fas fa-check"></i>
                                             </span>
@@ -367,6 +384,57 @@
             link.click();
             return link;
         })
+
+        function closeChooseCertificateForm() {
+            document.forms['chooseCertificateForm'].reset();
+            $('#chooseCertificateModal').removeClass('is-active');
+        }
+
+        function submitChooseCertificateForm() {
+            let certificateType = $('[name="certificate-type"]').val();
+            let attendeeId = $('[name=attendee_id]').val();
+            let organisationSlug = '{{ course.certifying_organisation.slug }}'
+            let courseSlug = '{{ course.slug }}'
+
+            let url = `/{{ LANGUAGE_CODE }}/certifyingorganisation/` +
+                      `${organisationSlug}/course/` +
+                      `${courseSlug}/courseattendee/` +
+                      `${attendeeId}/create-certificate/` +
+                      `${certificateType}/`;
+            window.location.href = url;
+            closeChooseCertificateForm()
+        }
+
+        $('#issueCertificateButton').click(function () {
+            let initialCertType = $(this).attr('attendee_certificate');
+            let courseCertId = '{{ course.certificate_type.id }}';
+            let courseCert = '{{ course.certificate_type.name }}';
+            let url = '/{{ LANGUAGE_CODE }}/certificate-types-list/';
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    var $selectCertType = $('[name="certificate-type"]');
+                    $selectCertType.empty();
+                    for(var i=0; i<data.length; i++){
+                        let additionalStr = '';
+                        if (data[i].id === parseInt(courseCertId)) {
+                            additionalStr = ' (Course Certificate)';
+                        }
+
+                        if(data[i].id === parseInt(initialCertType)){
+                            $selectCertType.append('<option value=' + data[i].id + ' selected>' + data[i].name + additionalStr + '</option>')
+                        }else {
+                            $selectCertType.append('<option value=' + data[i].id + '>' + data[i].name + additionalStr + '</option>')
+                        }
+
+                    }
+                }
+            });
+            $('#attendee-name').html($(this).attr('attendee_name'));
+            $('[name=attendee_id]').val($(this).attr('attendee_id'));
+            $('#chooseCertificateModal').addClass('is-active');
+        });
     </script>
 
 {% endblock %}

@@ -97,6 +97,9 @@ class CertificateCreateView(
             CertificateCreateView, self).get_context_data(**kwargs)
         context['course'] = Course.objects.get(slug=self.course_slug)
         context['attendee'] = Attendee.objects.get(pk=self.pk)
+        context['certificate_type'] = CertificateType.objects.get(
+            pk=self.certificate_type_pk
+        )
         return context
 
     def get_form_kwargs(self):
@@ -110,13 +113,17 @@ class CertificateCreateView(
         self.project_slug = 'qgis'
         self.organisation_slug = self.kwargs.get('organisation_slug', None)
         self.course_slug = self.kwargs.get('course_slug', None)
+        self.certificate_type_pk = self.kwargs.get('certificate_type_pk', None)
         self.pk = self.kwargs.get('pk', None)
         self.course = Course.objects.get(slug=self.course_slug)
         self.attendee = Attendee.objects.get(pk=self.pk)
+        self.certificate_type = CertificateType.objects.get(
+            pk=self.certificate_type_pk)
         kwargs.update({
             'user': self.request.user,
             'course': self.course,
             'attendee': self.attendee,
+            'certificate_type': self.certificate_type
         })
         return kwargs
 
@@ -292,28 +299,38 @@ def generate_pdf(
                 course.course_type.instruction_hours)
 
     if project.image_file:
+        if hasattr(project.image_file, 'open'):
+            project.image_file.open()
         project_logo = ImageReader(project.image_file)
     else:
         project_logo = None
 
     if course.certifying_organisation.logo:
+        if hasattr(course.certifying_organisation.logo, 'open'):
+            course.certifying_organisation.logo.open()
         organisation_logo = ImageReader(
             course.certifying_organisation.logo)
     else:
         organisation_logo = None
 
     if project.project_representative_signature:
+        if hasattr(project.project_representative_signature, 'open'):
+            project.project_representative_signature.open()
         project_representative_signature = \
             ImageReader(project.project_representative_signature)
     else:
         project_representative_signature = None
 
     if course.course_convener.signature:
+        if hasattr(course.course_convener.signature, 'open'):
+            course.course_convener.signature.open()
         convener_signature = ImageReader(course.course_convener.signature)
     else:
         convener_signature = None
 
     if course.template_certificate:
+        if hasattr(course.template_certificate, 'open'):
+            course.template_certificate.open()
         background = ImageReader(course.template_certificate)
     else:
         background = None
@@ -460,10 +477,13 @@ def certificate_pdf_view(request, **kwargs):
         makepath = '/home/web/media/pdf/{}/'.format(project_folder)
         if not os.path.exists(makepath):
             os.makedirs(makepath)
+        certificate_type = course.certificate_type
+        if certificate.certificate_type:
+            certificate_type = certificate.certificate_type
 
         generate_pdf(
             pathname, project, course, attendee, certificate, current_site,
-            course.certificate_type.wording
+            certificate_type.wording
         )
         try:
             return FileResponse(open(pathname, 'rb'),
@@ -696,9 +716,13 @@ def regenerate_certificate(request, **kwargs):
             os.makedirs(makepath)
 
         current_site = request.META['HTTP_HOST']
+        certificate_type = course.certificate_type
+
+        if certificate.certificate_type:
+            certificate_type = certificate.certificate_type
         generate_pdf(
             pathname, project, course, attendee, certificate, current_site,
-            course.certificate_type.wording
+            certificate_type.wording
         )
         try:
             return FileResponse(open(pathname, 'rb'),
@@ -713,6 +737,7 @@ def regenerate_certificate(request, **kwargs):
             'has_pending_organisations': has_pending,
             'attendee': attendee,
             'id': certificate.certificateID,
+            'certificate_type': certificate.certificate_type,
             'course': course})
 
 
@@ -741,10 +766,10 @@ def generate_all_certificate(request, **kwargs):
 
         try:
             certificate = Certificate.objects.get(
-                author=request.user,
                 attendee=course_attendee.attendee,
                 course=course,
             )
+            print(f'Certificate already exists for {course_attendee.attendee}')
         except Certificate.DoesNotExist:
 
             remaining_credits = \
@@ -848,9 +873,12 @@ def regenerate_all_certificate(request, **kwargs):
                 os.path.join(
                     '/home/web/media',
                     'pdf/{}/{}'.format(project_folder, filename))
+            certificate_type = course.certificate_type
+            if value.certificate_type:
+                certificate_type = value.certificate_type
             generate_pdf(
                 pathname, project, course, key, value, current_site,
-                course.certificate_type.wording)
+                certificate_type.wording)
 
         messages.success(request, 'All certificates are updated', 'regenerate')
         return HttpResponseRedirect(url)

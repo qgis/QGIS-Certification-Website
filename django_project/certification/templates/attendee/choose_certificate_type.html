@@ -1,0 +1,39 @@
+<div class="modal" id="chooseCertificateModal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">
+        <b>Choose Certificate Type for <span id="attendee-name"></span></b>
+      </p>
+      <button class="delete" aria-label="close" onclick="closeChooseCertificateForm()"></button>
+    </header>
+    <section class="modal-card-body">
+      <form id="chooseCertificateForm">
+        <div class="field">
+          <label class="label">Certificate type:</label>
+          <div class="control">
+            <div class="select is-fullwidth">
+              <select name="certificate-type">
+              </select>
+            </div>
+          </div>
+        </div>
+        <input name="attendee_id" type="hidden">
+      </form>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button" onclick="closeChooseCertificateForm()">
+        <span class="icon">
+          <i class="fas fa-times"></i>
+        </span>
+        <span>Cancel</span>
+      </button>
+      <button class="button is-success" onclick="submitChooseCertificateForm()">
+        <span class="icon">
+          <i class="fas fa-check"></i>
+        </span>
+        <span>Submit</span>
+      </button>
+    </footer>
+  </div>
+</div>

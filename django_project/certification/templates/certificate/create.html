@@ -9,8 +9,9 @@
 {% block content %}
     <div class="box-content">
         <h3 class="title is-4">Are you sure you want to issue this certificate?</h3>
-        <p><strong class="has-text-grey">Attendee:</strong> {{ attendee }}</p>
-        <p><strong class="has-text-grey">Course:</strong> {{ course.name }}</p>
+        <p><span class="has-text-weight-semibold">Attendee:</span> {{ attendee }}</p>
+        <p><span class="has-text-weight-semibold">Course:</span> {{ course.name }}</p>
+        <p><span class="has-text-weight-semibold">Certificate type:</span> {{ certificate_type.name }}</p>
         <h4 class="subtitle is-5">Your organisation credits will be deducted by {{ course.certifying_organisation.project.certificate_credit }}</h4>
 
         <section id="forms" style="margin-top: 30px;">

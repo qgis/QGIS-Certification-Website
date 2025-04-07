@@ -328,6 +328,20 @@ build-devweb: db
 	@echo "------------------------------------------------------------------"
 	@docker compose build devweb
 
+devweb-updatemigrations:
+	@echo
+	@echo "------------------------------------------------------------------"
+	@echo "Update migrations in DEVELOPMENT mode"
+	@echo "------------------------------------------------------------------"
+	@docker compose exec devweb python manage.py makemigrations
+
+ devweb-migrate:
+	@echo
+	@echo "------------------------------------------------------------------"
+	@echo "Migrate in DEVELOPMENT mode"
+	@echo "------------------------------------------------------------------"
+	@docker compose exec devweb python manage.py migrate
+
 # Run pep8 style checking
 #http://pypi.python.org/pypi/pep8
 pep8:

@@ -20,6 +20,10 @@
                 <td>{{ attendee.firstname }} {{ attendee.surname|default_if_none:"" }}</td>
             </tr>
             <tr>
+                <th>Certificate type:</th>
+                <td>{{ certificate_type.name|default:course.certificate_type.name }}</td>
+            </tr>
+            <tr>
                 <th>Course:</th>
                 <td>{{ course.certifying_organisation.project }} - {{ course.course_type.name }} ({{ course.start_date }} to {{ course.end_date }})</td>
             </tr>

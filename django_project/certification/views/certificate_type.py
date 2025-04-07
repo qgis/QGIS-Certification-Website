@@ -6,6 +6,57 @@ from base.models.project import Project
 from certification.models.certificate_type import (
     CertificateType, ProjectCertificateType
 )
+from braces.views import UserPassesTestMixin
+from rest_framework import serializers, status
+
+
+from rest_framework.views import APIView, Response
+from django.contrib.sessions.models import Session
+from django.utils import timezone
+
+class CerticateTypeSerializer(serializers.ModelSerializer):
+    """Serializer for model CertificateType."""
+
+    class Meta:
+        model = CertificateType
+        fields = '__all__'
+
+
+class GetCertificateTypeList(UserPassesTestMixin, APIView):
+    """API to get list of certificate types."""
+
+    def test_func(self, user):
+        if not user.is_anonymous:
+            return True
+        else:
+            session = self.request.GET.get('s', None)
+            try:
+                session = Session.objects.get(
+                    pk=session
+                )
+                return (
+                    session.expire_date > timezone.now()
+                )
+            except Session.DoesNotExist:
+                return False
+
+    def get(self, request):
+        try:
+            project = Project.objects.get(slug='qgis')
+            project_certificate_types = \
+                ProjectCertificateType.objects.filter(
+                    project=project
+                ).select_related('certificate_type').all()
+            certificate_types = [
+                pct.certificate_type for pct in project_certificate_types
+            ]
+            serializer = CerticateTypeSerializer(certificate_types, many=True)
+            return Response(serializer.data)
+        except Project.DoesNotExist:
+            return Response(
+                'Project does not exist.',
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 def update_project_certificate_view(request):

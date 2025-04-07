@@ -16,6 +16,7 @@
                     <thead>
                         <tr>
                             <th>Certificate ID</th>
+                            <th>Certificate type</th>
                             <th>Attendee</th>
                         </tr>
                     </thead>
@@ -23,6 +24,7 @@
                         {% for key, value in certificates.items %}
                             <tr>
                                 <td>{{ value.certificateID }}</td>
+                                <td>{{ value.certificate_type.name|default:course.certificate_type.name }}</td>
                                 <td>{{ key.firstname }} {{ key.surname|default_if_none:"" }}</td>
                             </tr>
                         {% endfor %}
