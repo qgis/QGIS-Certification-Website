@@ -27,32 +27,34 @@
         Approved Organisations
       </a>
     </li>
-    <li>
-      <div class="has-child">
-        <a onclick="toggleSubMenu('pending-organisations')">
-          <i class="fas fa-clock mr-3"></i>
-          Pending Organisations
-        </a>
-        <span onclick="toggleSubMenu('pending-organisations')" class="drop-arrow">
-          <img src="{% static 'images/arrow.svg' %}"/>
-        </span>
-      </div>
-      <ul id="pending-organisations" class="collapsed">
-        {% url 'pending-certifyingorganisation-list' as pending_url %}
-        <li>
-          <a href="{{ pending_url }}?ready=False">
+    {% if user.is_staff %}
+      <li>
+        <div class="has-child">
+          <a onclick="toggleSubMenu('pending-organisations')">
             <i class="fas fa-clock mr-3"></i>
-            Not Ready
+            Pending Organisations
           </a>
-        </li>
-        <li>
-          <a href="{{ pending_url }}?ready=True">
-            <i class="fas fa-check-circle mr-3"></i>
-            Ready
-          </a>
-        </li>
-      </ul>
-    </li>
+          <span onclick="toggleSubMenu('pending-organisations')" class="drop-arrow">
+            <img src="{% static 'images/arrow.svg' %}"/>
+          </span>
+        </div>
+        <ul id="pending-organisations" class="collapsed">
+          {% url 'pending-certifyingorganisation-list' as pending_url %}
+          <li>
+            <a href="{{ pending_url }}?ready=False">
+              <i class="fas fa-clock mr-3"></i>
+              Not Ready
+            </a>
+          </li>
+          <li>
+            <a href="{{ pending_url }}?ready=True">
+              <i class="fas fa-check-circle mr-3"></i>
+              Ready
+            </a>
+          </li>
+        </ul>
+      </li>
+    {% endif %}
     {% url 'archived-certifyingorganisation-list' as archived_organisation_list_url %}
     <li class="{% if request.path == archived_organisation_list_url %}is-active{% endif %}">
       <a href="{{ archived_organisation_list_url }}">

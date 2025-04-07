@@ -24,7 +24,11 @@ from django.http import HttpResponseRedirect, Http404
 from django.db import IntegrityError
 from django.shortcuts import render
 from django.core.exceptions import ValidationError
-from braces.views import LoginRequiredMixin, UserPassesTestMixin
+from braces.views import (
+    LoginRequiredMixin,
+    UserPassesTestMixin,
+    StaffuserRequiredMixin
+)
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from django.contrib.sessions.models import Session
 from pure_pagination.mixins import PaginationMixin
@@ -85,6 +89,23 @@ class JSONResponseMixin(object):
             first_flag = False
         result += u'\n}'
         return result
+
+
+class CustomStaffuserRequiredMixin(StaffuserRequiredMixin):
+    """Fix redirect loop when user is already authenticated but non staff."""
+    def no_permissions_fail(self, request=None):
+        """
+        Called when the user has no permissions and no exception was raised.
+        """
+        if not request.user.is_authenticated:
+            return super(
+                CustomStaffuserRequiredMixin, self).no_permissions_fail(
+                request)
+
+        return HttpResponse(
+            'Sorry! You do not have permission to perform this action.',
+            status=403
+        )
 
 
 class CertifyingOrganisationMixin(object):
@@ -974,6 +995,7 @@ class CertifyingOrganisationJson(BaseDatatableView):
 
 
 class PendingCertifyingOrganisationListView(
+    CustomStaffuserRequiredMixin,
     LoginRequiredMixin,
     CertifyingOrganisationMixin,
     PaginationMixin,
