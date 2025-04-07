@@ -170,11 +170,26 @@
                             <i class="fas fa-download"></i>
                         </span>
                     </a>
+                    {% if course.certifying_organisation.organisation_credits >= attendees.count and attendees.count > 0 %}
                     <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Generate all certificate for this course" href='{% url "generate-all-certificate" organisation_slug=course.certifying_organisation.slug course_slug=course.slug %}'>
                         <span class="icon is-small">
                             <i class="fas fa-folder-open"></i>
                         </span>
                     </a>
+                    {% elif course.certifying_organisation.organisation_credits > 0 and attendees.count == 0 %}
+                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="No attendees to generate certificates." >
+                        <span class="icon is-small">
+                            <i class="fas fa-folder-open"></i>
+                        </span>
+                    </a>
+                    {% else %}
+                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Top up credits to generate all certificates." >
+                        <span class="icon is-small">
+                            <i class="fas fa-folder-open"></i>
+                        </span>
+                    </a>
+                    {% endif %}
+
                     <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Re-generate all PDF certificate for this course" href='{% url "regenerate-all-certificate" organisation_slug=course.certifying_organisation.slug course_slug=course.slug %}'>
                         <span class="icon is-small">
                             <i class="fas fa-redo"></i>

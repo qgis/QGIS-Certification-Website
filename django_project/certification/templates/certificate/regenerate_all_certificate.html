@@ -22,11 +22,13 @@
                     </thead>
                     <tbody>
                         {% for key, value in certificates.items %}
-                            <tr>
-                                <td>{{ value.certificateID }}</td>
-                                <td>{{ value.certificate_type.name|default:course.certificate_type.name }}</td>
-                                <td>{{ key.firstname }} {{ key.surname|default_if_none:"" }}</td>
-                            </tr>
+                            {% if value.is_paid %}
+                                <tr>
+                                    <td>{{ value.certificateID }}</td>
+                                    <td>{{ value.certificate_type.name|default:course.certificate_type.name }}</td>
+                                    <td>{{ key.firstname }} {{ key.surname|default_if_none:"" }}</td>
+                                </tr>
+                            {% endif %}
                         {% endfor %}
                     </tbody>
                 </table>
