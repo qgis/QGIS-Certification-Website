@@ -32,7 +32,7 @@ $(function () {
     order: [[0, 'asc']],
     ajax: `${ajaxUrl}?ready=${ready}${approvedParam}${isArchivedParam}`,
     columnDefs: [
-      { bSortable: false, aTargets: [1, 2] },
+      { bSortable: true, aTargets: [1, 2] },
       {
         targets: [1, 2],
       },
