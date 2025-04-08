@@ -1,4 +1,4 @@
-{% extends "layouts/certification_base.html" %}
+{% extends "base_with_sidebar.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
 {% load custom_markup %}
@@ -10,23 +10,13 @@
 
 {% block content %}
     {% if messages %}
-        <div class="notification is-primary">
-            {% for message in messages %}
-                <p class="message">{{ message }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if messages %}
-    <div class="notification is-success">
         {% for message in messages %}
-            {% if 'email_sent' in message.tags or 'regenerate' in message.tags %}
-                <p class="message">{{ message }}</p>
-            {% endif %}
+            <div class="notification is-light {% if 'email_sent' in message.tags or 'regenerate' in message.tags %}is-success{% else %}is-primary3{% endif %}">
+                <p>{{ message }}</p>
+            </div>
         {% endfor %}
-    </div>
     {% endif %}
-
+    {% include 'attendee/choose_certificate_type.html' %}
     <div class="columns">
         <div class="column is-9">
             <h1 class="title">{{ course.course_type.name }} ({{ course.start_date }} to {{ course.end_date }})</h1>
@@ -37,14 +27,14 @@
                 {% if user in course.certifying_organisation.organisation_owners.all or user.is_staff or user == course.course_convener.user or user == project.owner or user in course.certifying_organisation.project.certification_managers.all %}
                     <a class="button is-danger is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" 
                        data-tooltip="Delete Course"
-                       href='{% url "course-delete" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug slug=course.slug %}'>
+                       href='{% url "course-delete" organisation_slug=course.certifying_organisation.slug slug=course.slug %}'>
                         <span class="icon">
                             <i class="fas fa-trash"></i>
                         </span>
                     </a>
                     <a class="button is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" 
                        data-tooltip="Edit Course"
-                       href='{% url "course-update" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug slug=course.slug %}'>
+                       href='{% url "course-update" organisation_slug=course.certifying_organisation.slug slug=course.slug %}'>
                         <span class="icon">
                             <i class="fas fa-pencil-alt"></i>
                         </span>
@@ -52,7 +42,7 @@
                 {% endif %}
                 <a class="button is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" 
                    data-tooltip="Back to Organisation"
-                   href='{% url "certifyingorganisation-detail" course.certifying_organisation.project.slug course.certifying_organisation.slug %}'>
+                   href='{% url "certifyingorganisation-detail" course.certifying_organisation.slug %}'>
                     <span class="icon">
                         <i class="fas fa-arrow-left"></i>
                     </span>
@@ -129,7 +119,7 @@
                         {% if user in course.certifying_organisation.organisation_owners.all or user.is_staff or user == course.course_convener.user or user == project.owner or user in certifyingorganisation.project.certification_managers.all %}
                         <a class="button is-success has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" 
                             data-tooltip="Top up credits"
-                            href='{% url "top-up" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug %}'
+                            href='{% url "top-up" organisation_slug=course.certifying_organisation.slug %}'
                         >
                             <span class="icon">
                                 <i class="fas fa-shopping-cart"></i>
@@ -160,37 +150,52 @@
                 </p>
                 {% if user in course.certifying_organisation.organisation_owners.all or user.is_staff or user == course.course_convener.user or user == project.owner or user in course.certifying_organisation.project.certification_managers.all %}
                 <div class="buttons card-header-icon">
-                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Add Course Attendees" href='{% url 'courseattendee-create' project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug slug=course.slug %}'>
+                    <a class="button is-success is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Add Course Attendees" href='{% url 'courseattendee-create' organisation_slug=course.certifying_organisation.slug slug=course.slug %}'>
                         <span class="icon is-small">
                             <i class="fas fa-plus"></i>
                         </span>
                     </a>
-                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom btn-download-table-csv" data-tooltip="Download table as CSV" href="#">
+                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" id="download-table-csv" data-tooltip="Download table as CSV" href="#">
                         <span class="icon is-small">
                             <i class="fas fa-file-csv"></i>
                         </span>
                     </a>
-                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Import Attendees from CSV file." href='{% url "upload-attendee" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug slug=course.slug %}'>
+                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Import Attendees from CSV file." href='{% url "upload-attendee" organisation_slug=course.certifying_organisation.slug slug=course.slug %}'>
                         <span class="icon is-small">
                             <i class="fas fa-upload"></i>
                         </span>
                     </a>
-                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Download all issued certificates from this course" href='{% url "download_zip_all" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug course_slug=course.slug %}'>
+                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Download all issued certificates from this course" href='{% url "download_zip_all" organisation_slug=course.certifying_organisation.slug course_slug=course.slug %}'>
                         <span class="icon is-small">
                             <i class="fas fa-download"></i>
                         </span>
                     </a>
-                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Generate all certificate for this course" href='{% url "generate-all-certificate" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug course_slug=course.slug %}'>
+                    {% if course.certifying_organisation.organisation_credits >= attendees.count and attendees.count > 0 %}
+                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Generate all certificate for this course" href='{% url "generate-all-certificate" organisation_slug=course.certifying_organisation.slug course_slug=course.slug %}'>
                         <span class="icon is-small">
                             <i class="fas fa-folder-open"></i>
                         </span>
                     </a>
-                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Re-generate all PDF certificate for this course" href='{% url "regenerate-all-certificate" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug course_slug=course.slug %}'>
+                    {% elif course.certifying_organisation.organisation_credits > 0 and attendees.count == 0 %}
+                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="No attendees to generate certificates." >
+                        <span class="icon is-small">
+                            <i class="fas fa-folder-open"></i>
+                        </span>
+                    </a>
+                    {% else %}
+                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Top up credits to generate all certificates." >
+                        <span class="icon is-small">
+                            <i class="fas fa-folder-open"></i>
+                        </span>
+                    </a>
+                    {% endif %}
+
+                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Re-generate all PDF certificate for this course" href='{% url "regenerate-all-certificate" organisation_slug=course.certifying_organisation.slug course_slug=course.slug %}'>
                         <span class="icon is-small">
                             <i class="fas fa-redo"></i>
                         </span>
                     </a>
-                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Email all participants with the link to their certificates." href='{% url "send_email" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug course_slug=course.slug %}'>
+                    <a class="button is-light is-small has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Email all participants with the link to their certificates." href='{% url "send_email" organisation_slug=course.certifying_organisation.slug course_slug=course.slug %}'>
                         <span class="icon is-small">
                             <i class="fas fa-envelope"></i>
                         </span>
@@ -201,12 +206,13 @@
             <div class="card-content">
                 <div class="content">
                     {% if user in course.certifying_organisation.organisation_owners.all or user.is_staff or user == course.course_convener.user or user == project.owner or user in course.certifying_organisation.project.certification_managers.all %}
-                    <table class="table is-fullwidth is-hoverable">
+                    <table id="course-attendees-table" class="table is-fullwidth is-hoverable">
                         <thead>
                             <tr>
                                 <th>Name</th>
                                 <th>Certificate Issued?</th>
                                 <th>Certificate Number</th>
+                                <th>Certificate Type</th>
                                 {% if user in course.certifying_organisation.organisation_owners.all or user.is_staff or user == course.course_convener.user or user == project.owner or user in course.certifying_organisation.project.certification_managers.all %}
                                 <th>Actions</th>
                                 {% endif %}
@@ -235,12 +241,23 @@
                                     -
                                     {% endif %}
                                 </td>
+                                <td class="has-text-centered">
+                                    {% with certificate_type=certificates_types|get_item:attendee.attendee.pk %}
+                                        {% if certificate_type %}
+                                            {{ certificate_type }}
+                                        {% elif course.certificate_type.name %}
+                                            {{ course.certificate_type.name }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    {% endwith %}
+                                </td>
                                 {% endwith %}
                                 {% if user in course.certifying_organisation.organisation_owners.all or user.is_staff or user == course.course_convener.user or user == project.owner or user in course.certifying_organisation.project.certification_managers.all %}
                                 <td>
                                     <div class="buttons is-right">
                                         {% if attendee.editable %}
-                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Edit Attendee" href='{% url "attendee-update" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.attendee.pk %}'>
+                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Edit Attendee" href='{% url "attendee-update" organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.attendee.pk %}'>
                                             <span class="icon is-small">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </span>
@@ -254,38 +271,38 @@
                                         {% endif %}
                                         {% if attendee.attendee.pk in certificates %}
                                         {% if attendee.attendee.pk in paid_certificates %}
-                                        {% if course.editable %}
-                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Revoke Certificate" href='{% url "revoke-certificate" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.attendee.pk %}'>
+                                        {% if attendee.editable %}
+                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Revoke Certificate" href='{% url "revoke-certificate" organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.attendee.pk %}'>
                                             <span class="icon is-small">
                                                 <i class="fas fa-exclamation-triangle"></i>
                                             </span>
                                         </a>
                                         {% else %}
-                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Revoke Certificate is only available 7 days after the completion of the course." href='#' disabled>
+                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Revoke Certificate is only available 7 days after the certificate is issued." href="#" disabled>
                                             <span class="icon is-small">
                                                 <i class="fas fa-exclamation-triangle"></i>
                                             </span>
                                         </a>
                                         {% endif %}
-                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Print Certificate" href='{% url "print-certificate" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.attendee.pk %}'>
+                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Print Certificate" href='{% url "print-certificate" organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.attendee.pk %}'>
                                             <span class="icon is-small">
                                                 <i class="fas fa-print"></i>
                                             </span>
                                         </a>
-                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Re-generate PDF certificate for this attendee" href='{% url "regenerate-certificate" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.attendee.pk %}'>
+                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Re-generate PDF certificate for this attendee" href='{% url "regenerate-certificate" organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.attendee.pk %}'>
                                             <span class="icon is-small">
                                                 <i class="fas fa-redo"></i>
                                             </span>
                                         </a>
                                         {% else %}
                                         {% if course.certifying_organisation.organisation_credits >= course.certifying_organisation.project.certificate_credit %}
-                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Pay this certificate using credits" href='{% url "paid-certificate" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.attendee.pk %}'>
+                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Pay this certificate using credits" href='{% url "paid-certificate" organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.attendee.pk %}'>
                                             <span class="icon is-small">
                                                 <i class="fas fa-dollar-sign"></i>
                                             </span>
                                         </a>
                                         {% else %}
-                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Top up credits to print the certificate" href='{% url "top-up" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug %}'>
+                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Top up credits to print the certificate" href='{% url "top-up" organisation_slug=course.certifying_organisation.slug %}'>
                                             <span class="icon is-small">
                                                 <i class="fas fa-shopping-cart"></i>
                                             </span>
@@ -294,20 +311,25 @@
                                         {% endif %}
                                         {% else %}
                                         {% if course.certifying_organisation.organisation_credits >= course.certifying_organisation.project.certificate_credit %}
-                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Issue Certificate using credits" href='{% url "certificate-create" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.attendee.pk %}'>
+                                        <a id="issueCertificateButton"
+                                        class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Issue Certificate using credits" 
+                                        href='#' attendee_certificate="{{ attendee.attendee.certificate_type.id }}"
+                                        attendee_id="{{ attendee.attendee.pk }}"
+                                        attendee_name="{{ attendee.attendee }}"
+                                        >
                                             <span class="icon is-small">
                                                 <i class="fas fa-check"></i>
                                             </span>
                                         </a>
                                         {% else %}
-                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Top up credits to issue the certificate" href='{% url "top-up" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug %}'>
+                                        <a class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Top up credits to issue the certificate" href='{% url "top-up" organisation_slug=course.certifying_organisation.slug %}'>
                                             <span class="icon is-small">
                                                 <i class="fas fa-shopping-cart"></i>
                                             </span>
                                         </a>
                                         {% endif %}
                                         {% endif %}
-                                        <a class="button is-small is-light is-danger has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Delete Course Attendee" href='{% url "courseattendee-delete" project_slug=course.certifying_organisation.project.slug organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.pk %}'>
+                                        <a class="button is-small is-light is-danger has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Delete Course Attendee" href='{% url "courseattendee-delete" organisation_slug=course.certifying_organisation.slug course_slug=course.slug pk=attendee.pk %}'>
                                             <span class="icon is-small">
                                                 <i class="fas fa-trash"></i>
                                             </span>
@@ -321,7 +343,7 @@
                         </tbody>
                     </table>
                     {% else %}
-                    <div class="notification is-warning">
+                    <div class="notification is-warning is-light">
                         <i class="fas fa-eye-slash"></i> Only authorized users can see the list of course attendees.
                     </div>
                     {% endif %}
@@ -353,48 +375,8 @@
             $('.messages').fadeOut('fast')
         });
 
-        $('#download-zip, .btn-print, .btn-info-focus').hover(
-            function (){
-                $(this).removeClass('btn-default').addClass('btn-info')
-            },
-            function () {
-                $(this).removeClass('btn-info').addClass('btn-default')
-            }
-        );
-        $('.btn-delete').hover(
-            function (){
-                $(this).removeClass('btn-default').addClass('btn-danger')
-            },
-            function (){
-                $(this).removeClass('btn-danger').addClass('btn-default')
-            }
-        );
-        $('.btn-primary-focus').hover(
-            function (){
-                $(this).removeClass('btn-default').addClass('btn-primary')
-            },
-            function (){
-                $(this).removeClass('btn-primary').addClass('btn-default')
-            }
-        );
-        $('.btn-issue').hover(
-            function (){
-                $(this).removeClass('btn-default').addClass('btn-warning')
-            },
-            function (){
-                $(this).removeClass('btn-warning').addClass('btn-default')
-            }
-        );
-        $('.btn-top-up').hover(
-            function (){
-                $(this).removeClass('btn-default').addClass('btn-success')
-            },
-            function (){
-                $(this).removeClass('btn-success').addClass('btn-default')
-            }
-        );
-        $('.btn-download-table-csv').click(function (e) {
-            const table = document.querySelector('.course-attendees-table');
+        $('#download-table-csv').click(function (e) {
+            const table = document.querySelector('#course-attendees-table');
             const arr = [...table.rows].map(r => [...r.querySelectorAll('td, th')].map(td => td.textContent.replace(/\n/g, "").trim()));
             let csv = '';
             for (let array of arr) {
@@ -417,6 +399,57 @@
             link.click();
             return link;
         })
+
+        function closeChooseCertificateForm() {
+            document.forms['chooseCertificateForm'].reset();
+            $('#chooseCertificateModal').removeClass('is-active');
+        }
+
+        function submitChooseCertificateForm() {
+            let certificateType = $('[name="certificate-type"]').val();
+            let attendeeId = $('[name=attendee_id]').val();
+            let organisationSlug = '{{ course.certifying_organisation.slug }}'
+            let courseSlug = '{{ course.slug }}'
+
+            let url = `/{{ LANGUAGE_CODE }}/certifyingorganisation/` +
+                      `${organisationSlug}/course/` +
+                      `${courseSlug}/courseattendee/` +
+                      `${attendeeId}/create-certificate/` +
+                      `${certificateType}/`;
+            window.location.href = url;
+            closeChooseCertificateForm()
+        }
+
+        $('#issueCertificateButton').click(function () {
+            let initialCertType = $(this).attr('attendee_certificate');
+            let courseCertId = '{{ course.certificate_type.id }}';
+            let courseCert = '{{ course.certificate_type.name }}';
+            let url = '/{{ LANGUAGE_CODE }}/certificate-types-list/';
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    var $selectCertType = $('[name="certificate-type"]');
+                    $selectCertType.empty();
+                    for(var i=0; i<data.length; i++){
+                        let additionalStr = '';
+                        if (data[i].id === parseInt(courseCertId)) {
+                            additionalStr = ' (Course Certificate)';
+                        }
+
+                        if(data[i].id === parseInt(initialCertType)){
+                            $selectCertType.append('<option value=' + data[i].id + ' selected>' + data[i].name + additionalStr + '</option>')
+                        }else {
+                            $selectCertType.append('<option value=' + data[i].id + '>' + data[i].name + additionalStr + '</option>')
+                        }
+
+                    }
+                }
+            });
+            $('#attendee-name').html($(this).attr('attendee_name'));
+            $('[name=attendee_id]').val($(this).attr('attendee_id'));
+            $('#chooseCertificateModal').addClass('is-active');
+        });
     </script>
 
 {% endblock %}

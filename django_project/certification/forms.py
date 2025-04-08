@@ -16,10 +16,10 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import (
     Layout,
     Fieldset,
+    HTML,
     Submit,
     Field,
 )
-from crispy_bulma.widgets import FileUploadInput
 
 from .models import (
     CertifyingOrganisation,
@@ -33,6 +33,10 @@ from .models import (
     Certificate,
     CertifyingOrganisationCertificate, Checklist, OrganisationChecklist
 )
+
+from crispy_bulma.widgets import FileUploadInput
+
+FileUploadInput.template_name = 'widgets/file_upload_input.html'
 
 class MultiSelectWidget(forms.SelectMultiple):
     template_name = 'widgets/multiselect.html'
@@ -108,11 +112,12 @@ class CertifyingOrganisationForm(forms.ModelForm):
             self.fields['owner_message'].widget = (
                 forms.HiddenInput()
             )
-        self.helper.add_input(
-            Submit(
-                'submit',
-                'Submit',
-                css_class='button is-success pt-2 mt-5'
+        self.helper.layout.append(
+            HTML(
+                '<button type="submit" class="button is-success mt-5" name="submit">'
+                '  <span class="icon"><i class="fas fa-check"></i></span>'
+                '  <span>Submit</span>'
+                '</button>'
             )
         )
 
@@ -213,7 +218,14 @@ class CourseTypeForm(forms.ModelForm):
         self.fields['certifying_organisation'].initial = \
             self.certifying_organisation
         self.fields['certifying_organisation'].widget = forms.HiddenInput()
-        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
+        self.helper.layout.append(
+            HTML(
+                '<button type="submit" class="button is-success mt-5" name="submit">'
+                '  <span class="icon"><i class="fas fa-check"></i></span>'
+                '  <span>Submit</span>'
+                '</button>'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(CourseTypeForm, self).save(commit=False)
@@ -224,6 +236,7 @@ class CourseTypeForm(forms.ModelForm):
 
 class CourseConvenerForm(forms.ModelForm):
 
+    signature = forms.ImageField(widget=FileUploadInput)
     user = forms.ModelChoiceField(
         queryset=User.objects.order_by('username'),
         widget=forms.Select)
@@ -259,7 +272,14 @@ class CourseConvenerForm(forms.ModelForm):
         super(CourseConvenerForm, self).__init__(*args, **kwargs)
         self.fields['user'].label_from_instance = \
             lambda obj: "%s < %s >" % (obj.get_full_name(), obj)
-        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
+        self.helper.layout.append(
+            HTML(
+                '<button type="submit" class="button is-success mt-5" name="submit">'
+                '  <span class="icon"><i class="fas fa-check"></i></span>'
+                '  <span>Submit</span>'
+                '</button>'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(CourseConvenerForm, self).save(commit=False)
@@ -358,7 +378,14 @@ class TrainingCenterForm(geoforms.ModelForm):
                         lon = data['properties']['LON']
         point = Point(x=lon, y=lat, srid=4326)
         self.fields['location'].initial = point
-        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
+        self.helper.layout.append(
+            HTML(
+                '<button type="submit" class="button is-success mt-5" name="submit">'
+                '  <span class="icon"><i class="fas fa-check"></i></span>'
+                '  <span>Submit</span>'
+                '</button>'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(TrainingCenterForm, self).save(commit=False)
@@ -371,6 +398,17 @@ class TrainingCenterForm(geoforms.ModelForm):
 class CourseForm(forms.ModelForm):
 
     # noinspection PyClassicStyleClass.
+    # Override the `trained_competence` field to add a character limit
+    trained_competence = forms.CharField(
+        max_length=120,
+        help_text=(
+            'Trained competence e.g. Plugin development '
+            '(max 120 characters).'
+        ),
+        widget=forms.TextInput(
+            attrs={'class': 'form-control', 'maxlength': '120'}
+        ),
+    )
     template_certificate = forms.ImageField(widget=FileUploadInput)
     class Meta:
         model = Course
@@ -425,7 +463,14 @@ class CourseForm(forms.ModelForm):
         self.fields['certifying_organisation'].initial = \
             self.certifying_organisation
         self.fields['certifying_organisation'].widget = forms.HiddenInput()
-        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
+        self.helper.layout.append(
+            HTML(
+                '<button type="submit" class="button is-success mt-5" name="submit">'
+                '  <span class="icon"><i class="fas fa-check"></i></span>'
+                '  <span>Submit</span>'
+                '</button>'
+            )
+        )
         self.fields['certificate_type'].queryset = \
             CertificateType.objects.filter(
                 projectcertificatetype__project=
@@ -466,7 +511,14 @@ class CourseAttendeeForm(forms.ModelForm):
                 certifying_organisation=self.certifying_organisation)
         self.fields['course'].initial = self.course
         self.fields['course'].widget = forms.HiddenInput()
-        self.helper.add_input(Submit('submit', 'Add'))
+        self.helper.layout.append(
+            HTML(
+                '<button type="submit" class="button is-success mt-5" name="submit">'
+                '  <span class="icon"><i class="fas fa-plus"></i></span>'
+                '  <span>Add</span>'
+                '</button>'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(CourseAttendeeForm, self).save(commit=False)
@@ -512,7 +564,14 @@ class AttendeeForm(forms.ModelForm):
         self.fields['certifying_organisation'].initial = \
             self.certifying_organisation
         self.fields['certifying_organisation'].widget = forms.HiddenInput()
-        self.helper.add_input(Submit('submit', 'Add'))
+        self.helper.layout.append(
+            HTML(
+                '<button type="submit" class="button is-success mt-5" name="submit">'
+                '  <span class="icon"><i class="fas fa-plus"></i></span>'
+                '  <span>Add</span>'
+                '</button>'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(AttendeeForm, self).save(commit=False)
@@ -551,7 +610,14 @@ class UpdateAttendeeForm(forms.ModelForm):
         self.fields['certifying_organisation'].initial = \
             self.certifying_organisation
         self.fields['certifying_organisation'].widget = forms.HiddenInput()
-        self.helper.add_input(Submit('submit', 'Add'))
+        self.helper.layout.append(
+            HTML(
+                '<button type="submit" class="button is-success mt-5" name="submit">'
+                '  <span class="icon"><i class="fas fa-plus"></i></span>'
+                '  <span>Add</span>'
+                '</button>'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(UpdateAttendeeForm, self).save(commit=False)
@@ -567,6 +633,7 @@ class CertificateForm(forms.ModelForm):
         fields = (
             'course',
             'attendee',
+            'certificate_type',
             'is_paid',
         )
 
@@ -574,6 +641,7 @@ class CertificateForm(forms.ModelForm):
         self.user = kwargs.pop('user')
         self.course = kwargs.pop('course')
         self.attendee = kwargs.pop('attendee')
+        self.certificate_type = kwargs.pop('certificate_type')
         organisation_credits = \
             self.course.certifying_organisation.organisation_credits
         cost = self.course.certifying_organisation.project.certificate_credit
@@ -585,12 +653,13 @@ class CertificateForm(forms.ModelForm):
         self.fields['course'].widget = forms.HiddenInput()
         self.fields['attendee'].initial = self.attendee
         self.fields['attendee'].widget = forms.HiddenInput()
+        self.fields['certificate_type'].initial = self.certificate_type
+        self.fields['certificate_type'].widget = forms.HiddenInput()
         if remaining_credits >= 0:
             self.fields['is_paid'].initial = True
         else:
             self.fields['is_paid'].initial = False
         self.fields['is_paid'].widget = forms.HiddenInput()
-        self.helper.add_input(Submit('submit', 'Issue Certificate'))
 
     def clean(self):
         clean_data = self.cleaned_data
@@ -610,6 +679,7 @@ class CertificateForm(forms.ModelForm):
         instance.author = self.user
         instance.course = self.course
         instance.attendee = self.attendee
+        instance.certificate_type = self.certificate_type
         instance.save()
         return instance
 
@@ -619,7 +689,7 @@ class CsvAttendeeForm(forms.Form):
 
     file = forms.FileField(
         label="Choose Attendee CSV File:",
-        widget=forms.FileInput(
+        widget=FileUploadInput(
             attrs={
                 'accept': ".csv"
             }
@@ -644,7 +714,14 @@ class OrganisationCertificateForm(forms.ModelForm):
         self.fields['certifying_organisation'].initial = \
             self.certifying_organisation
         self.fields['certifying_organisation'].widget = forms.HiddenInput()
-        self.helper.add_input(Submit('submit', 'Issue Certificate'))
+        # self.helper.layout.append(
+        #     HTML(
+        #         '<button type="submit" class="button is-success mt-5" name="submit">'
+        #         '  <span class="icon"><i class="fas fa-check"></i></span>'
+        #         '  <span>Issue Certificate</span>'
+        #         '</button>'
+        #     )
+        # )
 
     def save(self, commit=True):
         instance = super(OrganisationCertificateForm, self).save(commit=False)

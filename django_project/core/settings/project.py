@@ -15,11 +15,7 @@ import json
 # Project apps
 INSTALLED_APPS += [
     'base',
-    'changes',
-    'github_issue',
-    'vota',
     'certification',
-    'lesson',
 ]
 
 # Due to profile page does not available,
@@ -57,10 +53,6 @@ MIDDLEWARE += [
 PIPELINE['JAVASCRIPT']['project'] = {
     'source_filenames': (
         'js/csrf-ajax.js',
-        'js/changelog.js',
-        'js/github-issue.js',
-        'js/entry.js',
-        'js/category.js',
         'js/form.js',
     ),
     'output_filename': 'js/project.js',

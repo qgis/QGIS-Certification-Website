@@ -38,7 +38,6 @@ class CourseConvenerCreateView(
        """
 
         return reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.object.certifying_organisation.project.slug,
             'slug': self.object.certifying_organisation.slug
         })
 
@@ -97,10 +96,10 @@ class CourseConvenerCreateView(
 
 class CourseConvenerDeleteView(
         LoginRequiredMixin,
-        CourseConvenerMixin,
         DeleteView):
     """Delete view for Course Convener."""
 
+    model = CourseConvener
     context_object_name = 'convener'
     template_name = 'course_convener/delete.html'
 
@@ -160,7 +159,6 @@ class CourseConvenerDeleteView(
         """
 
         return reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.object.certifying_organisation.project.slug,
             'slug': self.object.certifying_organisation.slug
         })
 
@@ -242,7 +240,6 @@ class CourseConvenerUpdateView(
         """
 
         return reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.object.certifying_organisation.project.slug,
             'slug': self.object.certifying_organisation.slug
         })
 

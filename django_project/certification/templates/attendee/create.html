@@ -1,30 +1,19 @@
-{% extends "layouts/certification_base.html" %}
+{% extends "base_with_sidebar.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
 
-{% block page_title %}
-    <h1>Add Attendee</h1>
-{% endblock page_title %}
 
 {% block content %}
-    <style>
-        label[for=id_add_to_course] {
-            padding-left: 0 !important;
-            font-weight: bold !important;
-        }
-        label[for=id_add_to_course] p {
-            font-weight: normal !important;
-        }
-    </style>
+<h1>Add Attendee</h1>
     <section id="forms">
-        <div class='container'>
+        <div class='box-content'>
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ form|crispy }}
-                <div class="vertical-space"></div>
-                <div class="form-actions">
-                    <input type="submit" name="submit" value="Submit"
-                           class="btn btn-primary" id="submit-save">
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button type="submit" name="submit" class="button is-success" id="submit-save">Submit</button>
+                    </div>
                 </div>
             </form>
         </div>

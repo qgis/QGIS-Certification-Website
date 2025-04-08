@@ -1,0 +1,46 @@
+<h2>Courses coming soon</h2>
+
+<p>
+  Below, you will find a comprehensive list 
+  of upcoming courses scheduled to take place 
+  over the next three months. These courses
+  are designed to provide valuable learning 
+  opportunities and enhance your skills in 
+  various areas of expertise. 
+  Stay tuned and plan ahead to make the most of these offerings.
+</p>
+
+<div class="columns is-multiline is-centered">
+  {% for course in upcoming_courses %}
+    <div class="column is-flex is-half-tablet">
+      <div class="container rich">
+        <div class="cont coloring-6">
+          <h3>
+            <a href="{{ course.get_absolute_url }}">{{ course.course_type.name }}</a>
+          </h3>
+          <p>
+          <span class="icon-text">
+            <span class="icon">
+            <i class="fas fa-calendar-alt"></i>
+            </span>
+            <span>
+              From {{ course.start_date }} to {{ course.end_date }}
+            </span>
+          </span>
+          </p>
+            <p>
+            <span class="icon-text">
+            <span class="icon">
+            <i class="fas fa-map-marker-alt"></i>
+            </span>
+            <span>{{ course.training_center.name }}</span>
+            </span>
+            </p>
+          <p>
+          <span class="has-text-weight-medium">Trained competence(s):</span> {{ course.trained_competence|default:"-" }}
+          </p>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>

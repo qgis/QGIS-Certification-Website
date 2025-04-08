@@ -1,0 +1,24 @@
+{% extends "base.html" %} {% load thumbnail %} {% load static %} 
+{% block pagetitle %} 
+{% include "layouts/page-title.html" %} 
+{% endblock %} 
+{% block content %}
+<h1 class="title">Certification Programme</h1>
+<p>
+  Is your organisation an active member of the QGIS community and offering
+  high-quality training courses with QGIS? Then consider applying for the
+  <strong>QGIS Certification Programme</strong>. As a member, you’ll be able to
+  issue the official QGIS certificate to participants of your courses, workshops
+  and training. Each certificate contributes €20 to QGIS.
+</p>
+<p>
+  If you’re looking for organisations that offer training with the official 
+  QGIS certificate, check the 
+  <a href="{% url 'certifyingorganisation-list' %}">
+    current list of members
+  </a> of the QGIS Certification Programme. You can also explore the map below to
+  to find organisations in your area.
+</p>
+{% include "certifying_organisation/includes/world-map.html" %}
+{% include "certifying_organisation/includes/coming-soon.html" %}
+{% endblock %}

@@ -1,9 +1,9 @@
-{% extends "layouts/certification_base.html" %}
+{% extends "base_with_sidebar.html" %}
 {% load i18n %}
 {% block title %}Certification Management{% endblock %}
 {% block js_head %}
     <script>
-        $(function () {
+        {% comment %} $(function () {
             $(".checklist-sortable").sortable({
                 update: function (event, ui) {
                     let idsInOrder = $(event.target).sortable("toArray");
@@ -17,32 +17,32 @@
                         })
                         order += 1;
                     }
-                    $.post("{% url "update-checklist-order" project_slug=project_slug %}", {
+                    $.post("{% url "update-checklist-order" %}", {
                         'checklist_order': JSON.stringify(checklistPostData)
                     }, function (data) {
                         $('.badge-updated').stop(true, true).show().fadeOut(2000);
                     })
                 }
             });
-        });
+        }); {% endcomment %}
 
         function activate(checklistId, elm) {
             let div = $(elm);
-            $.post("{% url "activate-checklist" project_slug=project_slug %}", {
+            $.post("{% url "activate-checklist" %}", {
                 'checklist_id': checklistId
             }, function (data) {
                 $('.badge-updated').stop(true, true).show().fadeOut(2000);
-                div.removeClass('btn-success').addClass('btn-warning').html('Archive').attr("onclick", `archive(${checklistId}, this)`);
+                div.removeClass('is-success').addClass('is-warning').html('Archive').attr("onclick", `archive(${checklistId}, this)`);
             })
         }
 
         function archive(checklistId, elm) {
             let div = $(elm);
-            $.post("{% url "archive-checklist" project_slug=project_slug %}", {
+            $.post("{% url "archive-checklist" %}", {
                 'checklist_id': checklistId
             }, function (data) {
                 $('.badge-updated').stop(true, true).show().fadeOut(2000);
-                div.removeClass('btn-warning').addClass('btn-success').html('Activate').attr("onclick", `activate(${checklistId}, this)`);
+                div.removeClass('is-warning').addClass('is-success').html('Activate').attr("onclick", `activate(${checklistId}, this)`);
             })
         }
     </script>
@@ -117,7 +117,7 @@
     <h1 >{% trans 'Certification Manager Dashboard' %}</h1>
 
     <div class="card">
-        <form action="{% url 'certificate-type-update' project_slug %}" method="post">
+        <form action="{% url 'certificate-type-update' %}" method="post">
             {% csrf_token %}
             <header class="card-header">
                 <p class="card-header-title mb-0">{% trans 'Certification Type' %}</p>
@@ -160,7 +160,7 @@
             <p class="card-header-title mb-0">Certification Checklist</p>
             <div class="badge badge-success badge-updated">Updated</div>
             <div class="card-header-icon">
-                <a class="button is-success is-small" href="{% url "certificate-checklist-create" project_slug=project_slug %}" title="Add new question">
+                <a class="button is-success is-small" href="{% url "certificate-checklist-create" %}" title="Add new question">
                     <span class="icon"><i class="fas fa-plus"></i></span>
                     <span>New question</span>
                 </a>
@@ -217,7 +217,7 @@
     </div>
 
     <div class="card">
-        <form action="{% url 'update-external-reviewer-text' project_slug %}" method="post">
+        <form action="{% url 'update-external-reviewer-text' %}" method="post">
             {% csrf_token %}
             <header class="card-header">
                 <p class="card-header-title mb-0">External Reviewer</p>

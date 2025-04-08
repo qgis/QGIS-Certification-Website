@@ -10,7 +10,7 @@ from django.core.mail import send_mail
 from django.utils.html import escape
 from django.urls import reverse
 from django.shortcuts import get_list_or_404
-from django.db.models import Q, Prefetch
+from django.db.models import Q, Prefetch, OuterRef, Subquery
 from django.http import HttpResponse, request
 from django.views.generic import (
     ListView,
@@ -22,8 +22,13 @@ from django.views.generic import (
     TemplateView)
 from django.http import HttpResponseRedirect, Http404
 from django.db import IntegrityError
+from django.shortcuts import render
 from django.core.exceptions import ValidationError
-from braces.views import LoginRequiredMixin, UserPassesTestMixin
+from braces.views import (
+    LoginRequiredMixin,
+    UserPassesTestMixin,
+    StaffuserRequiredMixin
+)
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from django.contrib.sessions.models import Session
 from pure_pagination.mixins import PaginationMixin
@@ -84,6 +89,23 @@ class JSONResponseMixin(object):
             first_flag = False
         result += u'\n}'
         return result
+
+
+class CustomStaffuserRequiredMixin(StaffuserRequiredMixin):
+    """Fix redirect loop when user is already authenticated but non staff."""
+    def no_permissions_fail(self, request=None):
+        """
+        Called when the user has no permissions and no exception was raised.
+        """
+        if not request.user.is_authenticated:
+            return super(
+                CustomStaffuserRequiredMixin, self).no_permissions_fail(
+                request)
+
+        return HttpResponse(
+            'Sorry! You do not have permission to perform this action.',
+            status=403
+        )
 
 
 class CertifyingOrganisationMixin(object):
@@ -192,7 +214,7 @@ class CertifyingOrganisationListView(
         context['num_certifyingorganisations'] = \
             context['certifyingorganisations'].count()
         context['unapproved'] = False
-        project_slug = self.kwargs.get('project_slug', None)
+        project_slug = 'qgis'
         context['project_slug'] = project_slug
         if project_slug:
             context['the_project'] = Project.objects.get(slug=project_slug)
@@ -216,7 +238,7 @@ class CertifyingOrganisationListView(
         """
 
         if self.queryset is None:
-            project_slug = self.kwargs.get('project_slug', None)
+            project_slug = 'qgis'
             if project_slug:
                 project = Project.objects.get(slug=project_slug)
                 queryset = CertifyingOrganisation.objects.filter(
@@ -250,7 +272,7 @@ class CertifyingOrganisationDetailView(
             CertifyingOrganisationDetailView, self).get_context_data(**kwargs)
 
         certifying_organisation = self.object
-        project_slug = self.kwargs.get('project_slug', None)
+        project_slug = 'qgis'
 
         # Check session key
         session_key = self.request.GET.get('s', None)
@@ -407,7 +429,7 @@ class CertifyingOrganisationDetailView(
         if queryset is None:
             queryset = self.get_queryset()
             slug = self.kwargs.get('slug', None)
-            project_slug = self.kwargs.get('project_slug', None)
+            project_slug = 'qgis'
             if slug and project_slug:
                 try:
                     project = Project.objects.get(slug=project_slug)
@@ -425,13 +447,68 @@ class CertifyingOrganisationDetailView(
                               'your Certifying Organisation!')
 
 
+class CertifyingOrganisationArchivingView(
+    LoginRequiredMixin,
+    CertifyingOrganisationMixin,
+    APIView):
+    """Archive/Unarchive Certifying Organisation."""
+
+    context_object_name = 'certifyingorganisation'
+    template_name = 'certifying_organisation/toogle_archive.html'
+
+    def get(self, request, *args, **kwargs):
+        """Get the project_slug from the URL and define the Project.
+        :param request: HTTP request object
+        :type request: HttpRequest
+        :param args: Positional arguments
+        :type args: tuple
+        :param kwargs: Keyword arguments
+        :type kwargs: dict
+        :returns: Unaltered request object
+        :rtype: HttpResponse
+        """
+
+        self.project_slug = 'qgis'
+        self.project = Project.objects.get(slug=self.project_slug)
+        toogle_archive = kwargs.get('toogle_archive', 'unarchive')
+        return render(
+            request, self.template_name, {
+                'toogle_archive': toogle_archive,
+                'certifyingorganisation': CertifyingOrganisation.objects.get(
+                    slug=kwargs.get('slug', None))
+            })
+
+    def post(self, request, *args, **kwargs):
+        """Archive/Unarchive Certifying Organisation.
+        :param request: HTTP request object
+        :type request: HttpRequest
+        :param args: Positional arguments
+        :type args: tuple
+        :param kwargs: Keyword arguments
+        :type kwargs: dict
+        :returns: HTTP response object
+        :rtype: HttpResponse
+        """
+
+        certifying_organisation = CertifyingOrganisation.objects.get(
+            slug=kwargs.get('slug', None))
+        toogle_archive = kwargs.get('toogle_archive', 'unarchive')
+        is_archived = str(toogle_archive).lower() == 'archive'
+        certifying_organisation.is_archived = is_archived
+        certifying_organisation.save()
+
+        return HttpResponseRedirect(
+            reverse('certifyingorganisation-list', kwargs={})
+        )
+
+
 # noinspection PyAttributeOutsideInit
 class CertifyingOrganisationDeleteView(
     LoginRequiredMixin,
-    CertifyingOrganisationMixin,
     DeleteView):
     """Delete view for Certifying Organisation."""
 
+    model = CertifyingOrganisation
     context_object_name = 'certifyingorganisation'
     template_name = 'certifying_organisation/delete.html'
 
@@ -451,7 +528,7 @@ class CertifyingOrganisationDeleteView(
         :rtype: HttpResponse
         """
 
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.project = Project.objects.get(slug=self.project_slug)
         return super(
             CertifyingOrganisationDeleteView, self) \
@@ -473,7 +550,7 @@ class CertifyingOrganisationDeleteView(
         :rtype: HttpResponse
         """
 
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.project = Project.objects.get(slug=self.project_slug)
         return super(
             CertifyingOrganisationDeleteView, self) \
@@ -490,9 +567,7 @@ class CertifyingOrganisationDeleteView(
         :rtype: HttpResponse
         """
 
-        return reverse('certifyingorganisation-list', kwargs={
-            'project_slug': self.object.project.slug
-        })
+        return reverse('certifyingorganisation-list', kwargs={})
 
     def get_queryset(self):
         """Get the queryset for this view.
@@ -560,9 +635,7 @@ class CertifyingOrganisationCreateView(
        :rtype: HttpResponse
        """
 
-        return reverse('pending-certifyingorganisation-list', kwargs={
-            'project_slug': self.object.project.slug
-        })
+        return reverse('pending-certifyingorganisation-list', kwargs={})
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
@@ -687,7 +760,7 @@ class CertifyingOrganisationCreateView(
 
         kwargs = super(
             CertifyingOrganisationCreateView, self).get_form_kwargs()
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.project = Project.objects.get(slug=self.project_slug)
         kwargs.update({
             'user': self.request.user,
@@ -715,7 +788,7 @@ class CertifyingOrganisationUpdateView(
 
         kwargs = super(
             CertifyingOrganisationUpdateView, self).get_form_kwargs()
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.project = Project.objects.get(slug=self.project_slug)
         show_owner_message = False
         certifying_organisation = self.object
@@ -758,7 +831,7 @@ class CertifyingOrganisationUpdateView(
         :rtype: QuerySet
         """
 
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.project = Project.objects.get(slug=self.project_slug)
         if self.request.user.is_staff:
             queryset = CertifyingOrganisation.objects.all()
@@ -781,8 +854,7 @@ class CertifyingOrganisationUpdateView(
         :rtype: HttpResponse
         """
         return reverse('certifyingorganisation-detail', kwargs={
-            'slug': self.object.slug,
-            'project_slug': self.object.project.slug
+            'slug': self.object.slug
         })
 
     def form_valid(self, form):
@@ -806,8 +878,39 @@ class CertifyingOrganisationJson(BaseDatatableView):
     order_columns = ['name']
     max_display_length = 100
 
+    def ordering(self, qs):
+        order_column = self.request.GET.get('order[0][column]', None)
+        order_dir = self.request.GET.get('order[0][dir]', 'asc')
+
+        if order_column == '1':  # creation_date column index
+            order_field = 'created_at'
+        elif order_column == '2':  # update_date column index
+            order_field = 'updated_at'
+        else:
+            return super(CertifyingOrganisationJson, self).ordering(qs)
+
+        if order_dir == 'desc':
+            order_field = '-' + order_field
+
+        return qs.order_by(order_field)
+
     def get_initial_queryset(self):
-        return CertifyingOrganisation.objects.all()
+        # Subquery to get the earliest history date (creation_date)
+        earliest = CertifyingOrganisation.history.filter(
+            id=OuterRef('id')
+        ).order_by('history_date').values('history_date')[:1]
+
+        # Subquery to get the latest history date (update_date)
+        latest = CertifyingOrganisation.history.filter(
+            id=OuterRef('id')
+        ).order_by('-history_date').values('history_date')[:1]
+
+        # Annotate the queryset with creation_date and update_date
+        queryset = CertifyingOrganisation.objects.annotate(
+            created_at=Subquery(earliest),
+            updated_at=Subquery(latest)
+        )
+        return queryset
 
     def render_column(self, row, column):
         # We want to render user as a custom column
@@ -864,16 +967,27 @@ class CertifyingOrganisationJson(BaseDatatableView):
             self.request.GET.get('approved', 'False'))
         rejected = self._validate_param(
             self.request.GET.get('rejected', 'False'))
+        is_archived = self._validate_param(
+            self.request.GET.get('is_archived', 'False'))
+
+        if not is_archived:
+            qs = qs.filter(
+                rejected=rejected,
+                approved=approved,
+                is_archived=is_archived
+            )
+
+            if approved:
+                qs = qs.filter(enabled=True)
+            else:
+                if not ready:
+                    qs = qs.filter(status__name__icontains='pending')
+                else:
+                    qs = qs.exclude(status__name__icontains='pending')
+        else:
+            qs = qs.filter(is_archived=is_archived)
 
         qs = qs.filter(rejected=rejected, approved=approved)
-
-        if approved:
-            qs = qs.filter(enabled=True)
-        else:
-            if not ready:
-                qs = qs.filter(status__name__icontains='pending')
-            else:
-                qs = qs.exclude(status__name__icontains='pending')
 
         if search:
             qs = qs.filter(name__istartswith=search)
@@ -881,6 +995,7 @@ class CertifyingOrganisationJson(BaseDatatableView):
 
 
 class PendingCertifyingOrganisationListView(
+    CustomStaffuserRequiredMixin,
     LoginRequiredMixin,
     CertifyingOrganisationMixin,
     PaginationMixin,
@@ -937,7 +1052,7 @@ class PendingCertifyingOrganisationListView(
         """
 
         if self.queryset is None:
-            self.project_slug = self.kwargs.get('project_slug', None)
+            self.project_slug = 'qgis'
             if self.project_slug:
                 self.project = Project.objects.get(slug=self.project_slug)
                 if self.request.user.is_staff:
@@ -1043,11 +1158,78 @@ class ApproveCertifyingOrganisationView(
             site
         )
 
-        return reverse(self.pattern_name, kwargs={
-            'project_slug': project_slug
-        })
+        return reverse(self.pattern_name, kwargs={})
 
+class ArchivedCertifyingOrganisationListView(
+    LoginRequiredMixin,
+    CertifyingOrganisationMixin,
+    PaginationMixin,
+    ListView):
+    """List view for archived certifying organisation."""
 
+    context_object_name = 'certifyingorganisations'
+    template_name = 'certifying_organisation/archived-list.html'
+    paginate_by = 10
+
+    def __init__(self):
+        """
+        We overload __init__ in order to declare self.project and
+        self.project_slug. Both are then defined in self.get_queryset
+        which is the first method called. This means we can then reuse the
+        values in self.get_context_data.
+        """
+
+        super(ArchivedCertifyingOrganisationListView, self).__init__()
+        self.project = None
+        self.project_slug = None
+
+    def get_context_data(self, **kwargs):
+        """Get the context data which is passed to a template.
+        :param kwargs: Any arguments to pass to the superclass.
+        :type kwargs: dict
+        :returns: Context data which will be passed to the template.
+        :rtype: dict
+        """
+
+        context = super(ArchivedCertifyingOrganisationListView, self) \
+            .get_context_data(**kwargs)
+        context['num_certifyingorganisations'] = self.get_queryset().count()
+        context['project_slug'] = self.project_slug
+        if self.project_slug:
+            context['the_project'] = \
+                Project.objects.get(slug=self.project_slug)
+            context['project'] = context['the_project']
+        return context
+
+    def get_queryset(self):
+        """Get the queryset for this view.
+        :returns: A queryset which is filtered to only show archived
+        Certifying Organisation.
+        :rtype: QuerySet
+        :raises: Http404
+        """
+
+        if self.queryset is None:
+            self.project_slug = 'qgis'
+            if self.project_slug:
+                self.project = Project.objects.get(slug=self.project_slug)
+                if self.request.user.is_staff:
+                    queryset = \
+                        CertifyingOrganisation.archived_objects.filter(
+                            project=self.project)
+                else:
+                    queryset = \
+                        CertifyingOrganisation.archived_objects.filter(
+                            Q(project=self.project) &
+                            (Q(project__owner=self.request.user) |
+                            Q(organisation_owners=self.request.user) |
+                            Q(project__certification_managers=
+                            self.request.user))).distinct()
+                return queryset
+            else:
+                raise Http404(
+                    'Sorry! We could not find your Certifying Organisation!')
+        return self.queryset
 class AboutView(TemplateView):
     template_name = 'about.html'
 
@@ -1062,7 +1244,7 @@ class AboutView(TemplateView):
         """
 
         context = super(AboutView, self).get_context_data(**kwargs)
-        project_slug = self.kwargs.get('project_slug')
+        project_slug = 'qgis'
         context['the_project'] = Project.objects.get(slug=project_slug)
         return context
 
@@ -1112,7 +1294,7 @@ def reject_certifying_organisation(request, **kwargs):
     pattern_name = 'pending-certifyingorganisation-list'
 
     if request.method == 'GET':
-        project_slug = kwargs.pop('project_slug')
+        project_slug = 'qgis'
         slug = kwargs.pop('slug')
 
         certifyingorganisation_qs = \
@@ -1144,9 +1326,7 @@ def reject_certifying_organisation(request, **kwargs):
             schema
         )
 
-        url = reverse(pattern_name, kwargs={
-            'project_slug': project_slug
-        })
+        url = reverse(pattern_name, kwargs={})
         return HttpResponseRedirect(url)
     else:
         return HttpResponse('Please use GET method.')

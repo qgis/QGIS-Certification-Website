@@ -13,7 +13,7 @@ from ..views import (
 class UpdateStatusOrganisation(CertifyingOrganisationUserTestMixin):
     """API to update the status of an organisation."""
 
-    def post(self, request, project_slug, slug):
+    def post(self, request, slug):
         try:
             certifyingorganisation = (
                 CertifyingOrganisation.objects.get(slug=slug)

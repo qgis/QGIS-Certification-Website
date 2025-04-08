@@ -25,7 +25,7 @@ class CertificationManagementView(LoginRequiredMixin, ListView):
 
     def dispatch(self, request, *args, **kwargs):
         """Ensure user has permission to access this view."""
-        project = get_object_or_404(Project, slug=self.kwargs['project_slug'])
+        project = get_object_or_404(Project, slug='qgis')
         manager = project.certification_managers.all()
         if not request.user.is_staff and request.user not in manager:
             raise Http404('Sorry! You have to be staff or certification '
@@ -48,7 +48,7 @@ class CertificationManagementView(LoginRequiredMixin, ListView):
         """Get the context data which is passed to a template."""
 
         # Navbar data
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         context = super(
             CertificationManagementView, self).get_context_data(*kwargs)
         context['project_slug'] = self.project_slug
@@ -65,7 +65,7 @@ class CertificationManagementView(LoginRequiredMixin, ListView):
         context['certificate_types'] = CertificateType.objects.all().order_by(
             'order'
         )
-        project = get_object_or_404(Project, slug=self.kwargs['project_slug'])
+        project = get_object_or_404(Project, slug='qgis')
         context['certificate_types_applied'] = ProjectCertificateType.\
             objects.filter(project=project).values_list(
             'certificate_type', flat=True)
@@ -75,7 +75,7 @@ class CertificationManagementView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         """Return certificate_types for a project."""
 
-        project = get_object_or_404(Project, slug=self.kwargs['project_slug'])
+        project = get_object_or_404(Project, slug='qgis')
         return ProjectCertificateType.objects.filter(project=project)
 
 
@@ -105,7 +105,7 @@ class ActivateChecklist(APIView):
 class ArchiveChecklist(APIView):
     permission_classes = [IsAdminUser | IsCertificationManager]
 
-    def post(self, request, project_slug):
+    def post(self, request):
         """
         Archive a checklist, only managers and superuser can do this action.
         """

@@ -14,7 +14,7 @@ class UpdateChecklistReviewer(CertifyingOrganisationUserTestMixin):
     that was done by reviewer.
     """
 
-    def post(self, request, project_slug, slug):
+    def post(self, request, slug):
         post_data = request.POST.dict()
         organisation = CertifyingOrganisation.objects.get(
             slug=slug
@@ -97,7 +97,6 @@ class UpdateChecklistReviewer(CertifyingOrganisationUserTestMixin):
             organisation.save()
 
             redirect_url = reverse('certifyingorganisation-detail', kwargs={
-                'project_slug': organisation.project.slug,
                 'slug': organisation.slug
             })
 

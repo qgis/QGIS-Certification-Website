@@ -2,6 +2,7 @@
 @import "custom.bulma.scss";
 @import "sustaining_members.scss";
 @import "toogle-switch.scss";
+@import "map.scss";
 @import "../../../../node_modules/@creativebulma/bulma-tooltip/src/sass/index.sass";
 
 body {
@@ -360,15 +361,12 @@ a.is-active > span {
 
 .card {
   color: inherit !important;
-  transition: all 0.3s ease;
-  border: 1px solid $border;
 
   .card-header {
     box-shadow: 0 0.02em 0.25em rgba($scheme-invert, 0.1) !important;
   }
+}
 
-  &:hover {
-    box-shadow: $shadow-hover;
-    cursor: pointer;
-  }
+.rounded .rich-right img {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }

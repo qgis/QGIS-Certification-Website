@@ -34,7 +34,7 @@ class InviteReviewerApiView(UserPassesTestMixin, APIView):
 
         return False
 
-    def post(self, request, project_slug, slug):
+    def post(self, request, slug):
         email = request.POST.get('email', None)
         name = request.POST.get('name')
         regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'

@@ -12,9 +12,9 @@ from ..utilities import CustomSerializer
 class GetTrainingCenterProjectLocation(APIView):
     """API returns GeoJSON location of training center within a project."""
 
-    def get(self, request, project_slug):
+    def get(self, request):
         try:
-            project = Project.objects.get(slug=project_slug)
+            project = Project.objects.get(slug='qgis')
             training_centers = TrainingCenter.objects.filter(
                 certifying_organisation__project=project
             ).order_by('certifying_organisation__name')
@@ -40,9 +40,9 @@ class GetTrainingCenterOrganisationLocation(APIView):
 
     """
 
-    def get(self, request, project_slug, organisation_slug):
+    def get(self, request, organisation_slug):
         try:
-            project = Project.objects.get(slug=project_slug)
+            project = Project.objects.get(slug='qgis')
             organisation = CertifyingOrganisation.objects.get(
                 slug=organisation_slug,
                 project=project

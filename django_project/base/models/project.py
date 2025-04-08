@@ -9,7 +9,6 @@ from django.utils.text import slugify
 from django.conf.global_settings import MEDIA_ROOT
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from changes.models.version import Version
 from core.settings.contrib import STOP_WORDS
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -341,19 +340,6 @@ class Project(models.Model):
         """
         return reverse('project-detail', kwargs={'slug': self.slug})
 
-    def versions(self):
-        """Get all the versions for this project."""
-        qs = Version.objects.filter(project=self).order_by('-padded_version')
-        return qs
-
-    def latest_versions(self):
-        """Get the latest version.
-
-        How many versions returned is determined by the pagination threshold.
-
-        :returns: List of versions.
-        :rtype: list"""
-        return self.versions()[:settings.PROJECT_VERSION_LIST_SIZE]
 
     @staticmethod
     def pagination_threshold():

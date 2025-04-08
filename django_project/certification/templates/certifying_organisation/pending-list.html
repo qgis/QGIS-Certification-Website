@@ -1,4 +1,4 @@
-{% extends "layouts/certification_base.html" %}
+{% extends "base_with_sidebar.html" %}
 {% load thumbnail %}
 {% load custom_markup %}
 {% block title %}Certifying Organisations - {{ block.super }}{% endblock %}
@@ -8,66 +8,54 @@
 {% endblock page_title %}
 
 {% block content %}
-    <style>
-        .success {
-            text-align: center;
-            font-family: inherit;
-            color: inherit;
-            background: #adffd2;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #96ffc5;
-        }
-        .badge-warning {
-            background: #ffc107;
-            color: black;
-        }
-    </style>
-
     {% if messages %}
-    <div class="messages">
         {% for message in messages %}
             {% if 'organisation_submitted' in message.tags %}
-                <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
-            {% endif %}
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    <div class="page-header">
-        <h1 class="text-muted">
-            {% if pending %} Pending {% else %}Unapproved {% endif %}
-            Certifying Organisations
-            {% if user.is_authenticated %}
-                <div class="pull-right btn-group">
-                    <a class="btn btn-default btn-mini tooltip-toggle"
-                       href='{% url "certifyingorganisation-create" project_slug %}'
-                       data-title="Create New Certifying Organisation">
-                        {% show_button_icon "add" %}</a>
-                    <a class="btn btn-default btn-mini tooltip-toggle"
-                       href='{% url "certifyingorganisation-list" project_slug %}'
-                       data-title="Back">
-                        <span class="glyphicon glyphicon-arrow-left"></span>
-                    </a>
+                <div class="notification is-success">
+                    {{ message }}
                 </div>
             {% endif %}
-        </h1>
+        {% endfor %}
+    {% endif %}
+
+    <div class="columns is-vcentered">
+        <div class="column">
+            <h1 class="m-0">
+                {% if pending %} Pending {% else %}Unapproved {% endif %}
+                Certifying Organisations
+            </h1>
+        </div>
+        {% if user.is_authenticated %}
+        <div class="column is-narrow">
+            <div class="buttons is-pulled-right">
+                <a class="button is-success tooltip"
+                   href='{% url "certifyingorganisation-create" %}'
+                   data-tooltip="Create New Certifying Organisation">
+                    <span class="icon">
+                        <i class="fas fa-plus"></i>
+                    </span>
+                </a>
+                <a class="button is-light tooltip"
+                   href='{% url "certifyingorganisation-list" %}'
+                   data-tooltip="Back">
+                    <span class="icon">
+                        <i class="fas fa-arrow-left"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+        {% endif %}
     </div>
     {% if num_certifyingorganisations == 0 %}
         {% if unapproved %}
-            <h3>All certifying organisations are approved.</h3>
+            <h3 class="subtitle is-4 has-text-centered">All certifying organisations are approved.</h3>
         {% else %}
-            <h3>No certifying organisations are defined, but you can <a
-                    class="btn btn-default btn-mini"
-                    href='{% url "certifyingorganisation-create" project_slug %}'>create one</a>.</h3>
+            <h3 class="subtitle is-4 has-text-centered">
+                No certifying organisations are defined, but you can 
+                <a class="button is-success is-small" href='{% url "certifyingorganisation-create" %}'>create one</a>.
+            </h3>
         {% endif %}
     {% endif %}
 
     {% include 'certifying_organisation/includes/certifying-organisation-datatable.html' with approved=False %}
-
-    <script>
-        $(document).click(function () {
-            $('.messages').fadeOut('fast');
-        });
-    </script>
 {% endblock %}

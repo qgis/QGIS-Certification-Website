@@ -21,13 +21,13 @@ ALLOWED_HOSTS = [
     'localhost:9000',
     'changelog.linfiniti.com',
     'changelog.inasafe.org',
-    'changelog.qgis.org',
+    'certification.qgis.org',
     'changelog.kartoza.com']
 
 # Pipeline - for production we want to compress resources
-PIPELINE['PIPELINE_ENABLED'] = True
-PIPELINE['CSS_COMPRESSOR'] = 'pipeline.compressors.yuglify.YuglifyCompressor'
-PIPELINE['JS_COMPRESSOR'] = 'pipeline.compressors.yuglify.YuglifyCompressor'
+# PIPELINE['PIPELINE_ENABLED'] = True
+# PIPELINE['CSS_COMPRESSOR'] = 'pipeline.compressors.yuglify.YuglifyCompressor'
+# PIPELINE['JS_COMPRESSOR'] = 'pipeline.compressors.yuglify.YuglifyCompressor'
 # PIPELINE['CSS_COMPRESSOR'] = 'pipeline.compressors.csshtmljsminify.CssHtmlJsMinifyCompressor'
 # PIPELINE['JS_COMPRESSOR'] = 'pipeline.compressors.csshtmljsminify.CssHtmlJsMinifyCompressor'
 

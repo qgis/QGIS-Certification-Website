@@ -1,0 +1,74 @@
+{% extends "base_with_sidebar.html" %}
+{% load custom_markup %}
+
+{% block title %}Certifying Organisation Deleted - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+<h1 class="title">Certifying Organisation Archiving</h1>
+    <form action="" id="toogle-confirmation" method="post" class="box-content">{% csrf_token %}
+        <div class="notification is-warning is-light">
+            <p>Are you sure you want to 
+                {% if toogle_archive == 'archive' %}deactivate{% else %}activate{% endif %}
+                the certifying organisation listed below?
+                {% if toogle_archive == 'archive' %}
+                    It will be listed in the Archived Organisations list.
+                {% endif %}
+            </p>
+        </div>
+        <div>
+            <h3 class="title is-4">Certifying Organisation: {{ certifyingorganisation.name }}</h3>
+            <div class="columns">
+                <div class="column is-8">
+                    <p><strong>Address:</strong> {{ certifyingorganisation.address }}</p>
+                    <p><strong>Country:</strong> {{ certifyingorganisation.country.name }}</p>
+                    <p><strong>Email:</strong> {{ certifyingorganisation.organisation_email }}</p>
+                    <p><strong>Phone:</strong> {{ certifyingorganisation.organisation_phone }}</p>
+                    <p><strong>Organisation Owners:</strong> 
+                        {% for organisation_owners in certifyingorganisation.organisation_owners.all %}
+                            {% if organisation_owners.first_name %}
+                                {{ organisation_owners.first_name }} {{ organisation_owners.last_name }}{{ ", " }}
+                            {% else %}
+                                {{ organisation_owners }}{{ ", " }}
+                            {% endif %}
+                        {% endfor %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="buttons is-right">
+            {% if toogle_archive == 'archive' %}
+            <a class="button is-danger"
+               href="#"
+               onClick="$('#toogle-confirmation').submit()"
+               data-tooltip="Deactivate {{ certifyingorganisation.name }}">
+                <span class="icon">
+                    <i class="fas fa-archive"></i>
+                </span>
+                <span>Deactivate</span>
+            </a>
+            {% else %}
+                <a class="button is-success is-outlined"
+                href="#"
+                onClick="$('#toogle-confirmation').submit()"
+                data-tooltip="Activate {{ certifyingorganisation.name }}">
+                    <span class="icon">
+                        <i class="fas fa-check-circle"></i>
+                    </span>
+                    <span>Activate</span>
+                </a>
+
+            {% endif %}
+            <a class="button is-light"
+               href='{% url "certifyingorganisation-list" %}'
+               title="Cancel">
+                <span class="icon">
+                    <i class="fas fa-arrow-left"></i>
+                </span>
+                <span>Cancel</span>
+            </a>
+        </div>
+    </form>
+{% endblock %}

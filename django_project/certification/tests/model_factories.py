@@ -35,6 +35,7 @@ class CertifyingOrganisationF(factory.django.DjangoModelFactory):
     address = factory.sequence(lambda n: u'Test address %s' % n)
     project = factory.SubFactory(ProjectF)
     approved = True
+    is_archived = False
 
 
 class CertifyingOrganisationCertificateF(factory.django.DjangoModelFactory):
@@ -161,6 +162,7 @@ class CertificateF(factory.django.DjangoModelFactory):
     course = factory.SubFactory(CourseF)
     attendee = factory.SubFactory(AttendeeF)
     author = factory.SubFactory(UserF)
+    certificate_type = factory.SubFactory(CertificateTypeF)
 
 
 class StatusF(factory.django.DjangoModelFactory):

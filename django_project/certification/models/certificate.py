@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 from .course import Course
 from .attendee import Attendee
+from .certificate_type import CertificateType
 
 
 def increment_id(project):
@@ -54,6 +55,12 @@ class Certificate(models.Model):
     issue_date = models.DateField(
         auto_now_add=True,
         blank=True,
+        null=True
+    )
+
+    certificate_type = models.ForeignKey(
+        CertificateType,
+        on_delete=models.PROTECT,
         null=True
     )
 

@@ -36,9 +36,9 @@ class GetStatus(UserPassesTestMixin, APIView):
             except Session.DoesNotExist:
                 return False
 
-    def get(self, request, project_slug):
+    def get(self, request):
         try:
-            project = Project.objects.get(slug=project_slug)
+            project = Project.objects.get(slug='qgis')
             status_qs = Status.objects.filter(project=project)
             serializer = StatusSerializer(status_qs, many=True)
             return Response(serializer.data)

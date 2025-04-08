@@ -1,0 +1,49 @@
+{% extends "base_with_sidebar.html" %}
+{% load thumbnail %}
+{% load custom_markup %}
+{% block title %}Certifying Organisations - {{ block.super }}{% endblock %}
+
+{% block page_title %}
+    <h1>Certifying Organisations (all)</h1>
+{% endblock page_title %}
+
+{% block content %}
+    {% if messages %}
+        {% for message in messages %}
+            {% if 'organisation_submitted' in message.tags %}
+                <div class="notification is-success">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <div class="columns is-vcentered">
+        <div class="column">
+            <h1 class="m-0">
+                Archived Certifying Organisations
+            </h1>
+        </div>
+        {% if user.is_authenticated %}
+        <div class="column is-narrow">
+            <div class="buttons is-pulled-right">
+                <a class="button is-success tooltip"
+                   href='{% url "certifyingorganisation-create" %}'
+                   data-tooltip="Create New Certifying Organisation">
+                    <span class="icon">
+                        <i class="fas fa-plus"></i>
+                    </span>
+                </a>
+                <a class="button is-light tooltip"
+                   href='{% url "certifyingorganisation-list" %}'
+                   data-tooltip="Back">
+                    <span class="icon">
+                        <i class="fas fa-arrow-left"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% include 'certifying_organisation/includes/certifying-organisation-datatable.html' with is_archived=True %}
+{% endblock %}

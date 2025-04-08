@@ -1,4 +1,4 @@
-{% extends "layouts/certification_base.html" %}
+{% extends "base_with_sidebar.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
 
@@ -17,16 +17,17 @@
 {% block content %}
 
     <section id="forms">
-        <div class='container'>
+        <div class='box-content'>
             <h3>Update Training Centre for {{ organisation.name }}</h3>
             <hr/>
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ form|crispy }}
-                <div class="vertical-space" style="margin-top: 400px;"></div>
-                <div class="form-actions">
-                    <input type="submit" name="submit" value="Submit"
-                           class="btn btn-primary">
+                <div class="vertical-space" style="margin-top: 450px;"></div>
+                <div class="field is-grouped mt-5">
+                    <div class="control">
+                        <button type="submit" name="submit" class="button is-success">Submit</button>
+                    </div>
                 </div>
             </form>
         </div>
