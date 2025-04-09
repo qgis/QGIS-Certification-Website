@@ -4,6 +4,7 @@ from datetime import timedelta
 from certification.models.course import Course
 from django.views.generic import ListView
 
+
 class UpcomingCourseListView(ListView):
     model = Course
     context_object_name = 'upcoming_courses'
@@ -15,6 +16,7 @@ class UpcomingCourseListView(ListView):
             start_date__gte=now(),
             start_date__lte=three_months_from_now
         ).order_by('start_date')
+
 
 class HomepageView(CertifyingOrganisationListView):
     template_name = 'layouts/homepage.html'

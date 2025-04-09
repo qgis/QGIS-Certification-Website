@@ -709,7 +709,7 @@ class CertifyingOrganisationCreateView(
                     u' Please do not reply to this email.'.format(**data),
                     self.project.owner.email,
                     [recipient.email],
-                    fail_silently=False,
+                    fail_silently=True,
                 )
 
             contact_person = \
@@ -743,7 +743,8 @@ class CertifyingOrganisationCreateView(
                     u'{contact_person}'
                     u'\n\nSincerely,\n'.format(**email_data),
                     self.project.owner.email,
-                    [applicant.email]
+                    [applicant.email],
+                    fail_silently=True,
                 )
 
             return HttpResponseRedirect(self.get_success_url())
@@ -1109,7 +1110,7 @@ def send_approved_email(
                 **data),
             certifying_organisation.project.owner.email,
             [organisation_owner.email],
-            fail_silently=False,
+            fail_silently=True,
         )
 
 
@@ -1159,6 +1160,7 @@ class ApproveCertifyingOrganisationView(
         )
 
         return reverse(self.pattern_name, kwargs={})
+
 
 class ArchivedCertifyingOrganisationListView(
     LoginRequiredMixin,
@@ -1230,6 +1232,8 @@ class ArchivedCertifyingOrganisationListView(
                 raise Http404(
                     'Sorry! We could not find your Certifying Organisation!')
         return self.queryset
+
+
 class AboutView(TemplateView):
     template_name = 'about.html'
 
@@ -1284,7 +1288,7 @@ def send_rejection_email(certifying_organisation, site, schema='http'):
                 **data),
             certifying_organisation.project.owner.email,
             [organisation_owner.email],
-            fail_silently=False,
+            fail_silently=True,
         )
 
 
@@ -1294,7 +1298,6 @@ def reject_certifying_organisation(request, **kwargs):
     pattern_name = 'pending-certifyingorganisation-list'
 
     if request.method == 'GET':
-        project_slug = 'qgis'
         slug = kwargs.pop('slug')
 
         certifyingorganisation_qs = \

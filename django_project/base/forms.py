@@ -53,7 +53,8 @@ class ProjectForm(forms.ModelForm):
                 'get_list_url': '/autocomplete/users/',
                 'color_style': 'is-success',
             }
-        ),        required=False,
+        ),
+        required=False,
         help_text=_(
             'Managers of the certification app in this project. '
             'They will receive email notification about organisation and have'

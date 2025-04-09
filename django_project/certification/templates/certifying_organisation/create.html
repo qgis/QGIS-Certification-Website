@@ -68,6 +68,7 @@
             $('#project-form').after($('.checklist-container'));
             if (checklistAvailable) {
                 $('#submit-id-submit').attr('disabled', 'disabled');
+                console.log('Checklist available');
             }
             $('.form-check').change(() => {
                 let allChecked = [];

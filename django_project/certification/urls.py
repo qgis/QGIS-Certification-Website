@@ -108,9 +108,9 @@ urlpatterns = [
     url(r'^$', view=HomepageView.as_view(), name='home'),
 
     # Certifying Organisation management
-     url(r'^archived-certifyingorganisation/list/$',
-         view=ArchivedCertifyingOrganisationListView.as_view(),
-         name='archived-certifyingorganisation-list'),
+    url(r'^archived-certifyingorganisation/list/$',
+        view=ArchivedCertifyingOrganisationListView.as_view(),
+        name='archived-certifyingorganisation-list'),
     url(r'^pending-certifyingorganisation/list/$',
         view=PendingCertifyingOrganisationListView.as_view(),
         name='pending-certifyingorganisation-list'),
@@ -133,8 +133,8 @@ urlpatterns = [
         view=CertifyingOrganisationDetailView.as_view(),
         name='certifyingorganisation-detail'),
     url(r'^certifyingorganisation/(?P<slug>[\w-]+)/archiving/(?P<toogle_archive>[\w-]+)/$',
-         view=CertifyingOrganisationArchivingView.as_view(),
-         name='certifyingorganisation-toogle-archive'),
+        view=CertifyingOrganisationArchivingView.as_view(),
+        name='certifyingorganisation-toogle-archive'),
     url(r'^certifyingorganisation/(?P<slug>[\w-]+)/delete/$',
         view=CertifyingOrganisationDeleteView.as_view(),
         name='certifyingorganisation-delete'),

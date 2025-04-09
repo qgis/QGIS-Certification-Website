@@ -11,12 +11,11 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect
 from base.models import Project, ProjectFlatpage
 
-from django.shortcuts import render
-
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 def general_flatpage(request, url):
     """
@@ -91,12 +90,14 @@ def index_view(request):
     # look up the view name in base.urls
     return redirect(reverse('home'))
 
+
 class UserAutocomplete(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         query = request.GET.get("q", "").strip()
         users = User.objects.filter(username__icontains=query)[:20]  # Limit results for performance
         results = [{"value": user.pk, "display": f"{user.username} <{user.email}>"} for user in users]
         return JsonResponse(results, safe=False)
+
 
 class GetUserByPk(LoginRequiredMixin, View):
     def get(self, request, pk):
