@@ -113,7 +113,7 @@ class CertifyingOrganisationForm(forms.ModelForm):
             )
         self.helper.layout.append(
             HTML(
-                '<button type="submit" class="button is-success mt-5" name="submit">'
+                '<button id="submit-id-submit" type="submit" class="button is-success mt-5" name="submit">'
                 '  <span class="icon"><i class="fas fa-check"></i></span>'
                 '  <span>Submit</span>'
                 '</button>'
