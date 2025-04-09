@@ -31,4 +31,3 @@ def stripe_public_key(request):
         return {'STRIPE_PUBLIC_KEY': settings.STRIPE_LIVE_PUBLIC_KEY}
     else:
         return {'STRIPE_PUBLIC_KEY': settings.STRIPE_TEST_PUBLIC_KEY}
-

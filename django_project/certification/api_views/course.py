@@ -82,7 +82,7 @@ class GetPastCourseProject(APIView):
 
     """
 
-    def get(self, request ):
+    def get(self, request):
         try:
             today = datetime.today()
             project = Project.objects.get(slug='qgis')

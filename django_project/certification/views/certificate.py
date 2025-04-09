@@ -756,7 +756,7 @@ def generate_all_certificate(request, **kwargs):
         CertifyingOrganisation.objects.get(slug=organisation_slug)
 
     if not certifying_organisation.organisation_credits\
-          or certifying_organisation.organisation_credits <= 0:
+        or certifying_organisation.organisation_credits <= 0:
         return HttpResponseForbidden(
             'You do not have enough credits to generate certificates'
         )

@@ -12,6 +12,7 @@ from django.template import loader
 from .views import general_flatpage, index_view
 from django.urls import path
 from .views import UserAutocomplete, GetUserByPk
+import traceback
 
 admin.autodiscover()
 handler404 = 'base.views.error_views.custom_404'
@@ -26,12 +27,15 @@ def handler500(request):
     :param request: Django request object.
 
     Templates: `500.html`
-    Context: None
+    Context: Includes the error traceback for debugging.
     """
     # You need to create a 500.html template.
     t = loader.get_template('500.html')
+    error_traceback = traceback.format_exc()
+    print(error_traceback)  # Print the error traceback for debugging
     return HttpResponseServerError(t.render({
         'request': request,
+        'user': request.user,  # Add the user to the context
     }))
 
 

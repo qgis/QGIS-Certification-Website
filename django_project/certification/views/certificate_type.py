@@ -14,6 +14,7 @@ from rest_framework.views import APIView, Response
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 
+
 class CerticateTypeSerializer(serializers.ModelSerializer):
     """Serializer for model CertificateType."""
 

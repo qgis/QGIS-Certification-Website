@@ -1160,6 +1160,7 @@ class ApproveCertifyingOrganisationView(
 
         return reverse(self.pattern_name, kwargs={})
 
+
 class ArchivedCertifyingOrganisationListView(
     LoginRequiredMixin,
     CertifyingOrganisationMixin,
@@ -1230,6 +1231,8 @@ class ArchivedCertifyingOrganisationListView(
                 raise Http404(
                     'Sorry! We could not find your Certifying Organisation!')
         return self.queryset
+
+
 class AboutView(TemplateView):
     template_name = 'about.html'
 
@@ -1294,7 +1297,6 @@ def reject_certifying_organisation(request, **kwargs):
     pattern_name = 'pending-certifyingorganisation-list'
 
     if request.method == 'GET':
-        project_slug = 'qgis'
         slug = kwargs.pop('slug')
 
         certifyingorganisation_qs = \

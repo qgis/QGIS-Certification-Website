@@ -5,7 +5,6 @@ import os
 from django import forms
 from django.conf import settings
 from django.contrib.gis.geos import Point
-from django.contrib.admin import widgets
 from django.contrib.auth.models import User
 from django.contrib.gis import forms as geoforms
 from django.contrib.gis import gdal
@@ -17,7 +16,6 @@ from crispy_forms.layout import (
     Layout,
     Fieldset,
     HTML,
-    Submit,
     Field,
 )
 
@@ -37,6 +35,7 @@ from .models import (
 from crispy_bulma.widgets import FileUploadInput
 
 FileUploadInput.template_name = 'widgets/file_upload_input.html'
+
 
 class MultiSelectWidget(forms.SelectMultiple):
     template_name = 'widgets/multiselect.html'
@@ -91,7 +90,7 @@ class CertifyingOrganisationForm(forms.ModelForm):
                 Field('organisation_phone', css_class='form-control'),
                 Field('logo', css_class='form-control'),
                 Field('owner_message', css_class='form-control'),
-                Field('organisation_owners',css_class='is-fullwidth'),
+                Field('organisation_owners', css_class='is-fullwidth'),
                 Field('project', css_class='form-control'),
                 css_id='project-form')
         )
@@ -410,6 +409,7 @@ class CourseForm(forms.ModelForm):
         ),
     )
     template_certificate = forms.ImageField(widget=FileUploadInput)
+
     class Meta:
         model = Course
         fields = (

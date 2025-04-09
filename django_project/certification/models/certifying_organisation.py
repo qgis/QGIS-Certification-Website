@@ -69,7 +69,7 @@ class UnapprovedCertifyingOrganisationManager(models.Manager):
             approved=False,
             rejected=False,
             is_archived=False
-            )
+        )
 
 
 class ArchivedCertifyingOrganisationManager(models.Manager):
@@ -170,7 +170,7 @@ class CertifyingOrganisation(models.Model):
     is_archived = models.BooleanField(
          help_text=_('Is this organisation archived?'),
          default=False
-     )
+    )
 
     status = models.ForeignKey(
         Status,
