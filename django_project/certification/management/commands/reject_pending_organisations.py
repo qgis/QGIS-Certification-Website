@@ -48,7 +48,7 @@ class Command(BaseCommand):
 
                 send_rejection_email(
                     organisation,
-                    'changelog.qgis.org',
+                    'certification.qgis.org',
                     'https'
                 )
                 count += 1
