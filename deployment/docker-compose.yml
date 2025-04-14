@@ -66,6 +66,7 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - SENTRY_DSN=${SENTRY_DSN}
       - SENTRY_RATE=${SENTRY_RATE}
+      - LOGIN_REDIRECT_URL=${LOGIN_REDIRECT_URL}
     volumes:
       - static-data:/home/web/static:rw
       - media-data:/home/web/media:rw

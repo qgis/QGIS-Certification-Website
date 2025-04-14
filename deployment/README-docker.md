@@ -46,6 +46,16 @@ each command with 'staging' e.g. ``make staging-deploy``.
 git checkout**  from the production checkout as the code from the git checkout
 is shared into the source tree.
 
+### For staging under proxy pass
+To generate dummy certificates for staging use:
+```
+mkdir -p deployment/certs
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout dummy.key -out dummy.crt \
+  -subj "/CN=your.ip.address.here" \
+  -addext "subjectAltName = IP:your.ip.address.here"
+```
+
 ## Using make
 
 The following key make commands are provided for production:
