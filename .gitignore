@@ -132,6 +132,3 @@ node_modules
 django_project/base/static/bundles
 django_project/package-lock.json
 django_project/webpack-stats.json
-
-# Dummy certificates
-deployment/certs
