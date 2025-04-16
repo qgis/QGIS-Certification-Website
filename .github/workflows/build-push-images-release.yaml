@@ -31,8 +31,8 @@ jobs:
           push: true
           target: prod
           tags: |
-            qgis/qgis-changelog-uwsgi:${{ github.ref_name }}
-            qgis/qgis-changelog-uwsgi:latest
+            qgis/qgis-certification-uwsgi:${{ github.ref_name }}
+            qgis/qgis-certification-uwsgi:latest
       
       - name: Log out from Docker Hub
         run: docker logout
