@@ -25,7 +25,7 @@ web:
 	@# Dont confuse this with the dbbackup make command below
 	@# This one runs the postgis-backup cron container
 	@# We add --no-recreate so that it does not destroy & recreate the db container
-	# @docker compose up --no-recreate --no-deps -d dbbackups
+	@docker compose up --no-recreate --no-deps -d dbbackups
 
 permissions:
 	# Probably we want something more granular here....
