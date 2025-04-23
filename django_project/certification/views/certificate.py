@@ -332,7 +332,6 @@ def generate_pdf(
     else:
         convener_signature = None
 
-    print(course.template_certificate, "course.template_certificate")
     if course.template_certificate:
         if hasattr(course.template_certificate, 'open'):
             course.template_certificate.open()
