@@ -207,7 +207,7 @@
                 <button class="delete" aria-label="close" onclick="closeInviteExternalReviewer()"></button>
             </header>
             <section class="modal-card-body">
-                <div id="ie-badge" class="tag is-success" style="margin-bottom: 10px; display: none"></div>
+                <div id="ie-badge" class="notification" style="margin-bottom: 10px; display: none"></div>
                 <form id="inviteExternalReviewerForm" role="form">
                     <div class="field">
                         <label class="label">Name:</label>
@@ -916,8 +916,8 @@
             cancelButton.attr('disabled', true);
 
             let badge = $('#ie-badge');
-            badge.removeClass('badge-success');
-            badge.removeClass('badge-danger');
+            badge.removeClass('is-success');
+            badge.removeClass('is-danger');
 
             $.ajax({
                 url: url,
@@ -930,7 +930,7 @@
                 success: function(data){
                     document.forms['inviteExternalReviewerForm'].reset();
                     if (data['created']) {
-                        badge.addClass('badge-success');
+                        badge.addClass('is-success');
                         badge.html('Reviewer successfully invited!');
                         $('#list-external-reviewer').append(
                             `<li>${email}</li>`
@@ -947,7 +947,7 @@
                     cancelButton.attr('disabled', false);
                 },
                 error: function () {
-                    badge.addClass('badge-error');
+                    badge.addClass('is-danger');
                     badge.html('Error inviting reviewer');
                     badge.show();
 
