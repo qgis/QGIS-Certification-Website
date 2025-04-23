@@ -10,21 +10,19 @@
   Stay tuned and plan ahead to make the most of these offerings.
 </p>
 
-{% if user.is_authenticated %}
-  <div class="container rich tips">
-    <div class="icon">💁</div>
-    <div class="cont coloring-2">
-        <h5>
-          Want to showcase your courses here?
-        </h5>
-        <p>
-            Are you a certifying organisation looking to feature your upcoming courses? 
-            Simply log in to your <strong>organisation dashboard</strong> and <strong>create a course. </strong>
-            Please note that only courses <strong>within the next six months</strong> will be displayed here.
-        </p>
-    </div>
+<div class="container rich tips">
+  <div class="icon">💁</div>
+  <div class="cont coloring-2">
+      <h5>
+        Want to showcase your courses here?
+      </h5>
+      <p>
+          Are you a certifying organisation looking to feature your upcoming courses? 
+          Simply log in to your <strong>organisation dashboard</strong> and <strong>create a course. </strong>
+          Please note that only courses <strong>within the next six months</strong> will be displayed here.
+      </p>
   </div>
-{% endif %}
+</div>
 
 <div class="columns is-multiline is-centered">
   {% for course in upcoming_courses %}
