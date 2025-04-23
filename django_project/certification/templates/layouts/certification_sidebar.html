@@ -27,7 +27,7 @@
         Approved Organisations
       </a>
     </li>
-    {% if user.is_staff %}
+    {% if user.is_staff or user in the_project.certification_managers.all %}
       <li>
         <div class="has-child">
           <a onclick="toggleSubMenu('pending-organisations')">
