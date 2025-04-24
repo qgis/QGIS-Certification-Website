@@ -44,10 +44,18 @@ class TestCertificatePreview(TestCase):
         self.user.save()
 
         self.test_project = ProjectF.create()
-        self.test_certifying_organisation = CertifyingOrganisationF.create()
-        self.convener = CourseConvenerF.create()
-        self.training_center = TrainingCenterF.create()
-        self.course_type = CourseTypeF.create()
+        self.test_certifying_organisation = CertifyingOrganisationF.create(
+            project=self.test_project
+        )
+        self.convener = CourseConvenerF.create(
+            certifying_organisation=self.test_certifying_organisation
+        )
+        self.training_center = TrainingCenterF.create(
+            certifying_organisation=self.test_certifying_organisation
+        )
+        self.course_type = CourseTypeF.create(
+            certifying_organisation=self.test_certifying_organisation
+        )
         self.certificate_type = CertificateTypeF.create()
 
     @override_settings(VALID_DOMAIN=['testserver', ])
@@ -67,7 +75,6 @@ class TestCertificatePreview(TestCase):
     def test_preview_certificate_no_data_posted_no_login(self):
         client = Client()
         response = client.get(reverse('preview-certificate', kwargs={
-            'project_slug': self.test_project.slug,
             'organisation_slug': self.test_certifying_organisation.slug
         }))
         self.assertEqual(response.status_code, 200)
@@ -77,7 +84,6 @@ class TestCertificatePreview(TestCase):
         client = Client()
         client.login(username='anita', password='password')
         response = client.get(reverse('preview-certificate', kwargs={
-            'project_slug': self.test_project.slug,
             'organisation_slug': self.test_certifying_organisation.slug
         }))
         self.assertEqual(response.status_code, 200)
@@ -96,7 +102,6 @@ class TestCertificatePreview(TestCase):
             'template_certificate': ''
         }
         response = client.post(reverse('preview-certificate', kwargs={
-            'project_slug': self.test_project.slug,
             'organisation_slug': self.test_certifying_organisation.slug
         }), post_data)
         self.assertEqual(response.status_code, 200)
@@ -123,7 +128,6 @@ class TestCertificatePreview(TestCase):
             'certificate_type': self.certificate_type.id
         }
         response = client.post(reverse('preview-certificate', kwargs={
-            'project_slug': self.test_project.slug,
             'organisation_slug': self.test_certifying_organisation.slug
         }), post_data)
         self.assertEqual(response.status_code, 200)
@@ -148,7 +152,6 @@ class TestCertificatePreview(TestCase):
             'certificate_type': 99999
         }
         response = client.post(reverse('preview-certificate', kwargs={
-            'project_slug': self.test_project.slug,
             'organisation_slug': self.test_certifying_organisation.slug
         }), post_data)
         self.assertEqual(response.status_code, 200)

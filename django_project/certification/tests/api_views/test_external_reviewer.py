@@ -27,9 +27,7 @@ class TestExternalReviewer(TestCase):
         self.project = ProjectF.create(
             owner=self.user
         )
-        self.api_url = reverse('update-external-reviewer-text', kwargs={
-            'project_slug': self.project.slug
-        }).replace('en-us', 'en')
+        self.api_url = reverse('update-external-reviewer-text').replace('en-us', 'en')
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_update_external_reviewer_text(self):
@@ -53,7 +51,7 @@ class TestExternalReviewer(TestCase):
             data
         )
         self.assertTrue(response.status_code, 302)
-        project = Project.objects.get(id=self.project.id)
+        project = Project.objects.get(name=self.project.name)
         self.assertEqual(
             project.external_reviewer_invitation,
             'test'

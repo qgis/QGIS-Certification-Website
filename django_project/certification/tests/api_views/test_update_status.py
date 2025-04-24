@@ -1,24 +1,21 @@
 from django.core import mail
-from django.test import TestCase, override_settings, Client
+from django.test import override_settings, Client, TestCase
 from django.urls import reverse
 
 from core.model_factories import UserF
 
 from certification.models.certifying_organisation import CertifyingOrganisation
+from base.tests.model_factories import ProjectF
 from certification.tests.model_factories import (
     StatusF,
     CertifyingOrganisationF,
-    ProjectF, ExternalReviewerF
+    ExternalReviewerF
 )
 
 
 class TestUpdateStatus(TestCase):
 
     def setUp(self) -> None:
-        self.approved_status = StatusF.create(name='Approved')
-        self.rejected_status = StatusF.create(name='Rejected')
-        self.pending_status = StatusF.create(name='Pending')
-
         self.client = Client()
         self.client.post(
             '/set_language/', data={'language': 'en'})
@@ -43,6 +40,20 @@ class TestUpdateStatus(TestCase):
         self.project = ProjectF.create(
             owner=self.project_owner
         )
+
+        self.approved_status = StatusF.create(
+            name='Approved',
+            project=self.project
+        )
+        self.rejected_status = StatusF.create(
+            name='Rejected',
+            project=self.project
+        )
+        self.pending_status = StatusF.create(
+            name='Pending',
+            project=self.project
+        )
+
         self.certifying_organisation = CertifyingOrganisationF.create(
             project=self.project,
             approved=False,
@@ -58,7 +69,6 @@ class TestUpdateStatus(TestCase):
         self.manager.save()
 
         self.api_url = reverse('certifyingorganisation-update-status', kwargs={
-            'project_slug': self.project.slug,
             'slug': self.certifying_organisation.slug
         }).replace('en-us', 'en')
 
@@ -102,7 +112,6 @@ class TestUpdateStatus(TestCase):
         self.client.logout()
         response = self.client.post(
             reverse('certifyingorganisation-update-status', kwargs={
-                'project_slug': self.project.slug,
                 'slug': self.certifying_organisation.slug
             }), {
                 'status': self.pending_status.id,
@@ -128,7 +137,6 @@ class TestUpdateStatus(TestCase):
         self.client.login(username='admin', password='password')
         response = self.client.post(
             reverse('certifyingorganisation-update-status', kwargs={
-                'project_slug': self.project.slug,
                 'slug': certifying_organisation.slug
             }).replace('en-us', 'en'), {
                 'status': self.pending_status.id,

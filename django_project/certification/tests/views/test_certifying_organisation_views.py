@@ -77,7 +77,6 @@ class TestCertifyingOrganisationView(TestCase):
     def test_detail_view(self):
         client = Client()
         response = client.get(reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.project.slug,
             'slug': self.certifying_organisation.slug
         }))
         self.assertEqual(response.status_code, 200)
@@ -87,10 +86,7 @@ class TestCertifyingOrganisationView(TestCase):
         client = Client()
         client.login(username='anita', password='password')
         response = client.get(
-            reverse('pending-certifyingorganisation-list',
-                    kwargs={
-                        'project_slug': self.project.slug
-                    }) + '?ready=false')
+            reverse('pending-certifyingorganisation-list') + '?ready=false')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['pending'], True)
 
@@ -99,10 +95,7 @@ class TestCertifyingOrganisationView(TestCase):
         client = Client()
         client.login(username='user', password='password')
         response = client.get(
-            reverse('pending-certifyingorganisation-list',
-                    kwargs={
-                        'project_slug': self.project.slug
-                    }) + '?ready=false')
+            reverse('pending-certifyingorganisation-list') + '?ready=false')
         self.assertEqual(response.status_code, 403)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
@@ -111,7 +104,8 @@ class TestCertifyingOrganisationView(TestCase):
         client.login(username='anita', password='password')
 
         pending_status = StatusF.create(
-            name='pending'
+            name='pending',
+            project=self.project
         )
         pending_certifying_organisation = CertifyingOrganisationF.create(
             name='test organisation pending',
@@ -120,19 +114,13 @@ class TestCertifyingOrganisationView(TestCase):
             status=pending_status
         )
         response = client.get(
-            reverse('certifyingorganisation-list-json',
-                    kwargs={
-                        'project_slug': self.project.slug
-                    }) + '?ready=False&approved=False')
+            reverse('certifyingorganisation-list-json') + '?ready=False&approved=False')
         self.assertEqual(response.status_code, 200)
 
         # Empty and invalid parameters should be handled
         # and return the same result as above
         response_param_ivalid = client.get(
-            reverse('certifyingorganisation-list-json',
-                    kwargs={
-                        'project_slug': self.project.slug
-                    }) + '?ready=no&approved=')
+            reverse('certifyingorganisation-list-json') + '?ready=no&approved=')
         self.assertEqual(response_param_ivalid.status_code, 200)
 
         json_response = response.json()
@@ -145,21 +133,18 @@ class TestCertifyingOrganisationView(TestCase):
         )
         self.assertEqual(
             json_response['data'][0][1],
-            str(pending_certifying_organisation.creation_date)
+            pending_certifying_organisation.creation_date.strftime('%d/%m/%Y')
         )
         self.assertEqual(
             json_response['data'][0][2],
-            str(pending_certifying_organisation.update_date)
+            pending_certifying_organisation.update_date.strftime('%d/%m/%Y')
         )
         self.assertIn(
             pending_certifying_organisation.name,
             json_response['data'][0][0]
         )
         response = client.get(
-            reverse('certifyingorganisation-list-json',
-                    kwargs={
-                        'project_slug': self.project.slug
-                    }) + '?ready=True')
+            reverse('certifyingorganisation-list-json') + '?ready=True')
         json_response = response.json()
         self.assertEqual(
             len(json_response['data']),
@@ -180,10 +165,7 @@ class TestCertifyingOrganisationView(TestCase):
             approved=True
         )
         response = client.get(
-            reverse('certifyingorganisation-list-json',
-                    kwargs={
-                        'project_slug': self.project.slug
-                    }) + '?approved=True')
+            reverse('certifyingorganisation-list-json') + '?approved=True')
         self.assertEqual(response.status_code, 200)
         json_response = response.json()
         self.assertEqual(
@@ -192,11 +174,11 @@ class TestCertifyingOrganisationView(TestCase):
         )
         self.assertEqual(
             json_response['data'][1][1],
-            str(approved_certifying_organisation.creation_date)
+            approved_certifying_organisation.creation_date.strftime('%d/%m/%Y')
         )
         self.assertEqual(
             json_response['data'][1][2],
-            str(approved_certifying_organisation.update_date)
+            approved_certifying_organisation.update_date.strftime('%d/%m/%Y')
         )
         self.assertIn(
             approved_certifying_organisation.name,
@@ -217,9 +199,7 @@ class TestCertifyingOrganisationView(TestCase):
             active=True
         )
         response = client.get(
-            reverse('certifyingorganisation-create', kwargs={
-                'project_slug': self.project.slug
-            }))
+            reverse('certifyingorganisation-create'))
         self.assertTrue(len(response.context_data['available_checklist']) > 0)
         self.assertEqual(response.context_data['the_project'], self.project)
         self.assertEqual(response.status_code, 200)
@@ -246,9 +226,7 @@ class TestCertifyingOrganisationView(TestCase):
             f'textarea-{checklist.id}': 'test',
         }
         response = client.post(
-            reverse('certifyingorganisation-create', kwargs={
-                'project_slug': self.project.slug
-            }), post_data)
+            reverse('certifyingorganisation-create'), post_data)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(
             OrganisationChecklist.objects.filter(
@@ -274,8 +252,7 @@ class TestCertifyingOrganisationView(TestCase):
         )
         response = client.get(
             reverse('certifyingorganisation-update', kwargs={
-                'slug': pending_certifying_organisation.slug,
-                'project_slug': self.project.slug,
+                'slug': pending_certifying_organisation.slug
             }))
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Message to validator', response.content)
@@ -327,7 +304,6 @@ class TestCertifyingOrganisationView(TestCase):
             checked=True
         )
         response = client.get(reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.project.slug,
             'slug': pending_certifying_organisation.slug
         }))
         self.assertEqual(
@@ -355,7 +331,6 @@ class TestCertifyingOrganisationView(TestCase):
         )
         response = self.client.get(
             reverse('certifyingorganisation-detail', kwargs={
-                'project_slug': self.project.slug,
                 'slug': self.pending_certifying_organisation.slug
             }).replace('en-us', 'en') + f'?s={s.session_key}')
         self.assertEqual(response.status_code, 200)
@@ -365,13 +340,7 @@ class TestCertifyingOrganisationView(TestCase):
     def test_detail_view_object_does_not_exist(self):
         client = Client()
         response = client.get(reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.project.slug,
             'slug': 'random'
-        }))
-        self.assertEqual(response.status_code, 404)
-        response = client.get(reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': 'random',
-            'slug': self.certifying_organisation.slug
         }))
         self.assertEqual(response.status_code, 404)
 
@@ -385,7 +354,6 @@ class TestCertifyingOrganisationView(TestCase):
         self.assertEqual(self.pending_certifying_organisation.approved, False)
         response = self.client.get(
             reverse('certifyingorganisation-reject', kwargs={
-                'project_slug': self.project.slug,
                 'slug': self.pending_certifying_organisation.slug
             }), post_data
         )
@@ -400,7 +368,9 @@ class TestCertifyingOrganisationView(TestCase):
     def test_update_status_organisation(self):
         status = self.client.login(username='anita', password='password')
         self.assertTrue(status)
-        status_object = StatusF.create()
+        status_object = StatusF.create(
+            project=self.project
+        )
         post_data = {
             'remarks': 'test update status',
             'status': status_object.id
@@ -408,7 +378,6 @@ class TestCertifyingOrganisationView(TestCase):
         self.assertEqual(self.pending_certifying_organisation.approved, False)
         response = self.client.post(
             reverse('certifyingorganisation-update-status', kwargs={
-                'project_slug': self.project.slug,
                 'slug': self.pending_certifying_organisation.slug
             }), post_data
         )
@@ -423,9 +392,7 @@ class TestCertifyingOrganisationView(TestCase):
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_get_status_list_no_login(self):
         response = self.client.get(
-            reverse('get-status-list', kwargs={
-                'project_slug': self.project.slug,
-            })
+            reverse('get-status-list')
         )
         self.assertEqual(response.status_code, 302)
 
@@ -437,9 +404,7 @@ class TestCertifyingOrganisationView(TestCase):
             project=self.project
         )
         response = self.client.get(
-            reverse('get-status-list', kwargs={
-                'project_slug': self.project.slug,
-            })
+            reverse('get-status-list')
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['name'], status_object.name)

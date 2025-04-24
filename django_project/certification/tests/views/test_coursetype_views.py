@@ -26,7 +26,6 @@ class TestCourseTypeView(TestCase):
         """Test the valid url patterns."""
 
         url = reverse('coursetype-detail', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': self.certifying_organisation.slug,
             'pk': self.coursetype.pk
         })
@@ -37,7 +36,6 @@ class TestCourseTypeView(TestCase):
         # it should raise NoReverseMatch
         with self.assertRaises(NoReverseMatch):
             reverse('coursetype-detail', kwargs={
-                'project_slug': self.project.slug,
                 'organisation_slug': self.certifying_organisation.slug,
                 'pk': self.coursetype.slug
             })

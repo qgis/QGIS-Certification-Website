@@ -18,7 +18,10 @@ class TestCertifyingOrganisationForm(TestCase):
             'is_staff': True
         })
         self.project = ProjectF.create()
-        self.status = StatusF.create(name='pending')
+        self.status = StatusF.create(
+            name='pending',
+            project=self.project
+        )
         self.certifying_organisation = CertifyingOrganisationF.create(
             project=self.project,
             approved=False,

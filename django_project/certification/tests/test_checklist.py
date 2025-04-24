@@ -65,14 +65,12 @@ class TestCertificationChecklist(TestCase):
         post_data = {
             'checklist_id': self.checklist.id
         }
-        url = reverse('activate-checklist', kwargs={
-            'project_slug': self.project.slug
-        })
+        url = reverse('activate-checklist')
 
         response = self.client.post(url, post_data)
         self.assertEqual(
             response.status_code,
-            403
+            404
         )
 
     @override_settings(VALID_DOMAIN=['testserver', ])
@@ -82,9 +80,7 @@ class TestCertificationChecklist(TestCase):
         }
         # As manager
         self.client.login(username='manager', password='password')
-        url = reverse('activate-checklist', kwargs={
-            'project_slug': self.project.slug
-        })
+        url = reverse('activate-checklist')
 
         response = self.client.post(url, post_data)
         self.assertEqual(
@@ -101,9 +97,7 @@ class TestCertificationChecklist(TestCase):
         }
         # As manager
         self.client.login(username='manager', password='password')
-        url = reverse('archive-checklist', kwargs={
-            'project_slug': self.project.slug
-        })
+        url = reverse('archive-checklist')
 
         response = self.client.post(url, post_data)
         self.assertEqual(
@@ -131,9 +125,7 @@ class TestCertificationChecklist(TestCase):
         }
         # As manager
         self.client.login(username='manager', password='password')
-        url = reverse('update-checklist-order', kwargs={
-            'project_slug': self.project.slug
-        })
+        url = reverse('update-checklist-order')
 
         response = self.client.post(url, post_data)
         self.assertEqual(
@@ -149,9 +141,7 @@ class TestCertificationChecklist(TestCase):
     def test_create_checklist_view(self):
         self.client.login(username='super', password='password')
         response = self.client.get(
-            reverse('certificate-checklist-create', kwargs={
-                'project_slug': self.project.slug,
-            }).replace('en-us', 'en'))
+            reverse('certificate-checklist-create').replace('en-us', 'en'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context_data['project'], self.project)
@@ -164,9 +154,7 @@ class TestCertificationChecklist(TestCase):
             'project': self.project.id,
         }
         response = self.client.post(
-            reverse('certificate-checklist-create', kwargs={
-                'project_slug': self.project.slug,
-            }), post_data)
+            reverse('certificate-checklist-create'), post_data)
         self.assertEqual(response.status_code, 403)
         checklist = Checklist.objects.filter(question='test2')
         self.assertFalse(checklist.exists())
@@ -180,9 +168,7 @@ class TestCertificationChecklist(TestCase):
             'target': ORGANIZATION_OWNER
         }
         response = self.client.post(
-            reverse('certificate-checklist-create', kwargs={
-                'project_slug': self.project.slug,
-            }), post_data)
+            reverse('certificate-checklist-create'), post_data)
         self.assertEqual(response.status_code, 302)
         checklist = Checklist.objects.filter(question='test2')
         self.assertTrue(checklist.exists())
