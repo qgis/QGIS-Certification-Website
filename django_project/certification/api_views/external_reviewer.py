@@ -14,7 +14,7 @@ class UpdateExternalReviewerText(UserPassesTestMixin, APIView):
     def test_func(self, user):
         self.project = (
             Project.objects.get(
-                slug=self.kwargs.get('project_slug', None))
+                slug='qgis')
         )
 
         return (
@@ -23,7 +23,7 @@ class UpdateExternalReviewerText(UserPassesTestMixin, APIView):
             user in self.project.certification_managers.all()
         )
 
-    def post(self, request, project_slug):
+    def post(self, request):
         email_text = request.POST.get('text', '')
         if not email_text:
             raise Http404('Missing required data')
@@ -34,6 +34,5 @@ class UpdateExternalReviewerText(UserPassesTestMixin, APIView):
         self.project.save()
 
         return HttpResponseRedirect(
-            reverse('certification-management-view',
-                    kwargs={'project_slug': project_slug})
+            reverse('certification-management-view')
         )

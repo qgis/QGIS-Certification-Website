@@ -11,13 +11,21 @@ class ProjectF(factory.django.DjangoModelFactory):
     class Meta:
         model = Project
 
-    name = factory.Sequence(lambda n: 'Test Project %s' % n)
+    name = 'qgis'
     description = u'This is only for testing'
     owner = factory.SubFactory(UserF)
     project_representative = factory.SubFactory(UserF)
     approved = True
     private = False
     gitter_room = u'test/test'
+
+    @classmethod
+    def create(cls, **kwargs):
+        name = kwargs.get('name', 'qgis')
+        existing_project = Project.objects.filter(name=name).first()
+        if existing_project:
+            return existing_project
+        return super().create(**kwargs)
 
 
 class OrganisationF(factory.django.DjangoModelFactory):
