@@ -48,9 +48,7 @@ class TestCertificateTypesView(TestCase):
 
         self.client.post('/set_language/', data={'language': 'en'})
         self.client.force_login(self.user_staff)
-        url = reverse('certification-management-view', kwargs={
-            'project_slug': self.project.slug
-        })
+        url = reverse('certification-management-view')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -59,19 +57,17 @@ class TestCertificateTypesView(TestCase):
         self.assertContains(response, self.certificate_type_2.name)
 
         # only certificate types related to project in context_object ListView
-        self.assertEqual(len(response.context_data['object_list']), 1)
+        self.assertEqual(len(response.context_data['object_list']), 2)
         self.assertEqual(
             response.context_data['object_list'].last().certificate_type,
-            self.certificate_type_1
+            self.certificate_type_2
         )
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_certificate_type_user_is_manager(self):
         self.client.post('/set_language/', data={'language': 'en'})
         self.client.force_login(self.user_manager)
-        url = reverse('certification-management-view', kwargs={
-            'project_slug': self.project.slug
-        })
+        url = reverse('certification-management-view')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -79,9 +75,7 @@ class TestCertificateTypesView(TestCase):
     def test_certificate_type_non_manager_should_return404(self):
         self.client.post('/set_language/', data={'language': 'en'})
         self.client.force_login(self.user)
-        url = reverse('certification-management-view', kwargs={
-            'project_slug': self.project.slug
-        })
+        url = reverse('certification-management-view')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
@@ -89,9 +83,7 @@ class TestCertificateTypesView(TestCase):
     def test_update_project_certificate_view(self):
         self.client.post('/set_language/', data={'language': 'en'})
         self.client.force_login(self.user_staff)
-        url = reverse('certificate-type-update', kwargs={
-            'project_slug': self.project.slug
-        })
+        url = reverse('certificate-type-update')
         # choose certificate type-2 only
         post_data = {'certificate_types': 'type-2'}
         response = self.client.post(url, data=post_data, follow=True)
@@ -104,9 +96,7 @@ class TestCertificateTypesView(TestCase):
     def test_update_project_certificate_view_user_is_manager(self):
         self.client.post('/set_language/', data={'language': 'en'})
         self.client.force_login(self.user_manager)
-        url = reverse('certificate-type-update', kwargs={
-            'project_slug': self.project.slug
-        })
+        url = reverse('certificate-type-update')
         # choose certificate type-2 only
         post_data = {'certificate_types': 'type-2'}
         response = self.client.post(url, data=post_data, follow=True)
@@ -116,17 +106,14 @@ class TestCertificateTypesView(TestCase):
     def test_update_project_certificate_non_manager_should_return404(self):
         self.client.post('/set_language/', data={'language': 'en'})
         self.client.force_login(self.user)
-        url = reverse('certificate-type-update', kwargs={
-            'project_slug': self.project.slug
-        })
+        url = reverse('certificate-type-update')
         # choose certificate type-2 only
         post_data = {'certificate_types': 'type-2'}
         response = self.client.post(url, data=post_data, follow=True)
         self.assertRedirects(
             response,
             expected_url=reverse(
-                'certification-management-view',
-                kwargs={'project_slug': self.project.slug}
+                'certification-management-view'
             ),
             status_code=302,
             target_status_code=404

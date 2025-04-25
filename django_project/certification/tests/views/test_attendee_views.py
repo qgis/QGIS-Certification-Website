@@ -61,7 +61,6 @@ class TestAttendeeView(TestCase):
         status = self.client.login(username='user', password='password')
         self.assertTrue(status)
         url = reverse('attendee-update', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': self.certifying_organisation.slug,
             'course_slug': self.course.slug,
             'pk': self.attendee.pk
@@ -123,7 +122,6 @@ class TestCourseAttendeeView(TestCase):
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_AttendeeCreateView_no_login(self):
         response = self.client.get(reverse('attendee-create', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': self.certifying_organisation.slug,
             'slug': self.course.slug
         }))
@@ -134,7 +132,6 @@ class TestCourseAttendeeView(TestCase):
         status = self.client.login(username='anita', password='password')
         self.assertTrue(status)
         url = reverse('attendee-create', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': self.certifying_organisation.slug,
             'slug': self.course.slug
         })
@@ -161,7 +158,6 @@ class TestCourseAttendeeView(TestCase):
             'add_to_course': True,
         }
         response = self.client.post(reverse('attendee-create', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': self.certifying_organisation.slug,
             'slug': self.course.slug
         }), post_data)
@@ -170,7 +166,6 @@ class TestCourseAttendeeView(TestCase):
             reverse(
                 'course-detail',
                 kwargs={
-                    'project_slug': self.project.slug,
                     'organisation_slug': self.certifying_organisation.slug,
                     'slug': self.course.slug
                 }))
@@ -189,7 +184,6 @@ class TestCourseAttendeeView(TestCase):
             'certifying_organisation': self.certifying_organisation.id,
         }
         response = self.client.post(reverse('attendee-create', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': self.certifying_organisation.slug,
             'slug': self.course.slug
         }), post_data)
@@ -198,7 +192,6 @@ class TestCourseAttendeeView(TestCase):
             reverse(
                 'courseattendee-create',
                 kwargs={
-                    'project_slug': self.project.slug,
                     'organisation_slug': self.certifying_organisation.slug,
                     'slug': self.course.slug
                 }))
