@@ -10,8 +10,8 @@ class UpcomingCourseListView(ListView):
     context_object_name = 'upcoming_courses'
 
     def get_queryset(self):
-        """Return courses with start_date in the future and within the next 3 months."""
-        three_months_from_now = now() + timedelta(days=90)
+        """Return courses with start_date in the future and within the next 6 months."""
+        three_months_from_now = now() + timedelta(days=180)
         return Course.objects.filter(
             start_date__gte=now(),
             start_date__lte=three_months_from_now
