@@ -1,23 +1,16 @@
-# Projecta
+# QGIS Certification Website
 
-[![Projecta Screenshot](https://cloud.githubusercontent.com/assets/178003/12607822/8cdb225c-c4e0-11e5-8ab0-ba51bb6f4e93.png)](http://changelog.kartoza.com)
-
-
-A django app for creating 'visual changelogs' for software releases, and for 
-managing a software project at a high level.
-
-View a running instance at [http://changelog.kartoza.com](http://changelog.kartoza.com)
+[![image](https://github.com/user-attachments/assets/88e08b1f-2dd1-4311-9ebf-9b3ef91b64dc)](https://certification.qgis.org)
 
 
-Note that whilst usable, Projecta is under continual development and not
-yet feature complete.
+A django app for managing the QGIS Certification Programme
 
-The latest source code is available at 
-[https://github.com/kartoza/prj.app](https://github.com/kartoza/prj.app).
+View a running instance at [https://certification.qgis.org](https://certification.qgis.org)
 
 * **Developers:** See our [developer guide](README-dev.md)
 * **For production:** See our [deployment guide](README-docker.md)
 
+## TODO: update this README
 
 ## Key features
 
