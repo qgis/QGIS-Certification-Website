@@ -249,7 +249,10 @@ def generate_pdf(
         pathname, project, course, attendee, certificate, current_site,
         wording='Has attended and completed the course:'):
     """Create the PDF object, using the response object as its file."""
-    if not certificate.is_paid:
+
+    # Check if certificate is paid or not
+    # Allow dummy certificate (preview) to be generated
+    if not isinstance(certificate, DummyCertificate) and not certificate.is_paid:
         return
     # Register new font
     try:
