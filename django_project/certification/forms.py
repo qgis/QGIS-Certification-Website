@@ -52,7 +52,7 @@ class CertifyingOrganisationForm(forms.ModelForm):
         }),
     )
 
-    logo = forms.ImageField(widget=FileUploadInput)
+    logo = forms.ImageField(widget=FileUploadInput, required=False)
 
     # noinspection PyClassicStyleClass.
     class Meta:

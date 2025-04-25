@@ -91,7 +91,7 @@ class IsCertificationManager(BasePermission):
 class ActivateChecklist(APIView):
     permission_classes = [IsAdminUser | IsCertificationManager]
 
-    def post(self, request, project_slug):
+    def post(self, request):
         """
         Activate a checklist, only managers and superuser can do this action.
         """
@@ -119,7 +119,7 @@ class ArchiveChecklist(APIView):
 class UpdateChecklistOrder(APIView):
     permission_classes = [IsAdminUser | IsCertificationManager]
 
-    def post(self, request, project_slug):
+    def post(self, request):
         """
         Update order of checklist
 
