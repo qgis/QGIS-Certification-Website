@@ -93,7 +93,15 @@
                         </div>
                         <div class="columns">
                             <div class="column is-4 has-text-weight-medium">Organisation:</div>
-                            <div class="column">{{ course.certifying_organisation.name }}</div>
+                            <div class="column">
+                                {% if course.certifying_organisation.url %}
+                                    <a href="{{ course.certifying_organisation.url }}" target="_blank" rel="noopener noreferrer">
+                                        {{ course.certifying_organisation.name }}
+                                    </a>
+                                {% else %}
+                                    {{ course.certifying_organisation.name }}
+                                {% endif %}
+                            </div>
                         </div>
                         <div class="columns">
                             <div class="column is-4 has-text-weight-medium">Start date:</div>
