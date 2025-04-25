@@ -56,17 +56,27 @@ class TestCertificateOrganisationView(TestCase):
             project_representative=self.user2
         )
         self.certifying_organisation = \
-            CertifyingOrganisationF.create()
-        self.course_convener = CourseConvenerF.create()
-        self.training_center = TrainingCenterF.create()
-        self.course_type = CourseTypeF.create()
+            CertifyingOrganisationF.create(
+                project=self.project
+            )
+        self.course_convener = CourseConvenerF.create(
+            certifying_organisation=self.certifying_organisation
+        )
+        self.training_center = TrainingCenterF.create(
+            certifying_organisation=self.certifying_organisation
+        )
+        self.course_type = CourseTypeF.create(
+            certifying_organisation=self.certifying_organisation
+        )
         self.course = CourseF.create(
             course_convener=self.course_convener,
             certifying_organisation=self.certifying_organisation,
             course_type=self.course_type,
             training_center=self.training_center
         )
-        self.attendee = AttendeeF.create()
+        self.attendee = AttendeeF.create(
+            certifying_organisation=self.certifying_organisation
+        )
         self.certificate_type = CertificateTypeF.create()
         self.certificate = CertificateF.create(
             course=self.course,
@@ -104,7 +114,6 @@ class TestCertificateOrganisationView(TestCase):
         self.client.login(username='user', password='password')
         response = self.client.get(
             reverse('issue-certificate-organisation', kwargs={
-                'project_slug': self.project.slug,
                 'organisation_slug': self.certifying_organisation.slug
             })
         )
@@ -124,7 +133,6 @@ class TestCertificateOrganisationView(TestCase):
 
         response = self.client.post(
             reverse('issue-certificate-organisation', kwargs={
-                'project_slug': self.project.slug,
                 'organisation_slug': self.certifying_organisation.slug
             }), post_data
         )
@@ -137,7 +145,6 @@ class TestCertificateOrganisationView(TestCase):
         self.client.login(username='user', password='password')
         response = self.client.get(
             reverse('detail-certificate-organisation', kwargs={
-                'project_slug': self.project.slug,
                 'id': self.certifying_organisation_certificate.int_id
             })
         )

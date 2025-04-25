@@ -16,7 +16,9 @@ from certification.tests.model_factories import (
     CourseConvenerF,
     AttendeeF,
     CertificateF,
-    CourseAttendeeF
+    CourseAttendeeF,
+    TrainingCenterF,
+    CourseTypeF
 )
 
 
@@ -47,8 +49,17 @@ class TestCourseView(TestCase):
         self.certifying_organisation = CertifyingOrganisationF.create(
             project=self.project
         )
+        self.training_center = TrainingCenterF.create(
+            certifying_organisation=self.certifying_organisation)
+        self.course_convener = CourseConvenerF.create(
+            certifying_organisation=self.certifying_organisation)
+        self.course_type = CourseTypeF.create(
+            certifying_organisation=self.certifying_organisation)
         self.course = CourseF.create(
-            certifying_organisation=self.certifying_organisation
+            certifying_organisation=self.certifying_organisation,
+            training_center=self.training_center,
+            course_convener=self.course_convener,
+            course_type=self.course_type
         )
         self.certificate_type = CertificateTypeF.create()
         self.project_cert_type = ProjectCertificateTypeF.create(
@@ -73,7 +84,6 @@ class TestCourseView(TestCase):
     def test_create_course_must_showing_CertificateTypes(self):
         self.client.login(username='anita', password='password')
         response = self.client.get(reverse('course-create', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': self.certifying_organisation.slug,
         }))
         self.assertEqual(response.status_code, 200)
@@ -90,7 +100,9 @@ class TestCourseView(TestCase):
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_detail_view(self):
         client = Client()
-        attendee = AttendeeF.create()
+        attendee = AttendeeF.create(
+            certifying_organisation=self.certifying_organisation
+        )
         CourseAttendeeF.create(
             attendee=attendee,
             course=self.course
@@ -102,7 +114,9 @@ class TestCourseView(TestCase):
             issue_date=datetime.datetime.now()
         )
 
-        old_attendee = AttendeeF.create()
+        old_attendee = AttendeeF.create(
+            certifying_organisation=self.certifying_organisation
+        )
         CourseAttendeeF.create(
             attendee=old_attendee,
             course=self.course
@@ -116,7 +130,6 @@ class TestCourseView(TestCase):
         cert.save()
 
         response = client.get(reverse('course-detail', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': self.certifying_organisation.slug,
             'slug': self.course.slug
         }))
@@ -131,21 +144,28 @@ class TestCourseView(TestCase):
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_detail_with_duplicates(self):
         self.client.login(username='anita', password='password')
+        training_center = TrainingCenterF.create(
+            certifying_organisation=self.certifying_organisation)
+        course_convener = CourseConvenerF.create(
+            certifying_organisation=self.certifying_organisation)
+        course_type = CourseTypeF.create(
+            certifying_organisation=self.certifying_organisation)
         course2 = CourseF.create(
-            certifying_organisation=self.certifying_organisation
+            certifying_organisation=self.certifying_organisation,
+            training_center=training_center,
+            course_convener=course_convener,
+            course_type=course_type
         )
         course2.slug = self.course.slug
         course2.save()
 
         response = self.client.get(reverse('course-detail', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': self.certifying_organisation.slug,
             'slug': course2.slug
         }))
         self.assertEqual(response.status_code, 302)
 
         expected_url = reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.project.slug,
             'slug': self.certifying_organisation.slug,
         })
         self.assertRedirects(response, expected_url)
@@ -154,13 +174,11 @@ class TestCourseView(TestCase):
     def test_detail_view_object_does_not_exist(self):
         client = Client()
         response = client.get(reverse('course-detail', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': 'random',
             'slug': self.course.slug
         }))
         self.assertEqual(response.status_code, 404)
         response = client.get(reverse('course-detail', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': self.certifying_organisation.slug,
             'slug': 'random'
         }))
@@ -175,7 +193,6 @@ class TestCourseView(TestCase):
         }
         response = self.client.post(
             reverse('course-update', kwargs={
-                'project_slug': self.project.slug,
                 'organisation_slug': self.certifying_organisation.slug,
                 'slug': self.course.slug
             }), post_data)
@@ -184,8 +201,17 @@ class TestCourseView(TestCase):
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_update_with_duplicates(self):
         self.client.login(username='anita', password='password')
+        training_center = TrainingCenterF.create(
+            certifying_organisation=self.certifying_organisation)
+        course_convener = CourseConvenerF.create(
+            certifying_organisation=self.certifying_organisation)
+        course_type = CourseTypeF.create(
+            certifying_organisation=self.certifying_organisation)
         course2 = CourseF.create(
-            certifying_organisation=self.certifying_organisation
+            certifying_organisation=self.certifying_organisation,
+            training_center=training_center,
+            course_convener=course_convener,
+            course_type=course_type
         )
         course2.slug = self.course.slug
         course2.save()
@@ -194,14 +220,12 @@ class TestCourseView(TestCase):
             'language': 'Indonesian',
         }
         response = self.client.get(reverse('course-update', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': self.certifying_organisation.slug,
             'slug': course2.slug
         }), post_data)
         self.assertEqual(response.status_code, 302)
 
         expected_url = reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.project.slug,
             'slug': self.certifying_organisation.slug,
         })
         self.assertRedirects(response, expected_url)
@@ -209,19 +233,26 @@ class TestCourseView(TestCase):
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_delete_with_duplicates(self):
         self.client.login(username='anita', password='password')
+        training_center = TrainingCenterF.create(
+            certifying_organisation=self.certifying_organisation)
+        course_convener = CourseConvenerF.create(
+            certifying_organisation=self.certifying_organisation)
+        course_type = CourseTypeF.create(
+            certifying_organisation=self.certifying_organisation)
         course2 = CourseF.create(
-            certifying_organisation=self.certifying_organisation
+            certifying_organisation=self.certifying_organisation,
+            training_center=training_center,
+            course_convener=course_convener,
+            course_type=course_type
         )
         course2.slug = self.course.slug
         course2.save()
         response = self.client.get(reverse('course-delete', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': self.certifying_organisation.slug,
             'slug': course2.slug
         }))
         self.assertEqual(response.status_code, 302)
         expected_url = reverse('certifyingorganisation-detail', kwargs={
-            'project_slug': self.project.slug,
             'slug': self.certifying_organisation.slug,
         })
         self.assertRedirects(response, expected_url)
@@ -253,7 +284,6 @@ class TestCourseView(TestCase):
         )
         self.client.login(username='anita', password='password')
         response = self.client.get(reverse('course-create', kwargs={
-            'project_slug': self.project.slug,
             'organisation_slug': self.certifying_organisation.slug,
         }))
         self.assertContains(response, 'Pretty Smart')
@@ -287,7 +317,6 @@ class TestCourseView(TestCase):
         )
         response = self.client.get(
             reverse('certifyingorganisation-detail', kwargs={
-                'project_slug': self.project.slug,
                 'slug': self.certifying_organisation.slug,
             })
         )
@@ -323,7 +352,6 @@ class TestCourseView(TestCase):
         self.client.login(username='anita', password='password')
         response = self.client.get(
             reverse('certifyingorganisation-detail', kwargs={
-                'project_slug': self.project.slug,
                 'slug': self.certifying_organisation.slug,
             })
         )
