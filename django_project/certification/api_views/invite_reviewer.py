@@ -79,7 +79,7 @@ class InviteReviewerApiView(UserPassesTestMixin, APIView):
                 'session_key': s.session_key
             }
             send_mail(
-                u'Changelog - You have been invited as a reviewer',
+                u'Certification - You have been invited as a reviewer',
                 u'Dear {name},\n\n'
                 u'{invitation_text}'
                 u'\n\n'
