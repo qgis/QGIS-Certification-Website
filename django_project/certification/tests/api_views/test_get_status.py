@@ -18,9 +18,7 @@ class TestGetStatus(TestCase):
         self.status = StatusF.create(
             project=self.project
         )
-        self.api_url = reverse('get-status-list', kwargs={
-            'project_slug': self.project.slug
-        }).replace(
+        self.api_url = reverse('get-status-list').replace(
             'en-us', 'en'
         )
 

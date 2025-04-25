@@ -49,7 +49,6 @@ class TestInviteReviewer(TestCase):
             project=self.project
         )
         self.url = reverse('invite-external-reviewer', kwargs={
-            'project_slug': self.project.slug,
             'slug': self.certifying_organisation.slug
         })
         self.url = self.url.replace('us-en', 'en')

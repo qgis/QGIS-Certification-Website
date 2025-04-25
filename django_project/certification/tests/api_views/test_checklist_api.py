@@ -33,8 +33,7 @@ class TestChecklistApi(TestCase):
             approved=False,
             rejected=False
         )
-        self.api_url = '/en/{0}/update-checklist-reviewer/{1}/'.format(
-            self.project.slug,
+        self.api_url = '/en/update-checklist-reviewer/{0}/'.format(
             self.certifying_organisation.slug
         )
         self.certifying_organisation.organisation_owners.set([self.user])
@@ -106,7 +105,6 @@ class TestChecklistApi(TestCase):
             f'checklist-{self.checklist.id}': 'yes'
         }
         url = reverse('update-checklist-reviewer', kwargs={
-            'project_slug': self.project.slug,
             'slug': self.certifying_organisation.slug
         }) + '?s=' + s.session_key
         url = url.replace('/en-us/', '/en/')
