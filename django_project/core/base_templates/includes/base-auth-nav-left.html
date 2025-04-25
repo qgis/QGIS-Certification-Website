@@ -16,7 +16,7 @@
       <i class="fas fa-users mr-3"></i>
       Approved Organisations
     </a>
-    {% if user.is_staff %}
+    {% if user.is_staff or user in the_project.certification_managers.all %}
       <a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'pending-certifyingorganisation-list' %}?ready=False">
         <i class="fas fa-clock mr-3"></i>
         Pending Organisations - Not Ready

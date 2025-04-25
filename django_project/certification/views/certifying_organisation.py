@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.utils.html import escape
 from django.urls import reverse
-from django.shortcuts import get_list_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404
 from django.db.models import Q, Prefetch, OuterRef, Subquery
 from django.http import HttpResponse, request
 from django.views.generic import (
@@ -26,8 +26,7 @@ from django.shortcuts import render
 from django.core.exceptions import ValidationError
 from braces.views import (
     LoginRequiredMixin,
-    UserPassesTestMixin,
-    StaffuserRequiredMixin
+    UserPassesTestMixin
 )
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from django.contrib.sessions.models import Session
@@ -91,21 +90,47 @@ class JSONResponseMixin(object):
         return result
 
 
-class CustomStaffuserRequiredMixin(StaffuserRequiredMixin):
-    """Fix redirect loop when user is already authenticated but non staff."""
-    def no_permissions_fail(self, request=None):
+class CertificationManagerRequiredMixin(LoginRequiredMixin):
+    """Mixin to check if the user is a certification manager."""
+
+    def has_permission(self, user):
+        """Check if the user has the required permissions.
+        :param user: User object
+        :type user: User
+
+        :returns: True if the user has the required permissions, False otherwise.
+        :rtype: bool
         """
-        Called when the user has no permissions and no exception was raised.
+        project = get_object_or_404(Project, slug='qgis')
+        manager = project.certification_managers.all()
+        return user.is_staff or user in manager
+
+    def dispatch(self, request, *args, **kwargs):
+        """Check if the user is authenticated and has the required permissions.
+
+        :param request: HTTP request object
+        :type request: HttpRequest
+
+        :param args: Positional arguments
+        :type args: tuple
+
+        :param kwargs: Keyword arguments
+        :type kwargs: dict
+
+        :returns: HTTP response object
+        :rtype: HttpResponse
         """
         if not request.user.is_authenticated:
-            return super(
-                CustomStaffuserRequiredMixin, self).no_permissions_fail(
-                request)
+            return self.handle_no_permission()
 
-        return HttpResponse(
-            'Sorry! You do not have permission to perform this action.',
-            status=403
-        )
+        if not self.has_permission(user=request.user):
+            return HttpResponse(
+                'Sorry! You do not have permission to perform this action.',
+                status=403
+            )
+
+        return super(CertificationManagerRequiredMixin, self).dispatch(
+            request, *args, **kwargs)
 
 
 class CertifyingOrganisationMixin(object):
@@ -448,7 +473,7 @@ class CertifyingOrganisationDetailView(
 
 
 class CertifyingOrganisationArchivingView(
-    LoginRequiredMixin,
+    CertificationManagerRequiredMixin,
     CertifyingOrganisationMixin,
     APIView):
     """Archive/Unarchive Certifying Organisation."""
@@ -504,7 +529,7 @@ class CertifyingOrganisationArchivingView(
 
 # noinspection PyAttributeOutsideInit
 class CertifyingOrganisationDeleteView(
-    LoginRequiredMixin,
+    CertificationManagerRequiredMixin,
     DeleteView):
     """Delete view for Certifying Organisation."""
 
@@ -996,8 +1021,7 @@ class CertifyingOrganisationJson(BaseDatatableView):
 
 
 class PendingCertifyingOrganisationListView(
-    CustomStaffuserRequiredMixin,
-    LoginRequiredMixin,
+    CertificationManagerRequiredMixin,
     CertifyingOrganisationMixin,
     PaginationMixin,
     ListView):
