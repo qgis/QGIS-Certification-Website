@@ -1,39 +1,47 @@
-{% extends "base_with_sidebar.html" %}
+{% extends "base.html" %}
 
 {% load i18n %}
 {% load account socialaccount %}
+{% load static %}
 
 {% block title %}Sign Up{% endblock %}
 
-{% block container %}
-    <div class="content">
-        {% block content %}
+{% block pagetitle %}
+    <section class="hero is-dark is-medium has-bg-img" style="background: url({% static "images/hegobg1.webp" %});
+    background-position: 50%;
+    background-size: cover;">
+    <div class="hero-body" style="height: 100dvh;">
+        <div class="columns is-vcentered is-centered">
+            <div class="column is-4 p-6 login-container">
+                <div class="has-text-centered">
+                    <h3 class="title">{% trans "Sign Up" %}</h3>
+                    <hr class="login-hr" />
+                    <p class="subtitle">
+                        {% trans "Create a new account by filling in the information below." %}
+                    </p>
 
-            {% csrf_token %}
-            <div class="container">
+                    <form class="signup" id="signup_form" method="POST" action="{% url 'socialaccount_signup' %}">
+                        {% csrf_token %}
+                        {% include "account/form_snippet.html" with form=form %}        
 
-                <div class="custom-form-container">
-                    <h1>{% trans "Sign Up" %}</h1>
-                    <form class="signup" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">{% csrf_token %}
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-warning">
-                                {% for error in form.non_field_errors %}
-                                    <p>{{ error }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        {{ form.as_p }}
                         {% if redirect_field_value %}
                             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
                         {% endif %}
-                        <button class="login custom-form-submit" type="submit">{% trans "Sign Up" %}</button>
+                        <button class="button is-success is-medium is-fullwidth mt-5 login custom-form-submit" type="submit">
+                            <span>{% trans "Sign Up" %}</span>
+                            <span class="icon">
+                                <i class="fa fa-user-plus" aria-hidden="true"></i>
+                            </span>
+                        </button>
                     </form>
-                    <div class="login-help">
-                        <a href="{% url 'account_login' %}">{% trans "Log In" %}</a> -
-                        <a href="{% url 'account_reset_password' %}">{% trans "Forgot Password" %}</a>
-                    </div>
+
+                    <p class="login-help">
+                        <a href="{% url 'account_login' %}" class="has-text-success">{% trans "Log In" %}</a> -
+                        <a href="{% url 'account_reset_password' %}" class="has-text-success">{% trans "Forgot Password" %}</a>
+                    </p>
                 </div>
-            </div> <!-- /container -->
             </div>
-        {% endblock %}
+        </div>
+    </div>
+    </section>
 {% endblock %}
