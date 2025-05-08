@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from certification.utilities import PayrexxService
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.conf import settings
 from django.views import View
 from django.views.generic import TemplateView
@@ -10,7 +10,12 @@ from base.models.project import Project
 from decimal import Decimal
 from django.http import Http404
 from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class PayrexxTopUpView(TemplateView):
   template_name = 'certificate/top_up.html'
@@ -115,28 +120,51 @@ class PayrexxSuccessView(TemplateView):
 
     return context
 
+@method_decorator(csrf_exempt, name='dispatch')  # disable CSRF for webhooks
 class PayrexxWebhookView(View):
-  def post(self, request, *args, **kwargs):
-    """Handle Payrexx webhook notifications
 
-    :param request: HTTP request object
-    :type request: HttpRequest
+    def post(self, request, *args, **kwargs):
+        # Step 1: Get POST data
+        payload = request.POST  # Payrexx sends as form data
+        logger.info(f"Received Payrexx webhook: {payload}")
 
-    :param args: Positional arguments
-    :type args: tuple
+        # Example of fields in webhook
+        transaction_id = payload.get('transaction', None)
+        status = payload.get('status', None)
 
-    :param kwargs: Keyword arguments
-    :type kwargs: dict
+        # OPTIONAL: verify signature (if Payrexx provides a way)
+        # For example (check docs for correct method):
+        signature = request.headers.get('X-Payrexx-Signature')  # or wherever signature is sent
+        body_bytes = request.body  # raw body
 
-    :returns: Unaltered request object
-    :rtype: HttpResponse
-    """
-    
-    # Handle the webhook notification here
-    # You can access the data from the request body
-    # and process it as needed.
-    print('Webhook data:', request.body)
+        print(f"Signature: {signature}")
 
-    
-    return HttpResponse(status=200)
+        payrexx = PayrexxService()
+        # payrexx.check_signature(signature)
+        # Verify signature
+
+
+        # if signature:
+        #     computed_signature = hmac.new(
+        #         key=secret.encode(),
+        #         msg=body_bytes,
+        #         digestmod=hashlib.sha256
+        #     ).hexdigest()
+
+        #     if not hmac.compare_digest(signature, computed_signature):
+        #         logger.warning("Invalid Payrexx webhook signature!")
+        #         return HttpResponseForbidden("Invalid signature")
+
+        # Step 2: Process event
+        if status == 'confirmed':
+            # Mark payment as confirmed in your database
+            print(f"Transaction {transaction_id} confirmed.")
+        elif status == 'cancelled':
+            # Handle cancellation
+            print(f"Transaction {transaction_id} cancelled.")
+        else:
+            print(f"Transaction {transaction_id} has status: {status}")
+
+        # Step 3: Respond 200 OK
+        return HttpResponse('Webhook received', status=200)
 
