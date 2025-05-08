@@ -1,21 +1,25 @@
-from django.shortcuts import render, redirect
-from certification.utilities import PayrexxService
-from django.http import HttpResponse, HttpResponseForbidden
-from django.conf import settings
-from django.views import View
-from django.views.generic import TemplateView
-
-from certification.models.certifying_organisation import CertifyingOrganisation
-from base.models.project import Project
+import logging
+import json
 from decimal import Decimal
-from django.http import Http404
+
+from django.conf import settings
+from django.http import HttpResponse, HttpResponseForbidden, Http404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.generic import TemplateView
 from django.views.decorators.csrf import csrf_exempt
 
-import logging
+from certification.models.certifying_organisation import CertifyingOrganisation
+from certification.models.credits_order import CreditsOrder
+from certification.utilities import PayrexxService
+from base.models.project import Project
+
+from django.core.mail import send_mail
 
 logger = logging.getLogger(__name__)
+
 
 class PayrexxTopUpView(TemplateView):
   template_name = 'certificate/top_up.html'
@@ -80,10 +84,18 @@ class PayrexxTopUpView(TemplateView):
     description = f"Top up {total_credits} \
       credit{'s' if total_credits > 1 else ''} \
       for {organisation.name}"
-    
+
     payrexx = PayrexxService()
-    redirect_url = reverse('payrexx-success')
+
+    # Create a new CreditsOrder instance
+    credits_order = CreditsOrder.objects.create(
+      organisation=organisation,
+      credits_requested=total_credits,
+    )
+
+    redirect_url = reverse('certifyingorganisation-detail', kwargs={'slug': self.organisation_slug})
     response = payrexx.create_gateway(
+      reference_id=credits_order.pk,
       amount=cost_of_credits,
       currency=project.credit_cost_currency,
       purpose=description,
@@ -92,79 +104,66 @@ class PayrexxTopUpView(TemplateView):
       lastname=request.user.last_name,
       email=request.user.email,
     )
-    print('Response:', response)
     if response.get('status') == 'success':
       gateway = response['data'][0]
       return redirect(gateway['link'])
-    
+    else:
+      credits_order.delete()
+
     # Handle error
     return render(request, '500.html', {'error': response})
 
-class PayrexxSuccessView(TemplateView):
-  template_name = 'certificate/payrexx_success.html'
-  project_slug = ''
-  organisation_slug = ''
-
-  def get_context_data(self, **kwargs):
-    context = super(PayrexxSuccessView, self).get_context_data(**kwargs)
-    self.project_slug = 'qgis'
-    self.organisation_slug = self.kwargs.get('organisation_slug', None)
-
-    certifying_organisation = (
-        CertifyingOrganisation.objects.get(slug=self.organisation_slug)
-    )
-    project = Project.objects.get(slug=self.project_slug)
-
-    context['the_project'] = project
-    context['cert_organisation'] = certifying_organisation
-
-    return context
 
 @method_decorator(csrf_exempt, name='dispatch')  # disable CSRF for webhooks
 class PayrexxWebhookView(View):
 
     def post(self, request, *args, **kwargs):
-        # Step 1: Get POST data
-        payload = request.POST  # Payrexx sends as form data
-        logger.info(f"Received Payrexx webhook: {payload}")
+      # Step 1: Get POST data
+      try:
+          payload = json.loads(request.body)  # Parse JSON data from request body
+      except json.JSONDecodeError:
+          return HttpResponseForbidden("Invalid JSON")
 
-        # Example of fields in webhook
-        transaction_id = payload.get('transaction', None)
-        status = payload.get('status', None)
+      # Step 2: Verify the transaction
+      transaction = payload.get('transaction', None)
+      transaction_id = transaction.get('id', None) if transaction else None
+      reference_id = transaction.get('referenceId', None) if transaction else None
+      if not transaction or not transaction_id or not reference_id:
+        return HttpResponseForbidden("Invalid transaction data")
 
-        # OPTIONAL: verify signature (if Payrexx provides a way)
-        # For example (check docs for correct method):
-        signature = request.headers.get('X-Payrexx-Signature')  # or wherever signature is sent
-        body_bytes = request.body  # raw body
+      # Step 3: Get the CreditsOrder instance
+      get_object_or_404(CreditsOrder, pk=int(reference_id))
 
-        print(f"Signature: {signature}")
-
+      try:
         payrexx = PayrexxService()
-        # payrexx.check_signature(signature)
-        # Verify signature
+        verified_transation = payrexx.get_transaction(transaction_id)
+        if verified_transation.get('status') != 'confirmed':
+          return HttpResponseForbidden("Transaction verification failed")
+      except Exception:
+        return HttpResponseForbidden("Transaction not found")
 
+      verified_reference_id = verified_transation.get('referenceId', None)
+      # Step 4: Update the organization's credits
+      credits_order = get_object_or_404(CreditsOrder, pk=int(verified_reference_id))
+      if credits_order.credits_issued:
+        return HttpResponseForbidden("Credits already issued")
+      organisation = credits_order.organisation
+      current_credits = organisation.organisation_credits or 0
+      organisation.organisation_credits = current_credits + credits_order.credits_requested
+      organisation.save()
+      credits_order.credits_issued = True
+      credits_order.save()
 
-        # if signature:
-        #     computed_signature = hmac.new(
-        #         key=secret.encode(),
-        #         msg=body_bytes,
-        #         digestmod=hashlib.sha256
-        #     ).hexdigest()
+      # Step 5: Send email to organisation owners
+      organisation_owners = (
+        organisation.organisation_owners.all()
+      )
+      send_mail(
+        subject=f"QGIS Certification: Credits Top Up for {organisation.name}",
+        message=f"Your organisation has been credited with {credits_order.credits_requested} credits.",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[owner.email for owner in organisation_owners],
+      )
 
-        #     if not hmac.compare_digest(signature, computed_signature):
-        #         logger.warning("Invalid Payrexx webhook signature!")
-        #         return HttpResponseForbidden("Invalid signature")
-
-        # Step 2: Process event
-        if status == 'confirmed':
-            # Mark payment as confirmed in your database
-            print(f"Transaction {transaction_id} confirmed.")
-        elif status == 'cancelled':
-            # Handle cancellation
-            print(f"Transaction {transaction_id} cancelled.")
-        else:
-            print(f"Transaction {transaction_id} has status: {status}")
-
-        # Step 3: Respond 200 OK
-        return HttpResponse('Webhook received', status=200)
-
+      # Step 6: Respond 200 OK
+      return HttpResponse('Webhook received', status=200)

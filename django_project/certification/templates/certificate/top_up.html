@@ -48,14 +48,14 @@
                     </div>
                     <div class="column">
                         <button type="submit" class="button is-success is-fullwidth" id="buy" disabled>
-                            PAY WITH STRIPE
+                            PAY WITH PAYREXX
                         </button>
                     </div>
                 </div>
             </div>
         </form>
     </div>
-    {% include "stripe.html" %}
+    {% comment %} {% include "stripe.html" %} {% endcomment %}
 
     <script>
 
@@ -120,7 +120,7 @@
        window.location = `{% url 'checkout' %}?unit=${creditAmount}&total=${totalToPay}&org=${org}`;
     }); {% endcomment %}
 
-    function stripeSourceHandler(source) {
+    {% comment %} function stripeSourceHandler(source) {
         // Insert the source ID into the form so it gets submitted to the
         // server
         $('<input>').attr({
@@ -129,7 +129,7 @@
             name: 'stripe-source-id'
         }).appendTo($form).val(source.id);
         $form.submit();
-    }
+    } {% endcomment %}
 
     </script>
 {% endblock %}

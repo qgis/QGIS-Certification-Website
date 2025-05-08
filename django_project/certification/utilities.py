@@ -1,13 +1,13 @@
 # coding=utf-8
 """Tools for Certification app."""
-from django.contrib.gis.serializers.geojson import Serializer
-import requests
-import hmac
-import hashlib
-from django.conf import settings
 import base64
-import urllib
+import hashlib
+import hmac
+import requests
+from django.conf import settings
+from django.contrib.gis.serializers.geojson import Serializer
 from urllib.parse import urlencode, quote, quote_plus
+
 
 def check_slug(queryset, slug):
     """
@@ -54,8 +54,8 @@ class PayrexxService:
     def __init__(self):
         self.instance_name = settings.PAYREXX_INSTANCE
         self.api_secret = settings.PAYREXX_API_SECRET
-        self.base_url = f"https://api.payrexx.com/v1.0/"
-    
+        self.base_url = "https://api.payrexx.com/v1.0/"
+
     def generate_signature(self, query_string):
         signature = hmac.new(self.api_secret.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256)
         return base64.b64encode(signature.digest()).decode('utf-8')
@@ -86,7 +86,7 @@ class PayrexxService:
             else:
                 encoded_pairs.append(f"{encoded_key}={quote(str(value), safe='')}")
         return '&'.join(encoded_pairs)
-    
+
     def prepare_data(self, raw_data):
         # Flatten the rawData
         data = self.flatten_dict(raw_data)
@@ -105,6 +105,7 @@ class PayrexxService:
 
     def create_gateway(
             self,
+            reference_id,
             amount,
             currency,
             purpose,
@@ -117,7 +118,7 @@ class PayrexxService:
         """Create a payment gateway"""
         endpoint = "Gateway/"
         url = f"{self.base_url}{endpoint}?instance={self.instance_name}"
-        
+
         amount = amount * 100  # Convert to cents
         raw_data = {
             'amount': str(amount),
@@ -129,6 +130,7 @@ class PayrexxService:
                 'surname': {'value': lastname},
                 'email': {'value': email}
             },
+            'referenceId': str(reference_id),
         }
 
         # Generate QueryString for the Request
@@ -146,5 +148,19 @@ class PayrexxService:
         # Generate QueryString for the Request
         request_query_string = self.prepare_data(raw_data)
         # Make the GET request
-        response = requests.get(f"{url}{endpoint}", data=request_query_string)
+        response = requests.get(f"{url}", data=request_query_string)
         return response.json()
+
+    def get_transaction(self, transaction_id):
+        """Retrieve transaction information"""
+        endpoint = f"Transaction/{transaction_id}/"
+        url = f"{self.base_url}{endpoint}?instance={self.instance_name}"
+        raw_data = {}
+        # Generate QueryString for the Request
+        request_query_string = self.prepare_data(raw_data)
+        # Make the GET request
+        response = requests.get(f"{url}", data=request_query_string)
+        result = response.json()
+        if result.get('status') == 'success':
+            return result['data'][0]
+        raise Exception(f"Error retrieving transaction: {result.get('message', 'Unknown error')}")
