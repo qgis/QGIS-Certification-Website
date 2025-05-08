@@ -66,6 +66,8 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - SENTRY_DSN=${SENTRY_DSN}
       - SENTRY_RATE=${SENTRY_RATE}
+      - PAYREXX_INSTANCE=${PAYREXX_INSTANCE}
+      - PAYREXX_API_SECRET=${PAYREXX_API_SECRET}
     volumes:
       - static-data:/home/web/static:rw
       - media-data:/home/web/media:rw

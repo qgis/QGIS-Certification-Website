@@ -147,3 +147,7 @@ DJSTRIPE_WEBHOOK_SECRET = os.environ.get('DJSTRIPE_WEBHOOK_SECRET', 'whsec_x')
 DJSTRIPE_FOREIGN_KEY_TO_FIELD = "djstripe_id"
 
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'tim@kartoza.com')
+
+# Payrexx settings
+PAYREXX_INSTANCE = os.environ.get('PAYREXX_INSTANCE', 'qgis')
+PAYREXX_API_SECRET = os.environ.get('PAYREXX_API_SECRET', 'your_api_secret')

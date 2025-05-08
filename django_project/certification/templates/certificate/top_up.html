@@ -104,7 +104,7 @@
         updateTotal(this)
     });
 
-    $payButton.click(function (e) {
+    {% comment %} $payButton.click(function (e) {
        e.preventDefault();
        let creditAmount = $creditAmount.val();
        if (!creditAmount) {
@@ -118,7 +118,7 @@
            alert('error calculating total payment');
        }
        window.location = `{% url 'checkout' %}?unit=${creditAmount}&total=${totalToPay}&org=${org}`;
-    });
+    }); {% endcomment %}
 
     function stripeSourceHandler(source) {
         // Insert the source ID into the form so it gets submitted to the
