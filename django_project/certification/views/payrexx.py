@@ -129,7 +129,7 @@ class PayrexxWebhookView(View):
       transaction_id = transaction.get('id', None) if transaction else None
       reference_id = transaction.get('referenceId', None) if transaction else None
       if not transaction or not transaction_id or not reference_id:
-        return HttpResponseForbidden("Invalid transaction data")
+        return HttpResponse('Webhook triggered with non-credits order data. No action taken.', status=200)
 
       # Step 3: Get the CreditsOrder instance
       get_object_or_404(CreditsOrder, pk=int(reference_id))
@@ -138,15 +138,15 @@ class PayrexxWebhookView(View):
         payrexx = PayrexxService()
         verified_transation = payrexx.get_transaction(transaction_id)
         if verified_transation.get('status') != 'confirmed':
-          return HttpResponseForbidden("Transaction verification failed")
+          return HttpResponse("Transaction not confirmed! No credits issued.", status=200)
       except Exception:
-        return HttpResponseForbidden("Transaction not found")
+        return HttpResponseForbidden("Transaction not found!")
 
       verified_reference_id = verified_transation.get('referenceId', None)
       # Step 4: Update the organization's credits
       credits_order = get_object_or_404(CreditsOrder, pk=int(verified_reference_id))
       if credits_order.credits_issued:
-        return HttpResponseForbidden("Credits already issued")
+        return HttpResponse("Credits already issued. No action taken.", status=200)
       organisation = credits_order.organisation
       current_credits = organisation.organisation_credits or 0
       organisation.organisation_credits = current_credits + credits_order.credits_requested
@@ -166,4 +166,4 @@ class PayrexxWebhookView(View):
       )
 
       # Step 6: Respond 200 OK
-      return HttpResponse('Webhook received', status=200)
+      return HttpResponse('Credits updated with success!', status=200)
