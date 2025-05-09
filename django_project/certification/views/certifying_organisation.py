@@ -718,7 +718,7 @@ class CertifyingOrganisationCreateView(
                 # Send email notification to project owner and
                 # certification managers
                 send_mail(
-                    u'Projecta - New Pending Organisation Approval',
+                    u'QGIS Certification - New Pending Organisation Approval',
                     u'Dear {recipient_firstname} {recipient_lastname},\n\n'
                     u'You have a new organisation registered to your '
                     u'project: {project_name}.\n'
@@ -758,7 +758,7 @@ class CertifyingOrganisationCreateView(
                 }
 
                 send_mail(
-                    u'Projecta - Your Organisation is Successfully Submitted',
+                    u'QGIS Certification - Your Organisation is Successfully Submitted',
                     u'Dear {applicant_firstname} {applicant_lastname},\n\n'
                     u'Your organisation is successfully submitted.\n'
                     u'It is now waiting for an approval from the project\'s '
@@ -1296,7 +1296,7 @@ def send_rejection_email(certifying_organisation, site, schema='http'):
             'schema': schema
         }
         send_mail(
-            u'Projecta - Your organisation is not approved',
+            u'QGIS Certification - Your organisation is not approved',
             u'Dear {owner_firstname} {owner_lastname},\n\n'
             u'We are sorry that your certifying organisation '
             u'has not been approved. \nThe '

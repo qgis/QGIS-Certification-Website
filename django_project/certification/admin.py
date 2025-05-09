@@ -18,6 +18,7 @@ from certification.models.status import Status
 from certification.models.checklist import Checklist
 from certification.models.organisation_checklist import OrganisationChecklist
 from certification.models.external_reviewer import ExternalReviewer
+from certification.models.credits_order import CreditsOrder
 
 
 class CertificateAdmin(admin.ModelAdmin):
@@ -195,6 +196,18 @@ class ExternalReviewerAdmin(admin.ModelAdmin):
     )
 
 
+class CreditsOrderAdmin(admin.ModelAdmin):
+    list_display = (
+        'organisation',
+        'credits_requested',
+        'credits_issued',
+        'created_at',
+        'updated_at'
+    )
+    list_filter = ('organisation', 'credits_issued')
+    search_fields = ('organisation__name',)
+
+
 admin.site.register(Certificate, CertificateAdmin)
 admin.site.register(CertificateType, CertificateTypeAdmin)
 admin.site.register(Attendee, AttendeeAdmin)
@@ -210,3 +223,4 @@ admin.site.register(Status, StatusAdmin)
 admin.site.register(Checklist, ChecklistAdmin)
 admin.site.register(OrganisationChecklist, OrganisationChecklistAdmin)
 admin.site.register(ExternalReviewer, ExternalReviewerAdmin)
+admin.site.register(CreditsOrder, CreditsOrderAdmin)

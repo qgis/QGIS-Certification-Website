@@ -82,7 +82,9 @@ from .views import (
     ValidateCertificate,
     ValidateCertificateOrganisation,
 
-    TopUpView,
+    # TopUpView,
+    PayrexxTopUpView,
+    PayrexxWebhookView,
 
     CheckoutSessionSuccessView,
     CreateCheckoutSessionView
@@ -253,7 +255,7 @@ urlpatterns = [
         view=update_paid_status,
         name='paid-certificate'),
     url(r'^certifyingorganisation/(?P<organisation_slug>[\w-]+)/top-up/$',
-        view=TopUpView.as_view(),
+        view=PayrexxTopUpView.as_view(),
         name='top-up'),
     url(r'^certificate/(?P<id>[\w-]+)/$',
         view=CertificateDetailView.as_view(),
@@ -332,4 +334,9 @@ urlpatterns = [
     url("^checkout-success/$",
         CheckoutSessionSuccessView.as_view(),
         name="checkout-success"),
+
+    # Payrexx webhook
+    url(r'^payrexx-hook/$',
+        view=PayrexxWebhookView.as_view(),
+        name='payrexx-webhook'),
 ]
