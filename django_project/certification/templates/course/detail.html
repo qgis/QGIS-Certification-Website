@@ -321,7 +321,7 @@
                                         {% if course.certifying_organisation.organisation_credits >= course.certifying_organisation.project.certificate_credit %}
                                         <a id="issueCertificateButton"
                                         class="button is-small is-light has-tooltip-multiline has-tooltip-arrow has-tooltip-bottom" data-tooltip="Issue Certificate using credits" 
-                                        href='#' attendee_certificate="{{ attendee.attendee.certificate_type.id }}"
+                                        attendee_certificate="{{ attendee.attendee.certificate_type.id }}"
                                         attendee_id="{{ attendee.attendee.pk }}"
                                         attendee_name="{{ attendee.attendee }}"
                                         >
@@ -428,7 +428,7 @@
             closeChooseCertificateForm()
         }
 
-        $('#issueCertificateButton').click(function () {
+        $(document).on('click', '#issueCertificateButton', function () {
             let initialCertType = $(this).attr('attendee_certificate');
             let courseCertId = '{{ course.certificate_type.id }}';
             let courseCert = '{{ course.certificate_type.name }}';
