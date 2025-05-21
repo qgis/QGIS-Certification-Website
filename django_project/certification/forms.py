@@ -408,7 +408,7 @@ class CourseForm(forms.ModelForm):
             attrs={'class': 'form-control', 'maxlength': '120'}
         ),
     )
-    template_certificate = forms.ImageField(widget=FileUploadInput)
+    template_certificate = forms.ImageField(widget=FileUploadInput, required=False)
 
     class Meta:
         model = Course
