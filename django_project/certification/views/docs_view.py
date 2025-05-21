@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.utils.translation import gettext_lazy as _
 
 
 def docs_overview(request):
@@ -22,6 +21,7 @@ def docs_cert_manager(request):
         "docs/cert_manager.html",
         {},
     )
+
 
 def docs_register_cert_org(request):
   """

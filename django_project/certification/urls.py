@@ -354,7 +354,7 @@ urlpatterns = [
     url(r'^payrexx-hook/$',
         view=PayrexxWebhookView.as_view(),
         name='payrexx-webhook'),
-    
+
     # Documentation
     url(r'^docs/$',
         view=docs_overview,
