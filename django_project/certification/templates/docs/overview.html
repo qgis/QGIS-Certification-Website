@@ -1,4 +1,5 @@
 {% extends "base_with_sidebar.html" %}
+{% load static %}
 {% block content %}
 <h1 class="title">Certification programme overview</h1>
 <p>
@@ -16,7 +17,7 @@
   process from the point of view of a certifying organisation.
 </p>
 <img
-  src="https://raw.githubusercontent.com/kartoza/projecta/develop/docs/CertificationWorkflow.png"
+  src="{% static "images/docs/overview.webp" %}"
 />
 <p>
   You may be wondering about our approach to certification. We looked at a

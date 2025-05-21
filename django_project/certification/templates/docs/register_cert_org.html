@@ -1,15 +1,13 @@
 {% extends "base_with_sidebar.html" %} 
+{% load static %}
 {% block content %}
 <h1 class="title">Registering a certifying organisation</h1>
 <p>
-  To register a new certifying organisation, go to a project page and open the
-  <strong>Certification</strong> menu. Click on
-  <strong>Organisations</strong> and then click on the
-  <strong>asterisk icon</strong> next to the page heading for
-  <strong>Certifying Organisations</strong>.
+  To register a new certifying organisation, click the <strong>Sign Up</strong> button. 
+  You can find this button on the homepage, in the navigation bar, the sidebar, or on the organisation list page.
 </p>
 <img
-  src="https://raw.githubusercontent.com/kartoza/projecta/develop/docs/certification-organisation-creation.gif"
+  src="{% static "images/docs/register-org.gif" %}"
 />
 <p>
   On the registration page you can fill in all the key details about your

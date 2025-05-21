@@ -1,4 +1,5 @@
 {% extends "base_with_sidebar.html" %}
+{% load static %}
 {% block content %}
 <h1 class="title">Courses</h1>
 <p>
@@ -7,7 +8,7 @@
   do not need to register on the QGIS Certification web platform.
 </p>
 <img
-  src="https://raw.githubusercontent.com/kartoza/projecta/develop/docs/certification-new-course.png"
+  src="{% static "images/docs/course.png" %}"
 />
 
 {% endblock %}

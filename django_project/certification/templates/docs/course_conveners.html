@@ -1,4 +1,5 @@
 {% extends "base_with_sidebar.html" %} 
+{% load static %}
 {% block content %}
 <h1 class="title">Course conveners</h1>
 <p>
@@ -8,7 +9,7 @@
   not want to manually print and sign the certificates.
 </p>
 <img
-  src="https://raw.githubusercontent.com/kartoza/projecta/develop/docs/certification-new-course-convener.png"
+  src="{% static "images/docs/course-convener.png" %}"
 />
 
 {% endblock %}

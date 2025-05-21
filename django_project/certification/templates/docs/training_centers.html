@@ -1,4 +1,5 @@
 {% extends "base_with_sidebar.html" %} 
+{% load static %}
 {% block content %}
 <h1 class="title">Training centers</h1>
 <p>
@@ -9,7 +10,7 @@
   that you can use as a proxy for other venues.
 </p>
 <img
-  src="https://raw.githubusercontent.com/kartoza/projecta/develop/docs/certification-new-training-center.png"
+  src="{% static "images/docs/training-center.png" %}"
 />
 <p>
   In the future we will provide a map with pins showing where upcoming training

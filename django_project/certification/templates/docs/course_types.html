@@ -1,4 +1,5 @@
 {% extends "base_with_sidebar.html" %}
+{% load static %}
 {% block content %}
 <h1 class="title">Course types</h1>
 <p>
@@ -9,7 +10,7 @@
   working with databases) or around skill leve (beginner, intermediate etc.).
 </p>
 <img
-  src="https://raw.githubusercontent.com/kartoza/projecta/develop/docs/certification-new-course-type.png"
+  src="{% static "images/docs/course-type.png" %}"
 />
 
 {% endblock %}
