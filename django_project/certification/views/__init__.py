@@ -14,3 +14,4 @@ from .certification_management import *
 from .certificate_checlist import *
 from .homepage import *
 from .payrexx import *
+from .docs_view import *

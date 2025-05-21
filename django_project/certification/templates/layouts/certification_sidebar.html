@@ -95,6 +95,96 @@
         Learn about Certification
       </a>
     </li>
+
+    <li>
+      <div class="has-child">
+        <a onclick="toggleSubMenu('docs')">
+          <i class="fas fa-book mr-3"></i>
+          Documentation
+        </a>
+        <span onclick="toggleSubMenu('docs')" class="drop-arrow"><img src="{% static "images/arrow.svg" %}"/></span>
+      </div>
+      <ul class="collapsed" id="docs">
+        {% url 'docs-overview' as docs_overview_url %}
+        <li class="has-child {% if request.path == docs_overview_url %}is-active{% endif %}">
+          <a href="{{ docs_overview_url }}">
+            Overview
+          </a>
+        </li>
+        {% url 'docs-cert-manager' as docs_cert_manager_url %}
+        <li class="has-child {% if request.path == docs_cert_manager_url %}is-active{% endif %}">
+          <a href="{{ docs_cert_manager_url }}">
+            Managers
+          </a>
+        </li>
+        {% url 'docs-register-cert-org' as docs_register_cert_org_url %}
+        <li class="has-child {% if request.path == docs_register_cert_org_url %}is-active{% endif %}">
+          <a href="{{ docs_register_cert_org_url }}">
+            Register an Organisation
+          </a>
+        </li>
+        {% url 'docs-approval-cert-org' as docs_approval_cert_org_url %}
+        <li class="has-child {% if request.path == docs_approval_cert_org_url %}is-active{% endif %}">
+          <a href="{{ docs_approval_cert_org_url }}">
+            Approval of an Organisation
+          </a>
+        </li>
+        {% url 'docs-manage-cert-org' as docs_manage_cert_org_url %}
+        <li class="has-child {% if request.path == docs_manage_cert_org_url %}is-active{% endif %}">
+          <a href="{{ docs_manage_cert_org_url }}">
+            Manage an Organisation
+          </a>
+        </li>
+        {% url 'docs-training-centers' as docs_training_centers_url %}
+        <li class="has-child {% if request.path == docs_training_centers_url %}is-active{% endif %}">
+          <a href="{{ docs_training_centers_url }}">
+            Training Centers
+          </a>
+        </li>
+        {% url 'docs-course-conveners' as docs_course_conveners_url %}
+        <li class="has-child {% if request.path == docs_course_conveners_url %}is-active{% endif %}">
+          <a href="{{ docs_course_conveners_url }}">
+            Course Conveners
+          </a>
+        </li>
+        {% url 'docs-course-types' as docs_course_types_url %}
+        <li class="has-child {% if request.path == docs_course_types_url %}is-active{% endif %}">
+          <a href="{{ docs_course_types_url }}">
+            Course Types
+          </a>
+        </li>
+        {% url 'docs-courses' as docs_courses_url %}
+        <li class="has-child {% if request.path == docs_courses_url %}is-active{% endif %}">
+          <a href="{{ docs_courses_url }}">
+            Courses
+          </a>
+        </li>
+        {% url 'docs-create-certificate-template' as docs_create_certificate_template_url %}
+        <li class="has-child {% if request.path == docs_create_certificate_template_url %}is-active{% endif %}">
+          <a href="{{ docs_create_certificate_template_url }}">
+            Certificate Template
+          </a>
+        </li>
+        {% url 'docs-payments' as docs_payments_url %}
+        <li class="has-child {% if request.path == docs_payments_url %}is-active{% endif %}">
+          <a href="{{ docs_payments_url }}">
+            Payments
+          </a>
+        </li>
+        {% url 'docs-issuing-certificates' as docs_issuing_certificates_url %}
+        <li class="has-child {% if request.path == docs_issuing_certificates_url %}is-active{% endif %}">
+          <a href="{{ docs_issuing_certificates_url }}">
+            Issuing Certificates
+          </a>
+        </li>
+        {% url 'docs-getting-help' as docs_getting_help_url %}
+        <li class="has-child {% if request.path == docs_getting_help_url %}is-active{% endif %}">
+          <a href="{{ docs_getting_help_url }}">
+            Getting Help
+          </a>
+        </li>
+      </ul>
+    </li>
   </ul>
 </nav>
 
