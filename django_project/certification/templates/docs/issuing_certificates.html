@@ -1,0 +1,23 @@
+{% extends "base_with_sidebar.html" %} 
+{% block content %}
+<h1 class="title">Issuing certificates</h1>
+<p>
+  We are planning to introduce an e-commerce system soon. When that is
+  implemented, you will be able to purchase credits which can be used to then
+  pay for the certificates you issue. Currently we work on a somewhat manual
+  system - when you are going to be running a course, ask one of the project
+  administrators to load credits for your organisation. Then add attendees to
+  your course (you can do this individually or in bulk by providing a CSV file).
+  Once you have issued certificates for each attendee you can issue
+  certificates. The process of registering an attendee and issuing the
+  certificate is separated so you need only issue certificate to those that pass
+  your course. Each attendee will receive an email with a link to a downloadable
+  copy of the certificate. The certificate includes a unique number which is
+  allocated to each certificate and a unique link that they can provide (for
+  example in their CV) to verify that they have indeed completed the course.
+  This mechanism should help to prevent fake certificates. Course conveners
+  should upload a digital signature to their profile. This is embedded into the
+  certificate together with the digital signature of the project leader (who
+  needs to set this in the project profile options page).
+</p>
+{% endblock %}
