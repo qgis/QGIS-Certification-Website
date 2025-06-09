@@ -5,7 +5,9 @@ from rest_framework.views import Response
 from ..models.certifying_organisation import CertifyingOrganisation
 from ..models.status import Status
 from ..views import (
-    send_rejection_email, send_approved_email,
+    send_rejection_email,
+    send_approved_email,
+    send_pending_email,
     CertifyingOrganisationUserTestMixin
 )
 
@@ -74,6 +76,13 @@ class UpdateStatusOrganisation(CertifyingOrganisationUserTestMixin):
             else:
                 change_reason = change_reason.format(
                     self.request.user.username
+                )
+
+            if status_id and status_name and status_name.lower() == "pending":
+                send_pending_email(
+                    certifyingorganisation,
+                    change_reason,
+                    site
                 )
 
             certifyingorganisation._change_reason = (
