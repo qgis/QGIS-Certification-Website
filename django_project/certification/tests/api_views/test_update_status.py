@@ -106,6 +106,9 @@ class TestUpdateStatus(TestCase):
         )
         response = self.client.post(self.api_url, data)
         self.assertTrue(response.status_code, 200)
+        self.assertIn(
+            'Your organisation application status has been updated.',
+            mail.outbox[0].subject)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_update_status_no_login(self):
