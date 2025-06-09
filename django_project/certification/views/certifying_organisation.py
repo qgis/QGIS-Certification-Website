@@ -1142,7 +1142,7 @@ def send_pending_email(
         certifying_organisation: CertifyingOrganisation,
         change_reason: str,
         site: request
-        ):
+    ):
     for organisation_owner in \
             certifying_organisation.organisation_owners.all():
         data = {
