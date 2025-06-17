@@ -478,4 +478,3 @@ class TestCertifyingOrganisationView(TestCase):
         self.assertEqual(self.certifying_organisation.status.name, 'Approved')
         self.assertEqual(
             self.pending_certifying_organisation.status.name, 'Pending')
-
