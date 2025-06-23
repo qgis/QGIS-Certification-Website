@@ -118,6 +118,7 @@ from .api_views.training_center import (
 )
 from .api_views.invite_reviewer import InviteReviewerApiView
 from .api_views.external_reviewer import UpdateExternalReviewerText
+from .api_views.certifying_organisations import CertifyingOrganisationListView
 
 
 urlpatterns = [
@@ -321,6 +322,9 @@ urlpatterns = [
         view=GetStatus.as_view(), name='get-status-list'),
 
     # Feeds
+    url(r'^feed/certifyingorganisations/$',
+        view=CertifyingOrganisationListView.as_view(),
+        name='feed-certifyingorganisations'),
     url(r'^feed/upcoming-course/$',
         view=GetUpcomingCourseProject.as_view(),
         name='feed-upcoming-project-course'),

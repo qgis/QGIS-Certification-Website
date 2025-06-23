@@ -14,15 +14,25 @@ class GetUpcomingCourseProject(APIView):
     The location is the location of the training center where this course
     will be held.
 
+    Optional query parameter:
+        - country: Filter courses by the organisation's country (ISO 3166-1 alpha-2 code).
+          Example: /feed/upcoming-course/?country=ZA
+
     """
 
     def get(self, request):
+        country = request.GET.get('country', None)
         try:
             today = datetime.today()
             project = Project.objects.get(slug='qgis')
             courses = Course.objects.filter(
                 certifying_organisation__project=project, start_date__gte=today
-            ).order_by(
+            )
+            if country:
+                courses = courses.filter(
+                    certifying_organisation__country=str(country).upper()
+                )
+            courses = courses.order_by(
                 'certifying_organisation__name', 'start_date'
             )
             serializer = CourseSerializer(courses, many=True)
