@@ -16,22 +16,25 @@ class GetUpcomingCourseProject(APIView):
 
     Optional query parameter:
         - country: Filter courses by the organisation's country (ISO 3166-1 alpha-2 code).
-          Example: /feed/upcoming-course/?country=ZA
+          Supports single or multiple comma-separated codes.
+          Example: /feed/upcoming-course/?country=ZA or /feed/upcoming-course/?country=ZA,MG,NL
 
     """
 
     def get(self, request):
-        country = request.GET.get('country', None)
+        country_param = request.GET.get('country', None)
         try:
             today = datetime.today()
             project = Project.objects.get(slug='qgis')
             courses = Course.objects.filter(
                 certifying_organisation__project=project, start_date__gte=today
             )
-            if country:
-                courses = courses.filter(
-                    certifying_organisation__country=str(country).upper()
-                )
+            if country_param:
+                country_list = [c.strip().upper() for c in country_param.split(',') if c.strip()]
+                if country_list:
+                    courses = courses.filter(
+                        certifying_organisation__country__in=country_list
+                    )
             courses = courses.order_by(
                 'certifying_organisation__name', 'start_date'
             )
