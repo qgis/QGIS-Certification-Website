@@ -131,8 +131,8 @@ def generate_certificate_pdf(
     page.drawString(
         margin_left, (margin_bottom - 20),
         'You can verify this certificate by visiting '
-        'https://{}/en/{}/organisationcertificate/{}/.'
-        .format(current_site, project.slug, certificate.certificateID))
+        'https://{}/en/organisationcertificate/{}/.'
+        .format(current_site, certificate.certificateID))
 
     # Close the PDF object cleanly.
     page.showPage()
@@ -157,7 +157,10 @@ class OrganisationCertificateCreateView(LoginRequiredMixin, CreateView):
        :rtype: HttpResponse
        """
 
-        return reverse('certifyingorganisation-list', kwargs={})
+        return reverse(
+            'print-certificate-organisation',
+            kwargs={'organisation_slug': self.certifying_organisation.slug}
+        )
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
