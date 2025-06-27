@@ -1117,7 +1117,7 @@ def send_approved_email(
             'project_slug': certifying_organisation.project.slug,
         }
         send_mail(
-            u'Projecta - Your organisation is approved',
+            u'QGIS Certification - Your organisation is approved',
             u'Dear {owner_firstname} {owner_lastname},\n\n'
             u'Congratulations!\n'
             u'Your certifying organisation has been approved. The '
@@ -1129,6 +1129,45 @@ def send_approved_email(
             u'course type, course convener and course.\n'
             u'For further information please visit: '
             u'{site}/en/{project_slug}/about/\n\n'
+            u'Sincerely,\n'
+            u'{project_owner_firstname} {project_owner_lastname}'.format(
+                **data),
+            certifying_organisation.project.owner.email,
+            [organisation_owner.email],
+            fail_silently=True,
+        )
+
+
+def send_pending_email(
+        certifying_organisation: CertifyingOrganisation,
+        change_reason: str,
+        site: request
+    ):
+    for organisation_owner in \
+            certifying_organisation.organisation_owners.all():
+        data = {
+            'owner_firstname': organisation_owner.first_name,
+            'owner_lastname': organisation_owner.last_name,
+            'change_reason': change_reason,
+            'organisation_name': certifying_organisation.name,
+            'project_name': certifying_organisation.project.name,
+            'project_owner_firstname':
+                certifying_organisation.project.owner.first_name,
+            'project_owner_lastname':
+                certifying_organisation.project.owner.last_name,
+            'site': site,
+            'project_slug': certifying_organisation.project.slug,
+            'details_url': 'https://' + site + reverse(
+                'certifyingorganisation-detail',
+                kwargs={'slug': certifying_organisation.slug}
+            )
+        }
+        send_mail(
+            u'QGIS Certification - Your organisation application status has been updated.',
+            u'Dear {owner_firstname} {owner_lastname},\n\n'
+            u'{change_reason}\n'
+            u'For further information please visit: '
+            u'{details_url}\n\n'
             u'Sincerely,\n'
             u'{project_owner_firstname} {project_owner_lastname}'.format(
                 **data),
