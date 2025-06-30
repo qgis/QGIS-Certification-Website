@@ -26,12 +26,34 @@ def generate_certificate_pdf(
     try:
         font_folder = os.path.join(
             settings.STATIC_ROOT, 'fonts/times-new-roman')
+        website_font_folder = os.path.join(
+            settings.STATIC_ROOT, 'fonts', 'trueno')
         bold_ttf_file = os.path.join(
             font_folder, 'Times New Roman Gras 700.ttf')
         regular_ttf_file = os.path.join(
             font_folder, 'Times New Roman 400.ttf')
         pdfmetrics.registerFont(TTFont('Noto-Bold', bold_ttf_file))
         pdfmetrics.registerFont(TTFont('Noto-Regular', regular_ttf_file))
+
+        trueno_extra_bold_ttf_file = os.path.join(
+            website_font_folder, 'TruenoExBd.ttf')
+        trueno_regular_ttf_file = os.path.join(
+            website_font_folder, 'TruenoRg.ttf')
+        trueno_light_ttf_file = os.path.join(
+            website_font_folder, 'TruenoLt.ttf')
+        trueno_light_italic_ttf_file = os.path.join(
+            website_font_folder, 'TruenoLtIt.ttf')
+        trueno_ultra_light_ttf_file = os.path.join(
+            website_font_folder, 'TruenoUlLt.ttf')
+        trueno_ultra_light_italic_ttf_file = os.path.join(
+            website_font_folder, 'TruenoUlLtIt.ttf')
+        pdfmetrics.registerFont(TTFont('Trueno-Extra-Bold', trueno_extra_bold_ttf_file))
+        pdfmetrics.registerFont(TTFont('Trueno-Regular', trueno_regular_ttf_file))
+        pdfmetrics.registerFont(TTFont('Trueno-Light', trueno_light_ttf_file))
+        pdfmetrics.registerFont(TTFont('Trueno-Light-Italic', trueno_light_italic_ttf_file))
+        pdfmetrics.registerFont(TTFont('Trueno-Ultra-Light', trueno_ultra_light_ttf_file))
+        pdfmetrics.registerFont(TTFont('Trueno-Ultra-Light-Italic', trueno_ultra_light_italic_ttf_file))
+
     except TTFError:
         pass
 
@@ -43,7 +65,7 @@ def generate_certificate_pdf(
         project_logo = ImageReader(project.image_file)
     else:
         project_logo = None
-    
+
     if certifying_organisation.logo:
         if hasattr(certifying_organisation.logo, 'open'):
             certifying_organisation.logo.open()
@@ -77,14 +99,14 @@ def generate_certificate_pdf(
             background, 0, 0, height=width, width=height,
             preserveAspectRatio=True, mask='auto')
     page.setFillColorRGB(0.1, 0.1, 0.1)
-    page.setFont('Times-Roman', 18)
+    page.setFont('Trueno-Light', 18)
 
     if project_logo is not None:
         page.drawImage(
             project_logo, 50, 450, width=100, height=100,
             preserveAspectRatio=True, mask='auto')
 
-    page.setFont('Times-Roman', 12)
+    page.setFont('Trueno-Light', 12)
 
 
     if organisation_logo is not None:
@@ -92,56 +114,53 @@ def generate_certificate_pdf(
             organisation_logo, max_left, 450, height=100, width=100,
             preserveAspectRatio=True, anchor='c', mask='auto')
 
-    # date_now = datetime.now()
-    # str_date = date_now.strftime("%m/%d/%Y")
-    # page.drawRightString(
-    #     margin_right, width - 50, 'Date issued: {}'.format(str_date))
-
     try:
-        page.setFont('Noto-Bold', 26)
+        page.setFont('Trueno-Extra-Bold', 32)
     except KeyError:
-        page.setFont('Times-Bold', 26)
+        page.setFont('Times-Bold', 32)
 
     page.drawCentredString(
         center, 400, '{}'.format(certifying_organisation.name))
-    page.setFont('Times-Roman', 16)
+
+    page.setFont('Trueno-Light', 16)
+    address = certifying_organisation.address.replace('\n', ', ').replace('\r', '')
     page.drawCentredString(
-        center, 370,
-        'Is authorized to provide {} training and certification.'.format(
-            project.name))
-    
-    page.setFont('Times-Roman', 14)
-    page.drawCentredString(
-        center, 340,
-        f'Address: {certifying_organisation.address}')
-    
+        center, 360,
+        f'Address: {address}')
+
     if certifying_organisation.url:
         page.drawCentredString(
-            center, 320,
+            center, 330,
             f'Website: {certifying_organisation.url}')
-    
+
     if certifying_organisation.organisation_email:
         page.drawCentredString(
             center, 300,
-            f'Email: {certifying_organisation.organisation_email}')
+            f'Contact: {certifying_organisation.organisation_email}')
 
     if certifying_organisation.organisation_phone:
         page.drawCentredString(
-            center, 280,
+            center, 270,
             f'Phone: {certifying_organisation.organisation_phone}')
 
-    page.setFont('Times-Roman', 12)
+
+    page.setFont('Trueno-Regular', 24)
     page.drawCentredString(
-        center, 250,
-        f'Certificate Reference: {certificate.certificateID}')
-    
-    page.setFont('Times-Roman', 12)
-    page.drawCentredString(
-        center, 210,
-        'This certificate is issued in accordance with the QGIS Certification Program.')
+        center, 230,
+        'Is authorized to provide {} training and certification.'.format(
+            project.name))
+
+    page.setFont('Trueno-Regular', 16)
     page.drawCentredString(
         center, 190,
-        'Authorization is contingent on compliance with the applicable QGIS training policies.')
+        f'Certificate Reference: {certificate.certificateID}')
+
+    date_now = datetime.now()
+    str_date = date_now.strftime("%d/%m/%Y")
+    page.drawCentredString(
+        center, 160,
+        f'Date issued: {str_date}')
+
 
     page.setFillColorRGB(0.1, 0.1, 0.1)
     if project_representative_signature is not None:
@@ -154,7 +173,7 @@ def generate_certificate_pdf(
             anchor='s',
             mask='auto')
 
-    page.setFont('Times-Italic', 12)
+    page.setFont('Trueno-Light-Italic', 12)
     if project.project_representative:
         page.drawCentredString(
             (margin_right - 150), (margin_bottom + 60),
@@ -164,19 +183,18 @@ def generate_certificate_pdf(
     page.line(
         (margin_right - 70), (margin_bottom + 55),
         (margin_right - 230), (margin_bottom + 55))
-    page.setFont('Times-Roman', 13)
+    page.setFont('Trueno-Light', 13)
     page.drawCentredString(
         (margin_right - 150),
         (margin_bottom + 40),
         'Project Representative')
 
     # Footnotes.
-    page.setFont('Times-Roman', 14)
+    page.setFont('Trueno-Light', 8)
     page.drawString(
         margin_left,
         margin_bottom - 10,
-        'ID: {}'.format(certificate.certificateID))
-    page.setFont('Times-Roman', 8)
+        'This certificate is issued in accordance with the QGIS Certification Programme.')
     page.drawString(
         margin_left, (margin_bottom - 20),
         'You can verify this certificate by visiting '
