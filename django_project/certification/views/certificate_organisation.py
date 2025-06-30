@@ -43,6 +43,14 @@ def generate_certificate_pdf(
         project_logo = ImageReader(project.image_file)
     else:
         project_logo = None
+    
+    if certifying_organisation.logo:
+        if hasattr(certifying_organisation.logo, 'open'):
+            certifying_organisation.logo.open()
+        organisation_logo = ImageReader(
+            certifying_organisation.logo)
+    else:
+        organisation_logo = None
 
     if project.project_representative_signature:
         project_representative_signature = \
@@ -60,6 +68,7 @@ def generate_certificate_pdf(
     margin_right = height - 50
     margin_left = 50
     margin_bottom = 50
+    max_left = margin_right - 100
 
     # Draw things on the PDF. Here's where the PDF generation happens.
     # See the ReportLab documentation for the full list of functionality.
@@ -76,10 +85,17 @@ def generate_certificate_pdf(
             preserveAspectRatio=True, mask='auto')
 
     page.setFont('Times-Roman', 12)
-    date_now = datetime.now()
-    str_date = date_now.strftime("%m/%d/%Y")
-    page.drawRightString(
-        margin_right, width - 50, 'Date issued: {}'.format(str_date))
+
+
+    if organisation_logo is not None:
+        page.drawImage(
+            organisation_logo, max_left, 450, height=100, width=100,
+            preserveAspectRatio=True, anchor='c', mask='auto')
+
+    # date_now = datetime.now()
+    # str_date = date_now.strftime("%m/%d/%Y")
+    # page.drawRightString(
+    #     margin_right, width - 50, 'Date issued: {}'.format(str_date))
 
     try:
         page.setFont('Noto-Bold', 26)
@@ -87,12 +103,45 @@ def generate_certificate_pdf(
         page.setFont('Times-Bold', 26)
 
     page.drawCentredString(
-        center, 350, '{}'.format(certifying_organisation.name))
+        center, 400, '{}'.format(certifying_organisation.name))
     page.setFont('Times-Roman', 16)
     page.drawCentredString(
-        center, 320,
+        center, 370,
         'Is authorized to provide {} training and certification.'.format(
             project.name))
+    
+    page.setFont('Times-Roman', 14)
+    page.drawCentredString(
+        center, 340,
+        f'Address: {certifying_organisation.address}')
+    
+    if certifying_organisation.url:
+        page.drawCentredString(
+            center, 320,
+            f'Website: {certifying_organisation.url}')
+    
+    if certifying_organisation.organisation_email:
+        page.drawCentredString(
+            center, 300,
+            f'Email: {certifying_organisation.organisation_email}')
+
+    if certifying_organisation.organisation_phone:
+        page.drawCentredString(
+            center, 280,
+            f'Phone: {certifying_organisation.organisation_phone}')
+
+    page.setFont('Times-Roman', 12)
+    page.drawCentredString(
+        center, 250,
+        f'Certificate Reference: {certificate.certificateID}')
+    
+    page.setFont('Times-Roman', 12)
+    page.drawCentredString(
+        center, 210,
+        'This certificate is issued in accordance with the QGIS Certification Program.')
+    page.drawCentredString(
+        center, 190,
+        'Authorization is contingent on compliance with the applicable QGIS training policies.')
 
     page.setFillColorRGB(0.1, 0.1, 0.1)
     if project_representative_signature is not None:
