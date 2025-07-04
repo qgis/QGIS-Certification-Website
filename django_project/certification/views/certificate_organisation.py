@@ -331,9 +331,7 @@ def organisation_certificate_pdf_view(request, **kwargs):
         raise Http404("Not found")
 
 
-class OrganisationCertificateDetailView(
-    ActiveCertifyingOrganisationRequiredMixin, DetailView
-):
+class OrganisationCertificateDetailView(DetailView):
     """Detail view for Certificate."""
 
     model = CertifyingOrganisationCertificate
