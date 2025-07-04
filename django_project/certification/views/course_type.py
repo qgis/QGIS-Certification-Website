@@ -1,19 +1,15 @@
 # coding=utf-8
-from django.urls import reverse
-from django.http import Http404
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    UpdateView,
-    DetailView)
-from django.db import IntegrityError
-from django.core.exceptions import ValidationError
-from braces.views import LoginRequiredMixin
 from base.models import Project
-from ..models import (
-    CertifyingOrganisation,
-    CourseType)
+from braces.views import LoginRequiredMixin
+from certification.mixins import ActiveCertifyingOrganisationRequiredMixin
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
+from django.http import Http404
+from django.urls import reverse
+from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+
 from ..forms import CourseTypeForm
+from ..models import CertifyingOrganisation, CourseType
 
 
 class CourseTypeMixin(object):
@@ -24,26 +20,30 @@ class CourseTypeMixin(object):
 
 
 class CourseTypeCreateView(
-        LoginRequiredMixin,
-        CourseTypeMixin, CreateView):
+    LoginRequiredMixin,
+    ActiveCertifyingOrganisationRequiredMixin,
+    CourseTypeMixin,
+    CreateView,
+):
     """Create view for Course Type."""
 
-    context_object_name = 'coursetype'
-    template_name = 'course_type/create.html'
+    context_object_name = "coursetype"
+    template_name = "course_type/create.html"
 
     def get_success_url(self):
         """Define the redirect URL.
 
-        After successful creation of the object, the User will be redirected
-        to the Certifying Organisation detail page.
+         After successful creation of the object, the User will be redirected
+         to the Certifying Organisation detail page.
 
-       :returns: URL
-       :rtype: HttpResponse
-       """
+        :returns: URL
+        :rtype: HttpResponse
+        """
 
-        return reverse('certifyingorganisation-detail', kwargs={
-            'slug': self.object.certifying_organisation.slug
-        })
+        return reverse(
+            "certifyingorganisation-detail",
+            kwargs={"slug": self.object.certifying_organisation.slug},
+        )
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
@@ -55,12 +55,12 @@ class CourseTypeCreateView(
         :rtype: dict
         """
 
-        context = super(
-            CourseTypeCreateView, self).get_context_data(**kwargs)
-        context['coursetypes'] = self.get_queryset() \
-            .filter(certifying_organisation=self.certifying_organisation)
-        context['organisation'] = CertifyingOrganisation.objects.get(
-            slug=self.kwargs.get('organisation_slug', None)
+        context = super(CourseTypeCreateView, self).get_context_data(**kwargs)
+        context["coursetypes"] = self.get_queryset().filter(
+            certifying_organisation=self.certifying_organisation
+        )
+        context["organisation"] = CertifyingOrganisation.objects.get(
+            slug=self.kwargs.get("organisation_slug", None)
         )
         return context
 
@@ -72,24 +72,27 @@ class CourseTypeCreateView(
         """
 
         kwargs = super(CourseTypeCreateView, self).get_form_kwargs()
-        self.organisation_slug = self.kwargs.get('organisation_slug', None)
-        self.certifying_organisation = \
-            CertifyingOrganisation.objects.get(slug=self.organisation_slug)
-        kwargs.update({
-            'user': self.request.user,
-            'certifying_organisation': self.certifying_organisation,
-        })
+        self.organisation_slug = self.kwargs.get("organisation_slug", None)
+        self.certifying_organisation = CertifyingOrganisation.objects.get(
+            slug=self.organisation_slug
+        )
+        kwargs.update(
+            {
+                "user": self.request.user,
+                "certifying_organisation": self.certifying_organisation,
+            }
+        )
         return kwargs
 
 
 class CourseTypeDeleteView(
-        LoginRequiredMixin,
-        DeleteView):
+    LoginRequiredMixin, ActiveCertifyingOrganisationRequiredMixin, DeleteView
+):
     """Delete view for Course Type."""
 
     model = CourseType
-    context_object_name = 'coursetype'
-    template_name = 'course_type/delete.html'
+    context_object_name = "coursetype"
+    template_name = "course_type/delete.html"
 
     def get(self, request, *args, **kwargs):
         """
@@ -108,11 +111,11 @@ class CourseTypeDeleteView(
         :rtype: HttpResponse
         """
 
-        self.organisation_slug = self.kwargs.get('organisation_slug', None)
-        self.certifying_organisation = \
-            CertifyingOrganisation.objects.get(slug=self.organisation_slug)
-        return super(
-            CourseTypeDeleteView, self).get(request, *args, **kwargs)
+        self.organisation_slug = self.kwargs.get("organisation_slug", None)
+        self.certifying_organisation = CertifyingOrganisation.objects.get(
+            slug=self.organisation_slug
+        )
+        return super(CourseTypeDeleteView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """Post the project_slug from the URL and define the Project.
@@ -130,9 +133,10 @@ class CourseTypeDeleteView(
         :rtype: HttpResponse
         """
 
-        self.organisation_slug = self.kwargs.get('organisation_slug', None)
-        self.certifying_organisation = \
-            CertifyingOrganisation.objects.get(slug=self.organisation_slug)
+        self.organisation_slug = self.kwargs.get("organisation_slug", None)
+        self.certifying_organisation = CertifyingOrganisation.objects.get(
+            slug=self.organisation_slug
+        )
         return super(CourseTypeDeleteView, self).post(request, *args, **kwargs)
 
     def get_success_url(self):
@@ -145,9 +149,10 @@ class CourseTypeDeleteView(
         :rtype: HttpResponse
         """
 
-        return reverse('certifyingorganisation-detail', kwargs={
-            'slug': self.object.certifying_organisation.slug
-        })
+        return reverse(
+            "certifyingorganisation-detail",
+            kwargs={"slug": self.object.certifying_organisation.slug},
+        )
 
     def get_queryset(self):
         """Get the queryset for this view.
@@ -160,18 +165,21 @@ class CourseTypeDeleteView(
         if not self.request.user.is_authenticated:
             raise Http404
         qs = CourseType.objects.filter(
-            certifying_organisation=self.certifying_organisation)
+            certifying_organisation=self.certifying_organisation
+        )
         return qs
 
 
 class CourseTypeUpdateView(
-        LoginRequiredMixin,
-        CourseTypeMixin,
-        UpdateView):
+    LoginRequiredMixin,
+    ActiveCertifyingOrganisationRequiredMixin,
+    CourseTypeMixin,
+    UpdateView,
+):
     """Update view for Course Type."""
 
-    context_object_name = 'coursetype'
-    template_name = 'course_type/update.html'
+    context_object_name = "coursetype"
+    template_name = "course_type/update.html"
 
     def get_form_kwargs(self):
         """Get keyword arguments from form.
@@ -180,15 +188,17 @@ class CourseTypeUpdateView(
         :rtype: dict
         """
 
-        kwargs = super(
-            CourseTypeUpdateView, self).get_form_kwargs()
-        self.organisation_slug = self.kwargs.get('organisation_slug', None)
-        self.certifying_organisation = \
-            CertifyingOrganisation.objects.get(slug=self.organisation_slug)
-        kwargs.update({
-            'user': self.request.user,
-            'certifying_organisation': self.certifying_organisation
-        })
+        kwargs = super(CourseTypeUpdateView, self).get_form_kwargs()
+        self.organisation_slug = self.kwargs.get("organisation_slug", None)
+        self.certifying_organisation = CertifyingOrganisation.objects.get(
+            slug=self.organisation_slug
+        )
+        kwargs.update(
+            {
+                "user": self.request.user,
+                "certifying_organisation": self.certifying_organisation,
+            }
+        )
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -201,12 +211,12 @@ class CourseTypeUpdateView(
         :rtype: dict
         """
 
-        context = super(
-            CourseTypeUpdateView, self).get_context_data(**kwargs)
-        context['coursetypes'] = self.get_queryset() \
-            .filter(certifying_organisation=self.certifying_organisation)
-        context['organisation'] = CertifyingOrganisation.objects.get(
-            slug=self.kwargs.get('organisation_slug', None)
+        context = super(CourseTypeUpdateView, self).get_context_data(**kwargs)
+        context["coursetypes"] = self.get_queryset().filter(
+            certifying_organisation=self.certifying_organisation
+        )
+        context["organisation"] = CertifyingOrganisation.objects.get(
+            slug=self.kwargs.get("organisation_slug", None)
         )
         return context
 
@@ -230,27 +240,27 @@ class CourseTypeUpdateView(
         :rtype: HttpResponse
         """
 
-        return reverse('certifyingorganisation-detail', kwargs={
-            'slug': self.object.certifying_organisation.slug
-        })
+        return reverse(
+            "certifyingorganisation-detail",
+            kwargs={"slug": self.object.certifying_organisation.slug},
+        )
 
     def form_valid(self, form):
         """Check that there is no referential integrity error when saving."""
 
         try:
-            return super(
-                CourseTypeUpdateView, self).form_valid(form)
+            return super(CourseTypeUpdateView, self).form_valid(form)
         except IntegrityError:
-            return ValidationError(
-                'ERROR: Course Type already exists!')
+            return ValidationError("ERROR: Course Type already exists!")
 
 
 class CourseTypeDetailView(
-        CourseTypeMixin, DetailView):
+    ActiveCertifyingOrganisationRequiredMixin, CourseTypeMixin, DetailView
+):
     """Detail view for Course Type."""
 
-    context_object_name = 'coursetype'
-    template_name = 'course_type/detail.html'
+    context_object_name = "coursetype"
+    template_name = "course_type/detail.html"
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
@@ -262,18 +272,19 @@ class CourseTypeDetailView(
         :rtype: dict
         """
 
-        self.organisation_slug = self.kwargs.get('organisation_slug', None)
-        self.certifying_organisation = \
-            CertifyingOrganisation.objects.get(slug=self.organisation_slug)
-        context = super(
-            CourseTypeDetailView, self).get_context_data(**kwargs)
-        context['coursetypes'] = CourseType.objects.filter(
-            certifying_organisation=self.certifying_organisation)
-        project_slug = 'qgis'
-        context['project_slug'] = project_slug
+        self.organisation_slug = self.kwargs.get("organisation_slug", None)
+        self.certifying_organisation = CertifyingOrganisation.objects.get(
+            slug=self.organisation_slug
+        )
+        context = super(CourseTypeDetailView, self).get_context_data(**kwargs)
+        context["coursetypes"] = CourseType.objects.filter(
+            certifying_organisation=self.certifying_organisation
+        )
+        project_slug = "qgis"
+        context["project_slug"] = project_slug
         if project_slug:
-            context['the_project'] = Project.objects.get(slug=project_slug)
-            context['project'] = context['the_project']
+            context["the_project"] = Project.objects.get(slug=project_slug)
+            context["project"] = context["the_project"]
         return context
 
     def get_queryset(self):
@@ -300,13 +311,15 @@ class CourseTypeDetailView(
         """
         if queryset is None:
             queryset = self.get_queryset()
-            pk = self.kwargs.get('pk', None)
-            organisation_slug = self.kwargs.get('organisation_slug', None)
+            pk = self.kwargs.get("pk", None)
+            organisation_slug = self.kwargs.get("organisation_slug", None)
             if pk and organisation_slug:
-                certifying_organisation = \
-                    CertifyingOrganisation.objects.get(slug=organisation_slug)
+                certifying_organisation = CertifyingOrganisation.objects.get(
+                    slug=organisation_slug
+                )
                 obj = queryset.get(
-                    certifying_organisation=certifying_organisation, pk=pk)
+                    certifying_organisation=certifying_organisation, pk=pk
+                )
                 return obj
             else:
-                raise Http404('Sorry! We could not find your course type!')
+                raise Http404("Sorry! We could not find your course type!")

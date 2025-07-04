@@ -1,15 +1,14 @@
 # coding=utf-8
-from django.urls import reverse
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    UpdateView)
-from django.http import HttpResponseRedirect, Http404
-from django.db import IntegrityError
-from django.core.exceptions import ValidationError
 from braces.views import LoginRequiredMixin
-from ..models import CertifyingOrganisation, CourseConvener
+from certification.mixins import ActiveCertifyingOrganisationRequiredMixin
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
+from django.http import Http404, HttpResponseRedirect
+from django.urls import reverse
+from django.views.generic import CreateView, DeleteView, UpdateView
+
 from ..forms import CourseConvenerForm
+from ..models import CertifyingOrganisation, CourseConvener
 
 
 class CourseConvenerMixin(object):
@@ -20,26 +19,30 @@ class CourseConvenerMixin(object):
 
 
 class CourseConvenerCreateView(
-        LoginRequiredMixin,
-        CourseConvenerMixin, CreateView):
+    LoginRequiredMixin,
+    ActiveCertifyingOrganisationRequiredMixin,
+    CourseConvenerMixin,
+    CreateView,
+):
     """Create view for Course Convener."""
 
-    context_object_name = 'convener'
-    template_name = 'course_convener/create.html'
+    context_object_name = "convener"
+    template_name = "course_convener/create.html"
 
     def get_success_url(self):
         """Define the redirect URL.
 
-        After successful creation of the object, the User will be redirected
-        to the Certifying Organisation detail page.
+         After successful creation of the object, the User will be redirected
+         to the Certifying Organisation detail page.
 
-       :returns: URL
-       :rtype: HttpResponse
-       """
+        :returns: URL
+        :rtype: HttpResponse
+        """
 
-        return reverse('certifyingorganisation-detail', kwargs={
-            'slug': self.object.certifying_organisation.slug
-        })
+        return reverse(
+            "certifyingorganisation-detail",
+            kwargs={"slug": self.object.certifying_organisation.slug},
+        )
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
@@ -51,10 +54,10 @@ class CourseConvenerCreateView(
         :rtype: dict
         """
 
-        context = super(
-            CourseConvenerCreateView, self).get_context_data(**kwargs)
-        context['conveners'] = self.get_queryset() \
-            .filter(certifying_organisation=self.certifying_organisation)
+        context = super(CourseConvenerCreateView, self).get_context_data(**kwargs)
+        context["conveners"] = self.get_queryset().filter(
+            certifying_organisation=self.certifying_organisation
+        )
         return context
 
     def form_valid(self, form):
@@ -72,8 +75,7 @@ class CourseConvenerCreateView(
             super(CourseConvenerCreateView, self).form_valid(form)
             return HttpResponseRedirect(self.get_success_url())
         except IntegrityError:
-            return ValidationError(
-                'ERROR: Course Convener is already exists!')
+            return ValidationError("ERROR: Course Convener is already exists!")
 
     def get_form_kwargs(self):
         """Get keyword arguments from form.
@@ -82,26 +84,28 @@ class CourseConvenerCreateView(
         :rtype: dict
         """
 
-        kwargs = super(CourseConvenerCreateView,
-                       self).get_form_kwargs()
-        self.organisation_slug = self.kwargs.get('organisation_slug', None)
-        self.certifying_organisation = \
-            CertifyingOrganisation.objects.get(slug=self.organisation_slug)
-        kwargs.update({
-            'user': self.request.user,
-            'certifying_organisation': self.certifying_organisation
-        })
+        kwargs = super(CourseConvenerCreateView, self).get_form_kwargs()
+        self.organisation_slug = self.kwargs.get("organisation_slug", None)
+        self.certifying_organisation = CertifyingOrganisation.objects.get(
+            slug=self.organisation_slug
+        )
+        kwargs.update(
+            {
+                "user": self.request.user,
+                "certifying_organisation": self.certifying_organisation,
+            }
+        )
         return kwargs
 
 
 class CourseConvenerDeleteView(
-        LoginRequiredMixin,
-        DeleteView):
+    LoginRequiredMixin, ActiveCertifyingOrganisationRequiredMixin, DeleteView
+):
     """Delete view for Course Convener."""
 
     model = CourseConvener
-    context_object_name = 'convener'
-    template_name = 'course_convener/delete.html'
+    context_object_name = "convener"
+    template_name = "course_convener/delete.html"
 
     def get(self, request, *args, **kwargs):
         """Get the organisation_slug from the URL
@@ -120,11 +124,11 @@ class CourseConvenerDeleteView(
         :rtype: HttpResponse
         """
 
-        self.organisation_slug = self.kwargs.get('organisation_slug', None)
-        self.certifying_organisation = \
-            CertifyingOrganisation.objects.get(slug=self.organisation_slug)
-        return super(
-            CourseConvenerDeleteView, self).get(request, *args, **kwargs)
+        self.organisation_slug = self.kwargs.get("organisation_slug", None)
+        self.certifying_organisation = CertifyingOrganisation.objects.get(
+            slug=self.organisation_slug
+        )
+        return super(CourseConvenerDeleteView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """Post the organisation_slug from the URL.
@@ -142,11 +146,11 @@ class CourseConvenerDeleteView(
         :rtype: HttpResponse
         """
 
-        self.organisation_slug = self.kwargs.get('organisation_slug', None)
-        self.certifying_organisation = \
-            CertifyingOrganisation.objects.get(slug=self.organisation_slug)
-        return super(
-            CourseConvenerDeleteView, self).post(request, *args, **kwargs)
+        self.organisation_slug = self.kwargs.get("organisation_slug", None)
+        self.certifying_organisation = CertifyingOrganisation.objects.get(
+            slug=self.organisation_slug
+        )
+        return super(CourseConvenerDeleteView, self).post(request, *args, **kwargs)
 
     def get_success_url(self):
         """Define the redirect URL.
@@ -158,9 +162,10 @@ class CourseConvenerDeleteView(
         :rtype: HttpResponse
         """
 
-        return reverse('certifyingorganisation-detail', kwargs={
-            'slug': self.object.certifying_organisation.slug
-        })
+        return reverse(
+            "certifyingorganisation-detail",
+            kwargs={"slug": self.object.certifying_organisation.slug},
+        )
 
     def get_queryset(self):
         """Get the queryset for this view.
@@ -173,18 +178,21 @@ class CourseConvenerDeleteView(
         if not self.request.user.is_authenticated:
             raise Http404
         qs = CourseConvener.objects.filter(
-            certifying_organisation=self.certifying_organisation)
+            certifying_organisation=self.certifying_organisation
+        )
         return qs
 
 
 class CourseConvenerUpdateView(
-        LoginRequiredMixin,
-        CourseConvenerMixin,
-        UpdateView):
+    LoginRequiredMixin,
+    ActiveCertifyingOrganisationRequiredMixin,
+    CourseConvenerMixin,
+    UpdateView,
+):
     """Update view for Course Convener."""
 
-    context_object_name = 'convener'
-    template_name = 'course_convener/update.html'
+    context_object_name = "convener"
+    template_name = "course_convener/update.html"
 
     def get_form_kwargs(self):
         """Get keyword arguments from form.
@@ -194,13 +202,16 @@ class CourseConvenerUpdateView(
         """
 
         kwargs = super(CourseConvenerUpdateView, self).get_form_kwargs()
-        self.organisation_slug = self.kwargs.get('organisation_slug', None)
-        self.certifying_organisation = \
-            CertifyingOrganisation.objects.get(slug=self.organisation_slug)
-        kwargs.update({
-            'user': self.request.user,
-            'certifying_organisation': self.certifying_organisation
-        })
+        self.organisation_slug = self.kwargs.get("organisation_slug", None)
+        self.certifying_organisation = CertifyingOrganisation.objects.get(
+            slug=self.organisation_slug
+        )
+        kwargs.update(
+            {
+                "user": self.request.user,
+                "certifying_organisation": self.certifying_organisation,
+            }
+        )
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -213,10 +224,10 @@ class CourseConvenerUpdateView(
         :rtype: dict
         """
 
-        context = super(
-            CourseConvenerUpdateView, self).get_context_data(**kwargs)
-        context['conveners'] = self.get_queryset() \
-            .filter(certifying_organisation=self.certifying_organisation)
+        context = super(CourseConvenerUpdateView, self).get_context_data(**kwargs)
+        context["conveners"] = self.get_queryset().filter(
+            certifying_organisation=self.certifying_organisation
+        )
         return context
 
     def get_queryset(self):
@@ -239,9 +250,10 @@ class CourseConvenerUpdateView(
         :rtype: HttpResponse
         """
 
-        return reverse('certifyingorganisation-detail', kwargs={
-            'slug': self.object.certifying_organisation.slug
-        })
+        return reverse(
+            "certifyingorganisation-detail",
+            kwargs={"slug": self.object.certifying_organisation.slug},
+        )
 
     def form_valid(self, form):
         """Check that there is no referential integrity error when saving."""
@@ -249,5 +261,4 @@ class CourseConvenerUpdateView(
         try:
             return super(CourseConvenerUpdateView, self).form_valid(form)
         except IntegrityError:
-            return ValidationError(
-                'ERROR: Course Convener is already exists!')
+            return ValidationError("ERROR: Course Convener is already exists!")
