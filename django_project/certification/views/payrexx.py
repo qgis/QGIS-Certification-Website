@@ -87,8 +87,10 @@ class PayrexxTopUpView(ActiveCertifyingOrganisationRequiredMixin, TemplateView):
             credits_requested=total_credits,
         )
 
-        redirect_url = reverse(
-            "certifyingorganisation-detail", kwargs={"slug": self.organisation_slug}
+        redirect_url = request.build_absolute_uri(
+            reverse(
+                "certifyingorganisation-detail", kwargs={"slug": self.organisation_slug}
+            )
         )
         response = payrexx.create_gateway(
             reference_id=credits_order.pk,
