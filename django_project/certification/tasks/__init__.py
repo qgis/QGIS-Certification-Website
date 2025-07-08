@@ -1,0 +1,1 @@
+from certification.tasks.reject_pending_organisations import *

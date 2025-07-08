@@ -61,3 +61,6 @@ sorl-thumbnail~=12.11
 
 # Resend email
 resend~=2.7
+
+# Celery
+celery~=5.3

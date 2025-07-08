@@ -13,6 +13,8 @@ volumes:
   media-data:
   reports-data:
   nginx-conf:
+  rabbitmq:
+  celerybeat-schedule:
 services:
 
   db:
@@ -73,6 +75,7 @@ services:
       - media-data:/home/web/media:rw
       - reports-data:/home/web/reports
       - ./docker/uwsgi.conf:/uwsgi.conf
+      - celerybeat-schedule:/home/web/celerybeat-schedule:rw
     command: bash -c "npm install && npm run build && uwsgi --ini /uwsgi.conf"
     links:
       - db:db
@@ -133,6 +136,44 @@ services:
       options:
         max-size: "10m"
         max-file: "10"
+    networks:
+      internal:
+
+  rabbitmq:
+    image: ${RABBITMQ_IMAGE:-rabbitmq:3.7-alpine}
+    hostname: rabbitmq
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+    restart: unless-stopped
+    networks:
+      internal:
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  beat:
+    <<: *uwsgi-common
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    working_dir: /home/web/django_project
+    entrypoint: [ ]
+    command: celery --app=certification.celery:app beat -s /home/web/celerybeat-schedule/schedule -l INFO
+    networks:
+      internal:
+
+  worker:
+    <<: *uwsgi-common
+    depends_on:
+      db:
+        condition: service_started
+      beat:
+        condition: service_started
+    working_dir: /home/web/django_project
+    entrypoint: []
+    command: celery -A certification worker -l INFO
     networks:
       internal:
 
