@@ -30,21 +30,25 @@
                 </span>
               </button>
             {% else %}
-              <a class="button is-danger is-light has-tooltip-bottom has-tooltip-arrow"
-                 href='{% url "courseconvener-delete" organisation_slug=certifyingorganisation.slug slug=courseconvener.slug %}'
-                 data-tooltip="Delete {{ courseconvener.user.first_name }} {{ courseconvener.user.last_name }} <{{ courseconvener.user }}">
+              <button
+                class="button is-danger is-light has-tooltip-bottom has-tooltip-arrow"
+                {% if certifyingorganisation.is_archived %}disabled{% endif %}
+                onclick="if(!this.disabled){window.location.href='{% url 'courseconvener-delete' organisation_slug=certifyingorganisation.slug slug=courseconvener.slug %}'}"
+                data-tooltip="Delete {{ courseconvener.user.first_name }} {{ courseconvener.user.last_name }} &lt;{{ courseconvener.user }}">
                 <span class="icon is-small">
                   <i class="fas fa-trash"></i>
                 </span>
-              </a>
+              </button>
             {% endif %}
-            <a class="button is-light has-tooltip-bottom has-tooltip-arrow"
-               href='{% url "courseconvener-update" organisation_slug=certifyingorganisation.slug slug=courseconvener.slug %}'
-               data-tooltip="Edit {{ courseconvener.user.first_name }} {{ courseconvener.user.last_name }} <{{ courseconvener.user }}">
+            <button
+              class="button is-light has-tooltip-bottom has-tooltip-arrow"
+              {% if certifyingorganisation.is_archived %}disabled{% endif %}
+              onclick="if(!this.disabled){window.location.href='{% url 'courseconvener-update' organisation_slug=certifyingorganisation.slug slug=courseconvener.slug %}'}"
+              data-tooltip="Edit {{ courseconvener.user.first_name }} {{ courseconvener.user.last_name }} &lt;{{ courseconvener.user }}">
               <span class="icon is-small">
-                <i class="fas fa-pencil-alt"></i>
+              <i class="fas fa-pencil-alt"></i>
               </span>
-            </a>
+            </button>
           </div>
         </td>
         {% endif %}

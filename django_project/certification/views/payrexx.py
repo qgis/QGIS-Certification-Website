@@ -3,6 +3,7 @@ import logging
 from decimal import Decimal
 
 from base.models.project import Project
+from certification.mixins import ActiveCertifyingOrganisationRequiredMixin
 from certification.models.certifying_organisation import CertifyingOrganisation
 from certification.models.credits_order import CreditsOrder
 from certification.utilities import PayrexxService
@@ -19,7 +20,7 @@ from django.views.generic import TemplateView
 logger = logging.getLogger(__name__)
 
 
-class PayrexxTopUpView(TemplateView):
+class PayrexxTopUpView(ActiveCertifyingOrganisationRequiredMixin, TemplateView):
     template_name = "certificate/top_up.html"
     project_slug = ""
     organisation_slug = ""

@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.views import APIView, Response
 
+from ..mixins import ActiveCertifyingOrganisationRequiredMixin
 from ..models.certifying_organisation import CertifyingOrganisation
 from ..models.course import Course
 from ..serializers.course_serializer import CourseSerializer
@@ -48,7 +49,7 @@ class GetUpcomingCourseProject(APIView):
             )
 
 
-class GetUpcomingCourseOrganisation(APIView):
+class GetUpcomingCourseOrganisation(ActiveCertifyingOrganisationRequiredMixin, APIView):
     """API returns GeoJSON location of upcoming courses within a certifying
     organisation. The location is the location of the training center where
     this course will be held.
@@ -107,7 +108,7 @@ class GetPastCourseProject(APIView):
             )
 
 
-class GetPastCourseOrganisation(APIView):
+class GetPastCourseOrganisation(ActiveCertifyingOrganisationRequiredMixin, APIView):
     """API returns GeoJSON location of past courses within a certifying
     organisation. The location is the location of the training center where
     this course will be held.
