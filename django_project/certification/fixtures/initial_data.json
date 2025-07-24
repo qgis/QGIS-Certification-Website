@@ -1,0 +1,52 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$zrjsWMbBtuGfPjxi62DMgT$Meog7HsW+s5Yv439ya/+SeV2MwFbfu1G/rkoY8Ubp54=",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "qgisadmin",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2025-07-18T11:58:40Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "base.organisation",
+    "pk": 1,
+    "fields": {
+      "name": "Public",
+      "approved": true,
+      "owner": null
+    }
+  },
+  {
+    "model": "base.project",
+    "pk": 1,
+    "fields": {
+      "name": "QGIS",
+      "description": "Create, edit, visualise, analyse and publish geospatial information on Windows, Mac, Linux",
+      "precis": "**QGIS** is the leading Free and Open Source Desktop GIS. It allows you to create, edit, visualise, analyse and publish geospatial information on Windows, Mac OS, Linux, BSD and Android (via the QField app). We also provide an OGC Web Server application, a web browser client and developer libraries. The QGIS project is under very active development by an enthusiastic and engaged developer community with good mechanisms for help via stack exchange, mailing lists and (optionally) through a global network of commercial support providers. QGIS is a professional GIS application and developer platform. QGIS is built on top of and proud to be itself Free and Open Source Software.\r\n\r\n**QGIS Desktop:** Powerful desktop GIS software to create, edit, visualise, analyse and publish geospatial information.\r\n**QGIS Server & Web Client:** Publish your QGIS projects and layers as OGC compatible WMS and WFS services.\r\n\r\nQGIS runs on Linux, Unix, Mac OS and Windows and supports numerous vector, raster, and database formats and functionalities.\r\n\r\n### Key Features\r\n\r\n* QGIS provides a continuously growing number of capabilities provided by core functions and plugins.\r\n* You can visualize, manage, edit, analyse data, and design maps.\r\n* **Interoperability:** support for numerous file formats and databases as well as web services.\r\n* **Customizability:** freedom to tailor the application to your needs, from custom data input forms to personalized user interfaces and workflows.\r\n* **Extensibility:** a C++ core and Python support provide the framework for everything from quick scripts to novel stand-alone applications based on the QGIS API.\r\n\r\n### QGIS Community\r\n\r\nQGIS is developed by a team of dedicated volunteers and organisations",
+      "image_file": "",
+      "accent_color": "#B8C979",
+      "project_representative_signature": "",
+      "approved": true,
+      "private": false,
+      "project_url": "http://qgis.org",
+      "project_repository_url": "https://github.com/qgis/QGIS",
+      "organisation": 1,
+      "project_representative": null,
+      "owner": 1,
+      "slug": "qgis",
+      "gitter_room": "qgis/QGIS",
+      "is_sustaining_members": true,
+      "sponsorship_managers": []
+    }
+  }
+]
