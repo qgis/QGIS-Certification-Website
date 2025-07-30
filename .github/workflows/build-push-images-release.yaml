@@ -6,14 +6,13 @@ on:
         description: 'Git tag to use'
   push:
     tags:
-      - '*.*.*.'
-      - 'v*.*.*.'
+      - '*'
 jobs:
   docker-builder-run-on-tag:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-    
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -33,7 +32,6 @@ jobs:
           tags: |
             qgis/qgis-certification-uwsgi:${{ github.ref_name }}
             qgis/qgis-certification-uwsgi:latest
-      
+
       - name: Log out from Docker Hub
         run: docker logout
-
