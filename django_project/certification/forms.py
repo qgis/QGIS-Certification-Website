@@ -32,6 +32,9 @@ from .models import (
     CertifyingOrganisationCertificate, Checklist, OrganisationChecklist
 )
 
+from crispy_forms.layout import Submit
+from datetime import datetime
+
 from crispy_bulma.widgets import FileUploadInput
 
 FileUploadInput.template_name = 'widgets/file_upload_input.html'
@@ -714,17 +717,28 @@ class OrganisationCertificateForm(forms.ModelForm):
         self.fields['certifying_organisation'].initial = \
             self.certifying_organisation
         self.fields['certifying_organisation'].widget = forms.HiddenInput()
-        # self.helper.layout.append(
-        #     HTML(
-        #         '<button type="submit" class="button is-success mt-5" name="submit">'
-        #         '  <span class="icon"><i class="fas fa-check"></i></span>'
-        #         '  <span>Issue Certificate</span>'
-        #         '</button>'
-        #     )
-        # )
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Issue Certificate',
+                css_class='button is-success pt-2 mt-5'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(OrganisationCertificateForm, self).save(commit=False)
+        existing = CertifyingOrganisationCertificate.objects.filter(
+            certifying_organisation=self.certifying_organisation
+        ).first()
+
+        if existing:
+            existing.issued = datetime.now()
+            existing.author = self.user
+            if commit:
+                existing.save()
+            return existing
+
         instance.author = self.user
-        instance.save()
+        if commit:
+            instance.save()
         return instance
