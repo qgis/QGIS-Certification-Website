@@ -5,6 +5,7 @@ core.settings.base
 # Django settings for projecta project.
 import os
 from .utils import absolute_path
+from celery.schedules import crontab
 
 ADMINS = (
     ('Tim Sutton', 'tim@kartoza.com'),
@@ -210,4 +211,16 @@ WEBPACK_LOADER = {
         'BUNDLE_DIR_NAME': 'bundles',
         'STATS_FILE': os.path.join(SITE_ROOT, 'webpack-stats.json'),
     }
+}
+
+CELERY_RESULT_BACKEND = 'rpc://'
+CELERY_BROKER_URL = os.environ.get('BROKER_URL', 'amqp://rabbitmq:5672')
+CELERY_BEAT_SCHEDULE = {
+    'reject_pending_organisations': {
+        'task': 'certification.tasks.reject_pending_organisations.reject_pending_organisations',
+        'schedule': crontab(minute=0, hour=0),  # Execute every day at midnight.
+        'kwargs': {
+            'days': 365,  # Auto reject pending organisations that wasn't updated for a year.
+        }
+    },
 }

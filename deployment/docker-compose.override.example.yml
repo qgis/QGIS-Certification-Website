@@ -61,3 +61,11 @@ services:
       - ../django_project:/home/web/django_project
       - ${MEDIA_VOLUME}:/home/web/media:rw
       - ./logs:/var/log
+
+  beat:
+    volumes:
+      - ../django_project:/home/web/django_project
+
+  worker:
+    volumes:
+      - ../django_project:/home/web/django_project

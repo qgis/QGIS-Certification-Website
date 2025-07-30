@@ -21,7 +21,7 @@ web:
 	@echo "------------------------------------------------------------------"
 	@echo "Running in production mode"
 	@echo "------------------------------------------------------------------"
-	@docker compose up -d web
+	@docker compose up -d web worker beat
 	@# Dont confuse this with the dbbackup make command below
 	@# This one runs the postgis-backup cron container
 	@# We add --no-recreate so that it does not destroy & recreate the db container
@@ -366,7 +366,7 @@ devweb: db
 	@echo "------------------------------------------------------------------"
 	@echo "Running in DEVELOPMENT mode"
 	@echo "------------------------------------------------------------------"
-	@docker compose up --no-deps -d devweb webpack
+	@docker compose up --no-deps -d devweb webpack rabbitmq worker beat
 
 devweb-runserver: devweb
 	@echo
