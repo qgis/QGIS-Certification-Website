@@ -49,6 +49,13 @@
     {% block pagetitle %}{% endblock %}
     <section class="section">
         <div class="container content">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="notification is-light {% if message.tags %} {{ message.tags }}{% endif %}">
+                    <p>{{ message|safe }}</p>
+            </div>
+            {% endfor %}
+            {% endif %}
             {% block content %}
             {% endblock %}
         </div>

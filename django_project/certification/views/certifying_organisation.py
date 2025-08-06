@@ -656,7 +656,7 @@ class CertifyingOrganisationCreateView(
         "Your organisation is successfully registered. "
         "It is now waiting for an approval."
     )
-    message_extra_tags = "organisation_submitted"
+    message_extra_tags = "is-success"
 
     def get_success_url(self):
         """Define the redirect URL.
@@ -669,7 +669,7 @@ class CertifyingOrganisationCreateView(
         :rtype: HttpResponse
         """
 
-        return reverse("pending-certifyingorganisation-list", kwargs={})
+        return reverse("certifyingorganisation-list", kwargs={})
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
