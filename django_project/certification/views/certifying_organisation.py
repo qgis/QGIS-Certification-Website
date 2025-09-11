@@ -558,7 +558,9 @@ class CertifyingOrganisationPrintView(
         slug = self.kwargs.get("slug", None)
         user = self.request.user
         obj = self.get_certifying_organisation_object(slug, self.request)
-        if obj.approved is False or user not in obj.organisation_owners.all():
+        if obj.approved is False:
+            raise Http404("Sorry! We could not find your Certifying Organisation!")
+        if user not in obj.organisation_owners.all() and not user.is_staff:
             raise Http404("Sorry! We could not find your Certifying Organisation!")
         return obj
 
