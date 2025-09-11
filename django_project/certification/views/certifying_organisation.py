@@ -126,7 +126,7 @@ class CertificationManagerRequiredMixin(LoginRequiredMixin):
         :rtype: HttpResponse
         """
         if not request.user.is_authenticated:
-            return self.handle_no_permission()
+            return self.handle_no_permission(request)
 
         if not self.has_permission(user=request.user):
             return HttpResponse(
@@ -508,7 +508,7 @@ class CertifyingOrganisationDetailView(
 
 
 class CertifyingOrganisationPrintView(
-    CertificationManagerRequiredMixin,
+    LoginRequiredMixin,
     CertifyingOrganisationMixin,
     CertifyingOrganisationDetailContextMixin,
     PDFView,
@@ -556,8 +556,9 @@ class CertifyingOrganisationPrintView(
         """
 
         slug = self.kwargs.get("slug", None)
+        user = self.request.user
         obj = self.get_certifying_organisation_object(slug, self.request)
-        if obj.approved is False:
+        if obj.approved is False or user not in obj.organisation_owners.all():
             raise Http404("Sorry! We could not find your Certifying Organisation!")
         return obj
 
@@ -1381,7 +1382,6 @@ class ArchivedCertifyingOrganisationListView(
                             | Q(project__certification_managers=self.request.user)
                         )
                     ).distinct()
-                print(queryset.values("name", "slug"), "#######")
                 return queryset
             else:
                 raise Http404("Sorry! We could not find your Certifying Organisation!")

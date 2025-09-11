@@ -41,7 +41,9 @@
 <body>
     <div class="certifying-org-pdf">
         <div class="header">
-            <img class="logo" src="file://{{ certifyingorganisation.logo.path }}" alt="{{ certifyingorganisation.name }} Logo">
+            {% if certifyingorganisation.logo %}
+                <img class="logo" src="file://{{ certifyingorganisation.logo.path }}" alt="{{ certifyingorganisation.name }} Logo">
+            {% endif %}
             <div style="text-align: center;">
                 <h2 class="title hero-title is-4 m-0 has-text-success">{{ certifyingorganisation.name }}</h2>
                 <h3>QGIS Certifying Organisation </h3>
