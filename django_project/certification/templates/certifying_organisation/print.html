@@ -1,0 +1,186 @@
+
+{% load static %}
+{% load render_bundle from webpack_loader %}
+{% render_bundle 'main' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>QGIS Certification: Certifying Organisation</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+            @bottom-right {
+                background: #589632;
+                color: #fff;
+                font-size: 9pt;
+                content: counter(page);
+                height: 1cm;
+                text-align: center;
+                width: 1cm;
+            }
+            @bottom-center {
+                background: #589632;
+                content: '';
+                display: block;
+                height: .05cm;
+                opacity: .5;
+                width: 100%;
+            }
+            }
+        body {
+            color: #222;
+            background: #fff;
+            margin: 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="certifying-org-pdf">
+        <div class="header">
+            <img class="logo" src="file://{{ certifyingorganisation.logo.path }}" alt="{{ certifyingorganisation.name }} Logo">
+            <div style="text-align: center;">
+                <h2 class="title hero-title is-4 m-0 has-text-success">{{ certifyingorganisation.name }}</h2>
+                <h3>QGIS Certifying Organisation </h3>
+            </div>
+            <img class="logo" src="{% static 'images/large-logo.svg' %}" alt="QGIS Logo">
+        </div>
+
+        <div class="card">
+            <div class="title is-5 has-text-centered">Organisation Details</div>
+            <table class="table">
+                <tr><th>Name</th><td>{{ certifyingorganisation.name }}</td></tr>
+                <tr><th>Address</th><td>{{ certifyingorganisation.address }}</td></tr>
+                <tr><th>Country</th><td>{{ certifyingorganisation.country.name }}</td></tr>
+                <tr><th>Email</th><td><a href="mailto:{{ certifyingorganisation.organisation_email }}">{{ certifyingorganisation.organisation_email }}</a></td></tr>
+                <tr><th>Phone</th><td>{{ certifyingorganisation.organisation_phone }}</td></tr>
+                <tr><th>Owners</th><td>
+                    {% for organisation_owners in certifyingorganisation.organisation_owners.all %}
+                        {% if organisation_owners.first_name %}
+                            {{ organisation_owners.first_name }} {{ organisation_owners.last_name }}{% if not forloop.last %}, {% endif %}
+                        {% else %}
+                            {{ organisation_owners }}{% if not forloop.last %}, {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </td></tr>
+                <tr><th>URL</th><td>
+                    {% if certifyingorganisation.url %}
+                        <a href="{{ certifyingorganisation.url }}">{{ certifyingorganisation.url }}</a>
+                    {% else %}-{% endif %}
+                </td></tr>
+            </table>
+        </div>
+
+        {% if certifyingorganisation.approved %}
+            <div class="card">
+                <div class="title is-5 has-text-centered">Courses</div>
+                {% if num_course == 0 %}
+                    <div class="notification">No courses are defined.</div>
+                {% else %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Course Name</th>
+                                <th>Date</th>
+                                <th>Training Center</th>
+                                <th>Course Convener</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in courses %}
+                            <tr>
+                                <td>{{ course.course_type.name }}</td>
+                                <td>{{ course.start_date }} to {{ course.end_date }}</td>
+                                <td>{{ course.training_center.name }}</td>
+                                <td>
+                                    {% if course.course_convener.user.first_name %}
+                                        {{ course.course_convener.user.first_name }} {{ course.course_convener.user.last_name }}
+                                    {% else %}
+                                        {{ course.course_convener.user }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+
+            <div class="card">
+                <div class="title is-5 has-text-centered">Training Centers</div>
+                {% if num_trainingcenter == 0 %}
+                    <div class="notification">No training centers are defined.</div>
+                {% else %}
+                    <table class="table">
+                        <tbody>
+                            {% for trainingcenter in trainingcenters %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'trainingcenter-detail' certifyingorganisation.slug trainingcenter.slug %}">{{ trainingcenter.name }}</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+
+            <div class="card">
+                <div class="title is-5 has-text-centered">Course Types</div>
+                {% if num_coursetype == 0 %}
+                    <div class="notification">No course types are defined.</div>
+                {% else %}
+                    <table class="table">
+                        <tbody>
+                            {% for coursetype in coursetypes %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'coursetype-detail' organisation_slug=certifyingorganisation.slug pk=coursetype.pk %}">{{ coursetype.name }}</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+
+            <div class="card">
+                <div class="title is-5 has-text-centered">Course Conveners</div>
+                {% if num_courseconvener == 0 %}
+                    <div class="notification">No course conveners are defined.</div>
+                {% else %}
+                    <table class="table">
+                        <tbody>
+                            {% for courseconvener in courseconveners %}
+                            <tr>
+                                <td>
+                                    {% if courseconvener.is_active %}
+                                        {% if courseconvener.user.first_name %}
+                                            {{ courseconvener.user.first_name }} {{ courseconvener.user.last_name }}
+                                        {% else %}
+                                            {{ courseconvener.user }}
+                                        {% endif %}
+                                    {% elif user_can_delete %}
+                                        <span class="inactive">
+                                            {% if courseconvener.user.first_name %}
+                                                {{ courseconvener.user.first_name }} {{ courseconvener.user.last_name }}
+                                            {% else %}
+                                                {{ courseconvener.user }}
+                                            {% endif %}
+                                            [inactive]
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

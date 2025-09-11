@@ -26,6 +26,7 @@ from django.views.generic import (
     UpdateView,
 )
 from django_datatables_view.base_datatable_view import BaseDatatableView
+from django_renderpdf.views import PDFView
 from pure_pagination.mixins import PaginationMixin
 from rest_framework.views import APIView
 
@@ -177,6 +178,168 @@ class CertifyingOrganisationUserTestMixin(UserPassesTestMixin, APIView):
         return False
 
 
+class CertifyingOrganisationDetailContextMixin:
+    """
+    Mixin to provide context data for Certifying Organisation detail views.
+    """
+
+    def get_certifying_organisation_detail_context(
+        self, certifying_organisation, request
+    ):
+        context = {}
+        project_slug = "qgis"
+        session_key = request.GET.get("s", None)
+        session = None
+        if session_key:
+            try:
+                session = Session.objects.get(pk=session_key)
+            except Session.DoesNotExist:
+                pass
+
+        external_reviewers = ExternalReviewer.objects.filter(
+            certifying_organisation=certifying_organisation
+        ).order_by("id")
+        context["external_reviewers"] = [
+            er for er in external_reviewers if not er.session_expired
+        ]
+
+        if certifying_organisation.approved:
+            context["trainingcenters"] = TrainingCenter.objects.filter(
+                certifying_organisation=certifying_organisation
+            )
+            context["num_trainingcenter"] = context["trainingcenters"].count()
+            context["coursetypes"] = CourseType.objects.filter(
+                certifying_organisation=certifying_organisation
+            )
+            context["num_coursetype"] = context["coursetypes"].count()
+            context["courseconveners"] = CourseConvener.objects.filter(
+                certifying_organisation=certifying_organisation
+            ).prefetch_related("course_set")
+            context["num_courseconvener"] = context["courseconveners"].count()
+            context["courses"] = Course.objects.filter(
+                certifying_organisation=certifying_organisation
+            ).order_by("-start_date")
+            context["num_course"] = context["courses"].count()
+            context["attendee"] = CourseAttendee.objects.filter(
+                course__in=context["courses"],
+                attendee__certifying_organisation=certifying_organisation,
+            )
+            context["num_attendees"] = context["attendee"].count()
+
+        context["project_slug"] = project_slug
+        context["the_project"] = Project.objects.get(slug=project_slug)
+        context["available_status"] = (
+            context["the_project"]
+            .status_set.all()
+            .values_list(Lower("name"), flat=True)
+        )
+        context["project"] = context["the_project"]
+
+        user_can_create = False
+        user_can_delete = False
+        user_can_update_status = False
+        user_can_invite_external_reviewer = False
+
+        user = request.user
+        if (
+            user.is_staff
+            or user in context["the_project"].certification_managers.all()
+            or user == context["project"].owner
+        ):
+            user_can_create = True
+            user_can_delete = True
+            user_can_update_status = True
+            user_can_invite_external_reviewer = True
+
+        if user in certifying_organisation.organisation_owners.all():
+            if (
+                certifying_organisation.approved
+                or certifying_organisation.rejected
+                or (
+                    certifying_organisation.status
+                    and certifying_organisation.status.name.lower() == "pending"
+                )
+            ):
+                user_can_create = True
+                user_can_delete = True
+
+        if session:
+            try:
+                external_reviewer = ExternalReviewer.objects.get(
+                    session_key=session.session_key,
+                    certifying_organisation=certifying_organisation,
+                )
+                if not external_reviewer.session_expired:
+                    user_can_update_status = True
+            except ExternalReviewer.DoesNotExist:
+                pass
+
+        context["user_can_delete"] = user_can_delete
+        context["user_can_create"] = user_can_create
+        context["user_can_update_status"] = user_can_update_status
+        context["user_can_invite_external_reviewer"] = user_can_invite_external_reviewer
+
+        checklist_questions = Checklist.objects.filter(
+            project=context["the_project"], target=REVIEWER, active=True
+        ).prefetch_related(
+            Prefetch(
+                "organisationchecklist_set",
+                queryset=OrganisationChecklist.objects.filter(
+                    organisation=certifying_organisation
+                ),
+            )
+        )
+        context["available_checklist"] = ChecklistSerializer(
+            checklist_questions, many=True
+        ).data
+
+        context["submitted_checklist"] = OrganisationChecklist.objects.filter(
+            organisation=certifying_organisation,
+        )
+
+        context["checked_checklist"] = (
+            context["submitted_checklist"]
+            .filter(checklist__in=checklist_questions, checked=True)
+            .count()
+        )
+
+        context["history"] = certifying_organisation.history.all()
+        return context
+
+    def get_certifying_organisation_object(self, slug, request):
+        """Get the object for this view.
+
+        Because Certifying Organisation slugs are unique within a Project,
+        we need to make sure that we fetch the correct
+        Certifying Organisation from the correct Project
+
+        :returns: Queryset which is filtered to only show a project
+        :rtype: QuerySet
+        :raises: Http404
+        """
+
+        project_slug = "qgis"
+        if slug and project_slug:
+            try:
+                project = Project.objects.get(slug=project_slug)
+            except Project.DoesNotExist:
+                raise Http404("Sorry! We could not find " "your Project!")
+            try:
+                obj = CertifyingOrganisation.objects.get(project=project, slug=slug)
+            except CertifyingOrganisation.DoesNotExist:
+                raise Http404(
+                    "Sorry! We could not find " "your Certifying Organisation!"
+                )
+            if obj.is_archived:
+                messages.warning(
+                    request,
+                    "This Certifying Organisation has been archived. Most features are disabled and editing is not permitted.",
+                )
+            return obj
+        else:
+            raise Http404("Sorry! We could not find " "your Certifying Organisation!")
+
+
 class JSONCertifyingOrganisationListView(
     CertifyingOrganisationMixin, JSONResponseMixin, ListView
 ):
@@ -279,7 +442,11 @@ class CertifyingOrganisationListView(
         return self.queryset
 
 
-class CertifyingOrganisationDetailView(CertifyingOrganisationMixin, DetailView):
+class CertifyingOrganisationDetailView(
+    CertifyingOrganisationMixin,
+    CertifyingOrganisationDetailContextMixin,
+    DetailView,
+):
     """Detail view for Certifying Organisation."""
 
     context_object_name = "certifyingorganisation"
@@ -299,128 +466,11 @@ class CertifyingOrganisationDetailView(CertifyingOrganisationMixin, DetailView):
             **kwargs
         )
 
-        certifying_organisation = self.object
-        project_slug = "qgis"
-
-        # Check session key
-        session_key = self.request.GET.get("s", None)
-        session = None
-        if session_key:
-            try:
-                session = Session.objects.get(pk=session_key)
-            except Session.DoesNotExist:
-                pass
-
-        external_reviewers = ExternalReviewer.objects.filter(
-            certifying_organisation=certifying_organisation
-        ).order_by("id")
-        context["external_reviewers"] = []
-        for external_reviewer in external_reviewers:
-            if not external_reviewer.session_expired:
-                context["external_reviewers"].append(external_reviewer)
-
-        if certifying_organisation.approved:
-            context["trainingcenters"] = TrainingCenter.objects.filter(
-                certifying_organisation=certifying_organisation
-            )
-            context["num_trainingcenter"] = context["trainingcenters"].count()
-            context["coursetypes"] = CourseType.objects.filter(
-                certifying_organisation=certifying_organisation
-            )
-            context["num_coursetype"] = context["coursetypes"].count()
-            context["courseconveners"] = CourseConvener.objects.filter(
-                certifying_organisation=certifying_organisation
-            ).prefetch_related("course_set")
-            context["num_courseconvener"] = context["courseconveners"].count()
-            context["courses"] = Course.objects.filter(
-                certifying_organisation=certifying_organisation
-            ).order_by("-start_date")
-            context["num_course"] = context["courses"].count()
-            context["attendee"] = CourseAttendee.objects.filter(
-                course__in=context["courses"],
-                attendee__certifying_organisation=certifying_organisation,
-            )
-            context["num_attendees"] = context["attendee"].count()
-
-        context["project_slug"] = project_slug
-        context["the_project"] = Project.objects.get(slug=project_slug)
-
-        context["available_status"] = (
-            context["the_project"]
-            .status_set.all()
-            .values_list(Lower("name"), flat=True)
-        )
-        context["project"] = context["the_project"]
-
-        user_can_create = False
-        user_can_delete = False
-        user_can_update_status = False
-        user_can_invite_external_reviewer = False
-
-        if (
-            self.request.user.is_staff
-            or self.request.user in context["the_project"].certification_managers.all()
-            or self.request.user == context["project"].owner
-        ):
-            user_can_create = True
-            user_can_delete = True
-            user_can_update_status = True
-            user_can_invite_external_reviewer = True
-
-        if self.request.user in certifying_organisation.organisation_owners.all():
-            if (
-                certifying_organisation.approved
-                or certifying_organisation.rejected
-                or (
-                    certifying_organisation.status
-                    and certifying_organisation.status.name.lower() == "pending"
-                )
-            ):
-                user_can_create = True
-                user_can_delete = True
-
-        if session:
-            try:
-                external_reviewer = ExternalReviewer.objects.get(
-                    session_key=session.session_key,
-                    certifying_organisation=certifying_organisation,
-                )
-                if not external_reviewer.session_expired:
-                    user_can_update_status = True
-            except ExternalReviewer.DoesNotExist:
-                pass
-
-        context["user_can_delete"] = user_can_delete
-        context["user_can_create"] = user_can_create
-        context["user_can_update_status"] = user_can_update_status
-        context["user_can_invite_external_reviewer"] = user_can_invite_external_reviewer
-
-        checklist_questions = Checklist.objects.filter(
-            project=context["the_project"], target=REVIEWER, active=True
-        ).prefetch_related(
-            Prefetch(
-                "organisationchecklist_set",
-                queryset=OrganisationChecklist.objects.filter(
-                    organisation=certifying_organisation
-                ),
-            )
-        )
-        context["available_checklist"] = ChecklistSerializer(
-            checklist_questions, many=True
-        ).data
-
-        context["submitted_checklist"] = OrganisationChecklist.objects.filter(
-            organisation=certifying_organisation,
+        certifying_org_context = self.get_certifying_organisation_detail_context(
+            certifying_organisation=self.object, request=self.request
         )
 
-        context["checked_checklist"] = (
-            context["submitted_checklist"]
-            .filter(checklist__in=checklist_questions, checked=True)
-            .count()
-        )
-
-        # Get history data
-        context["history"] = certifying_organisation.history.all()
+        context.update(certifying_org_context)
 
         return context
 
@@ -453,28 +503,63 @@ class CertifyingOrganisationDetailView(CertifyingOrganisationMixin, DetailView):
         if queryset is None:
             queryset = self.get_queryset()
             slug = self.kwargs.get("slug", None)
-            project_slug = "qgis"
-            if slug and project_slug:
-                try:
-                    project = Project.objects.get(slug=project_slug)
-                except Project.DoesNotExist:
-                    raise Http404("Sorry! We could not find " "your Project!")
-                try:
-                    obj = queryset.get(project=project, slug=slug)
-                except CertifyingOrganisation.DoesNotExist:
-                    raise Http404(
-                        "Sorry! We could not find " "your Certifying Organisation!"
-                    )
-                if obj.is_archived:
-                    messages.warning(
-                        self.request,
-                        "This Certifying Organisation has been archived. Most features are disabled and editing is not permitted.",
-                    )
-                return obj
-            else:
-                raise Http404(
-                    "Sorry! We could not find " "your Certifying Organisation!"
-                )
+            obj = self.get_certifying_organisation_object(slug, self.request)
+            return obj
+
+
+class CertifyingOrganisationPrintView(
+    CertificationManagerRequiredMixin,
+    CertifyingOrganisationMixin,
+    CertifyingOrganisationDetailContextMixin,
+    PDFView,
+):
+    """Print view for Certifying Organisation."""
+
+    template_name = "certifying_organisation/print.html"
+
+    def get_context_data(self, *args, **kwargs):
+        """Get the context data which is passed to a template.
+
+        :param args: Any arguments to pass to the superclass.
+        :type args: tuple
+
+        :param kwargs: Any arguments to pass to the superclass.
+        :type kwargs: dict
+
+        :returns: Context data which will be passed to the template.
+        :rtype: dict
+        """
+
+        context = super(CertifyingOrganisationPrintView, self).get_context_data(
+            *args, **kwargs
+        )
+        certifying_organisation = self.get_object()
+        context["certifyingorganisation"] = certifying_organisation
+
+        certifying_org_context = self.get_certifying_organisation_detail_context(
+            certifying_organisation=certifying_organisation, request=self.request
+        )
+
+        context.update(certifying_org_context)
+        return context
+
+    def get_object(self):
+        """Get the object for this view.
+
+        Because Certifying Organisation slugs are unique within a Project,
+        we need to make sure that we fetch the correct
+        Certifying Organisation from the correct Project
+
+        :returns: Queryset which is filtered to only show a project
+        :rtype: QuerySet
+        :raises: Http404
+        """
+
+        slug = self.kwargs.get("slug", None)
+        obj = self.get_certifying_organisation_object(slug, self.request)
+        if obj.approved is False:
+            raise Http404("Sorry! We could not find your Certifying Organisation!")
+        return obj
 
 
 class CertifyingOrganisationArchivingView(
