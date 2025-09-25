@@ -37,6 +37,7 @@ from .views import (  # Certifying Organisation.; Course Type.; Course Convener.
     CertifyingOrganisationDetailView,
     CertifyingOrganisationJson,
     CertifyingOrganisationListView,
+    CertifyingOrganisationPrintView,
     CertifyingOrganisationUpdateView,
     CheckoutSessionSuccessView,
     CourseAttendeeCreateView,
@@ -137,6 +138,11 @@ urlpatterns = [
         r"^certifyingorganisation/(?P<slug>[\w-]+)/$",
         view=CertifyingOrganisationDetailView.as_view(),
         name="certifyingorganisation-detail",
+    ),
+    url(
+        r"^certifyingorganisation/(?P<slug>[\w-]+)/print/$",
+        view=CertifyingOrganisationPrintView.as_view(),
+        name="certifyingorganisation-print",
     ),
     url(
         r"^certifyingorganisation/(?P<slug>[\w-]+)/archiving/(?P<toogle_archive>[\w-]+)/$",

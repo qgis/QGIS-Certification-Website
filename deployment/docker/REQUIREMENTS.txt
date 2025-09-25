@@ -64,3 +64,6 @@ resend~=2.7
 
 # Celery
 celery~=5.3
+
+# PDF rendering
+django-renderpdf~=5.0

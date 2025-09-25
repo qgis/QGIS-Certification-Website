@@ -314,6 +314,14 @@
         <i class="fas fa-rss"></i>
     </button>
         {% if user_can_delete %}
+
+        <button class="button is-light has-tooltip-arrow has-tooltip-bottom icon"
+            {% if certifyingorganisation.is_archived %}disabled{% endif %}
+            onclick="location.href='{% url "certifyingorganisation-print" slug=certifyingorganisation.slug %}'"
+            data-tooltip="Print this page to PDF">
+            <i class="fas fa-print"></i>
+        </button>
+
         <button class="button is-light has-tooltip-arrow has-tooltip-bottom icon"
             {% if certifyingorganisation.is_archived %}disabled{% endif %}
             onclick="location.href='{% url "issue-certificate-organisation" organisation_slug=certifyingorganisation.slug %}'"

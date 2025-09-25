@@ -631,3 +631,82 @@ class TestCertifyingOrganisationView(TestCase):
         self.pending_certifying_organisation.refresh_from_db()
         self.assertEqual(self.certifying_organisation.status.name, "Approved")
         self.assertEqual(self.pending_certifying_organisation.status.name, "Pending")
+
+
+class TestCertifyingOrganisationPrintView(TestCase):
+    """Test that Certifying Organisation Print View works."""
+
+    @override_settings(VALID_DOMAIN=["testserver"])
+    def setUp(self):
+        self.client = Client()
+        self.client.post("/set_language/", data={"language": "en"})
+        self.user = UserF.create(username="anita", password="password")
+        self.user.set_password("password")
+        self.user.save()
+        self.orgmanager = UserF.create(username="orgmanager", password="password")
+        self.orgmanager.set_password("password")
+        self.orgmanager.save()
+        self.project = ProjectF.create()
+        self.certifying_organisation = CertifyingOrganisationF.create(
+            project=self.project, approved=True
+        )
+        self.certifying_organisation.organisation_owners.set([self.orgmanager])
+        self.certifying_organisation.save()
+        self.unapproved_organisation = CertifyingOrganisationF.create(
+            project=self.project, approved=False
+        )
+
+    @override_settings(VALID_DOMAIN=["testserver"])
+    def tearDown(self):
+        self.certifying_organisation.delete()
+        self.unapproved_organisation.delete()
+        self.project.delete()
+        self.user.delete()
+
+    @override_settings(VALID_DOMAIN=["testserver"])
+    def test_print_view_approved_org(self):
+        self.client.login(username="orgmanager", password="password")
+        response = self.client.get(
+            reverse(
+                "certifyingorganisation-print",
+                kwargs={"slug": self.certifying_organisation.slug},
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+
+    @override_settings(VALID_DOMAIN=["testserver"])
+    def test_print_view_unapproved_org(self):
+        self.client.login(username="orgmanager", password="password")
+        response = self.client.get(
+            reverse(
+                "certifyingorganisation-print",
+                kwargs={"slug": self.unapproved_organisation.slug},
+            )
+        )
+        self.assertNotEqual(response.status_code, 200)
+        # Should be forbidden or not found for unapproved org
+        self.assertIn(response.status_code, [403, 404])
+
+    @override_settings(VALID_DOMAIN=["testserver"])
+    def test_print_view_as_non_owner(self):
+        self.client.login(username="anita", password="password")
+        response = self.client.get(
+            reverse(
+                "certifyingorganisation-print",
+                kwargs={"slug": self.certifying_organisation.slug},
+            )
+        )
+        # Should be forbidden or not found for non owner
+        self.assertIn(response.status_code, [403, 404])
+
+    @override_settings(VALID_DOMAIN=["testserver"])
+    def test_print_view_requires_login(self):
+        response = self.client.get(
+            reverse(
+                "certifyingorganisation-print",
+                kwargs={"slug": self.certifying_organisation.slug},
+            )
+        )
+        # Should redirect to login
+        self.assertIn(response.status_code, [302, 403])
