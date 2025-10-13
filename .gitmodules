@@ -1,0 +1,3 @@
+[submodule "django_project/base/static/theme"]
+	path = django_project/base/static/theme
+	url = https://github.com/qgis/QGIS-Website-Theme.git
