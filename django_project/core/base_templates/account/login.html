@@ -13,17 +13,17 @@
             function updateButtonState() {
                 var usernameIsEmpty = $("#id_login").val() === "";
                 var passwordIsEmpty = $("#id_password").val() === "";
-        
+
                 if (usernameIsEmpty || passwordIsEmpty) {
                 $("#submit-button").prop("disabled", true);
                 } else {
                 $("#submit-button").prop("disabled", false);
                 }
             }
-        
+
             // Call the function when the page loads
             updateButtonState();
-        
+
             // Call the function when the field changes or the form is submitted
             $("#id_login").on("input", updateButtonState);
             $("#id_password").on("input", updateButtonState);
@@ -38,7 +38,7 @@
     <section class="hero is-dark is-medium has-bg-img" style="background: url({% static "images/hegobg1.webp" %});
     background-position: 50%;
     background-size: cover;">
-    <div class="hero-body" style="height: 100dvh;">
+    <div class="hero-body">
         <div class="columns is-vcentered is-centered">
             <div class="column is-4 p-6 login-container">
                 <div class="has-text-centered">
@@ -82,7 +82,7 @@
 
                     <form class="login" method="POST" action="{% url 'account_login' %}">{% csrf_token %}
                         {% include "account/form_snippet.html" with form=form %}
-        
+
                         {% if form.errors or form.non_field_errors %}
                         <div class="notification is-danger is-light">
                             {% for error in form.non_field_errors %}
