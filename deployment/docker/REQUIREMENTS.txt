@@ -49,8 +49,8 @@ reportlab~=4.0
 requests~=2.32
 # support special characters
 Unidecode~=0.4
-WeasyPrint~=62.1
-pydyf~=0.11
+WeasyPrint==62.1
+pydyf==0.11.0
 xhtml2pdf~=0.2
 sentry-sdk~=2.2
 setuptools~=75.1
