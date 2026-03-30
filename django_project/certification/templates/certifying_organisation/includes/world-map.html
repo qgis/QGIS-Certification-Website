@@ -39,6 +39,7 @@
                       '<a href="http://hot.openstreetmap.org/" target="_blank">'+
                       'Humanitarian OpenStreetMap Team</a>',
       opacity: 0.75,
+      className: 'basemap-tiles',
     }).addTo(map);
 
     add_layers_to_map();
@@ -152,10 +153,10 @@
   function style(feature) {
     return {
       fillColor: get_color(feature.properties.organisation_count),
-      weight: 1.5,
-      opacity: 1,
-      color: '#b3b3b3',
-      fillOpacity: 0.9
+      weight: 1,
+      opacity: .5,
+      color: '#002033',
+      fillOpacity: 0.75
     };
   }
 
@@ -172,7 +173,7 @@
         var feature = e.target;
 
         feature.setStyle({
-          weight: 2.5,
+          weight: 3,
           color: '#ee7913',
           dashArray: '',
           fillOpacity: 0.9
@@ -208,4 +209,9 @@
     </div>
   </div>
 </div>
+<style>
+  .basemap-tiles {
+    filter: grayscale(100%) brightness(80%);
+  }
+</style>
 {% endblock %}
