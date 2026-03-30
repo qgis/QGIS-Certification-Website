@@ -1,4 +1,5 @@
 {% block js_head %}
+
 <script>
   var map;
   var geojson;
@@ -8,9 +9,36 @@
 
   $(document).ready(function () {
     $('#map').css('height', 700);
-    map = Leaflet.map('map').setView([20, 0], 2);
-    Leaflet.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+    $('#map').css('background', '#002033');
+
+    const worldBounds = Leaflet.latLngBounds(
+      Leaflet.latLng(-90, -180),  // south-west
+      Leaflet.latLng(90, 180)     // north-east
+    );
+
+    map = Leaflet.map('map', {
+      maxBounds: worldBounds,
+      maxBoundsViscosity: 1.0,  // 1.0 = hard lock, won't pan outside at all
+      minZoom: 2,
+    }).setView([20, 0], 2);
+
+    const RefererTileLayer = Leaflet.TileLayer.extend({
+      createTile(coords, done) {
+        const tile = document.createElement('img');
+        tile.referrerPolicy = 'origin';
+        tile.onload = () => done(null, tile);
+        tile.onerror = (e) => done(e, tile);
+        tile.src = this.getTileUrl(coords);
+        return tile;
+      }
+    });
+
+    new RefererTileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+      attribution:  '&copy; <a href="http://www.openstreetmap.org/copyright">'+
+                      'OpenStreetMap</a>, Tiles courtesy of '+
+                      '<a href="http://hot.openstreetmap.org/" target="_blank">'+
+                      'Humanitarian OpenStreetMap Team</a>',
+      opacity: 0.75,
     }).addTo(map);
 
     add_layers_to_map();
@@ -124,10 +152,10 @@
   function style(feature) {
     return {
       fillColor: get_color(feature.properties.organisation_count),
-      weight: 1,
+      weight: 1.5,
       opacity: 1,
-      color: '#D3D3D3',
-      fillOpacity: 0.7
+      color: '#b3b3b3',
+      fillOpacity: 0.9
     };
   }
 
@@ -144,10 +172,10 @@
         var feature = e.target;
 
         feature.setStyle({
-          weight: 1.5,
+          weight: 2.5,
           color: '#ee7913',
           dashArray: '',
-          fillOpacity: 0.7
+          fillOpacity: 0.9
         });
 
         if (!Leaflet.Browser.ie && !Leaflet.Browser.opera) {

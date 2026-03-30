@@ -32,12 +32,35 @@
 
                 // Add map
                 $('#map').css({'height': 400, 'width': "100%"});
-                map = Leaflet.map('map').setView([lat, long], 4);
-                Leaflet.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-                    attribution:  '&copy; <a href="http://www.openstreetmap.org/copyright">'+
-                                    'OpenStreetMap</a>, Tiles courtesy of '+
-                                    '<a href="http://hot.openstreetmap.org/" target="_blank">'+
-                                    'Humanitarian OpenStreetMap Team</a>'
+
+
+                const worldBounds = Leaflet.latLngBounds(
+                    Leaflet.latLng(-90, -180),  // south-west
+                    Leaflet.latLng(90, 180)     // north-east
+                );
+
+                map = Leaflet.map('map', {
+                    maxBounds: worldBounds,
+                    maxBoundsViscosity: 1.0,  // 1.0 = hard lock, won't pan outside at all
+                    minZoom: 2,
+                }).setView([lat, long], 4);
+                const RefererTileLayer = Leaflet.TileLayer.extend({
+                createTile(coords, done) {
+                    const tile = document.createElement('img');
+                    tile.referrerPolicy = 'origin';
+                    tile.onload = () => done(null, tile);
+                    tile.onerror = (e) => done(e, tile);
+                    tile.src = this.getTileUrl(coords);
+                    return tile;
+                }
+                });
+
+                new RefererTileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+                attribution:  '&copy; <a href="http://www.openstreetmap.org/copyright">'+
+                                'OpenStreetMap</a>, Tiles courtesy of '+
+                                '<a href="http://hot.openstreetmap.org/" target="_blank">'+
+                                'Humanitarian OpenStreetMap Team</a>',
+                opacity: 0.75,
                 }).addTo(map);
 
                 addMarkers();
