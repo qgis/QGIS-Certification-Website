@@ -236,3 +236,5 @@ WEASYPRINT_OPTIONS = {
     "cache": None,
     # Add any other WeasyPrint options you need
 }
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
