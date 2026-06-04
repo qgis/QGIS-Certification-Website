@@ -25,6 +25,7 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from django.utils.translation import gettext as _
 from braces.views import LoginRequiredMixin
+from ..mixins import ActiveCertifyingOrganisationRequiredMixin
 from djstripe.enums import PaymentIntentStatus
 from djstripe.models import Customer, PaymentIntent
 from djstripe import settings as djstripe_settings
@@ -1042,7 +1043,7 @@ def preview_certificate(request, **kwargs):
     return response
 
 
-class TopUpView(TemplateView):
+class TopUpView(ActiveCertifyingOrganisationRequiredMixin, TemplateView):
     template_name = 'certificate/top_up.html'
     project_slug = ''
     organisation_slug = ''
