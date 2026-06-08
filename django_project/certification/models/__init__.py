@@ -17,3 +17,4 @@ from certification.models.checklist import *
 from certification.models.organisation_checklist import *
 from certification.models.external_reviewer import *
 from certification.models.credits_order import *
+from certification.models.invoice import *

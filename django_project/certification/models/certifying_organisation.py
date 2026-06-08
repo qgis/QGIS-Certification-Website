@@ -145,6 +145,15 @@ class CertifyingOrganisation(models.Model):
         blank=False
     )
 
+    vat_number = models.CharField(
+        help_text=_(
+            'VAT or company registration number '
+            '(optional, shown on invoices).'),
+        max_length=50,
+        null=True,
+        blank=True,
+    )
+
     organisation_credits = models.IntegerField(
         help_text=_('Credits available'),
         default=0,

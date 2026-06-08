@@ -1,0 +1,13 @@
+Hello,
+
+Thank you for your credit purchase for {{ organisation.name }}.
+
+Invoice number: {{ invoice.invoice_number }}
+Issue date:     {{ invoice.issue_date|date:"d M Y" }}
+Credits added:  {{ invoice.quantity }}
+Total paid:     {{ invoice.total }} {{ invoice.currency }}
+
+A PDF copy of your invoice is attached to this email for your records.
+
+Kind regards,
+QGIS Certification Team
