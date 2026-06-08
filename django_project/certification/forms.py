@@ -60,12 +60,8 @@ class CertifyingOrganisationForm(forms.ModelForm):
     vat_number = forms.CharField(
         required=False,
         max_length=50,
-        widget=forms.TextInput(attrs={'style': 'text-transform: uppercase;'}),
+        label='VAT or company registration number',
     )
-
-    def clean_vat_number(self):
-        value = self.cleaned_data.get('vat_number') or ''
-        return value.strip().upper()
 
     # noinspection PyClassicStyleClass.
     class Meta:
