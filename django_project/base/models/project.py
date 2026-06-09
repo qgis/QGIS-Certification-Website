@@ -162,6 +162,73 @@ class Project(models.Model):
         blank=True,
     )
 
+    invoice_issuer_name = models.CharField(
+        help_text=_("Issuer (seller) name displayed on credit purchase invoices."),
+        max_length=200,
+        blank=True,
+        default="QGIS.ORG",
+    )
+
+    invoice_issuer_address = models.TextField(
+        help_text=_("Issuer postal address displayed on credit purchase invoices."),
+        blank=True,
+        default="Via Geinas 2\nCH-7031 Laax",
+    )
+
+    invoice_issuer_vat = models.CharField(
+        help_text=_(
+            "Issuer VAT or company registration number "
+            "(rendered as e.g. 'UID-Nr: CHE-…')."),
+        max_length=100,
+        blank=True,
+        default="UID-Nr: CHE-489.853.176",
+    )
+
+    invoice_issuer_email = models.EmailField(
+        help_text=_("Issuer contact email displayed on invoices."),
+        blank=True,
+        default="finance@qgis.org",
+    )
+
+    invoice_issuer_phone = models.CharField(
+        help_text=_("Issuer contact phone displayed on invoices."),
+        max_length=50,
+        blank=True,
+        default="Mobile: +41 79 938 11 71",
+    )
+
+    invoice_issuer_bank_details = models.TextField(
+        help_text=_("Issuer bank details / IBAN / SWIFT shown in invoice footer."),
+        blank=True,
+        default=(
+            "Bank name and address:\n\n"
+            "PostFinance AG\n"
+            "Mingerstrasse 20\n"
+            "3030 Berne\n"
+            "Switzerland\n\n"
+            "Account Name: QGIS.ORG Association\n"
+            "Account Holder Address: Via Geinas 2, CH-7031 Laax, Switzerland\n"
+            "IBAN (account nr): CH09 0900 0000 9146 3839 8\n"
+            "BIC/SWIFT: POFICHBEXXX"
+        ),
+    )
+
+    invoice_number_prefix = models.CharField(
+        help_text=_("Prefix used in invoice numbers, e.g. 'QGIS-Cert' -> 'QGIS-Cert-26-0001'."),
+        max_length=20,
+        blank=True,
+        default="QGIS-Cert",
+    )
+
+    invoice_tax_rate = models.DecimalField(
+        help_text=_(
+            "Tax / VAT percentage applied to invoices. Leave blank for no tax line."),
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+
     private = models.BooleanField(
         help_text=_("Only visible to logged-in users?"), default=False
     )

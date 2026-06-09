@@ -1,0 +1,233 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Invoice {{ invoice.invoice_number }}</title>
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 18mm 22mm 18mm;
+    @bottom-center {
+      content: counter(page) "/" counter(pages);
+      font-size: 9pt;
+      color: #666;
+    }
+  }
+  body {
+    font-family: "Helvetica", "Arial", sans-serif;
+    font-size: 10.5pt;
+    color: #222;
+    line-height: 1.35;
+    margin: 0;
+  }
+  a { color: #0066cc; text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; }
+  pre.address {
+    font-family: inherit;
+    font-size: 10.5pt;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+
+  /* Header: logo | issuer info | issuer contact */
+  table.header td { vertical-align: top; padding: 0; }
+  table.header td.logo { width: 110px; }
+  table.header td.logo img { width: 90px; height: auto; }
+  table.header td.issuer .name { font-weight: bold; }
+  table.header td.contact { text-align: right; }
+
+  /* Title row */
+  table.title { margin-top: 36px; }
+  table.title td { vertical-align: top; padding: 0; }
+  table.title h1 {
+    font-size: 20pt;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+  table.title td.meta {
+    text-align: right;
+    padding-top: 6px;
+  }
+  table.title td.meta .meta-row { margin-bottom: 4px; }
+
+  /* Billing block */
+  .billto {
+    margin-top: 6px;
+  }
+  .billto .name { font-weight: bold; }
+
+  /* Items table */
+  table.items {
+    margin-top: 36px;
+    border-collapse: collapse;
+  }
+  table.items thead th {
+    border-bottom: 1px solid #000;
+    padding: 6px 4px;
+    text-align: left;
+    font-weight: bold;
+  }
+  table.items thead th.right { text-align: right; }
+  table.items tbody td {
+    border-bottom: 1px solid #ddd;
+    padding: 8px 4px;
+    vertical-align: top;
+  }
+  table.items tbody td.right { text-align: right; }
+  table.items tbody tr.total td {
+    border-bottom: 2px solid #000;
+    border-top: 1px solid #000;
+    font-weight: bold;
+  }
+
+  .paid-note {
+    margin-top: 18px;
+    text-align: center;
+    font-style: italic;
+  }
+
+  .due-date {
+    margin-top: 28px;
+    font-weight: bold;
+  }
+
+  .payment-details {
+    margin-top: 14px;
+  }
+  .payment-details .label { margin-bottom: 8px; }
+  .payment-details pre {
+    font-family: inherit;
+    font-size: 10.5pt;
+    margin: 0 0 10px 0;
+    white-space: pre-wrap;
+  }
+  .footer-notes { margin-top: 10px; }
+  .closing {
+    margin-top: 40px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<table class="header">
+  <tr>
+    <td class="logo">
+      {% if logo_url %}
+        <img src="{{ logo_url }}" alt="logo" />
+      {% endif %}
+    </td>
+    <td class="issuer">
+      {% if invoice.issuer_name %}
+        <div class="name">{{ invoice.issuer_name }}</div>
+      {% endif %}
+      {% if invoice.issuer_address %}
+        <pre class="address">{{ invoice.issuer_address }}</pre>
+      {% endif %}
+      {% if invoice.issuer_vat %}
+        <div>{{ invoice.issuer_vat }}</div>
+      {% endif %}
+    </td>
+    <td class="contact">
+      {% if invoice.issuer_url %}
+        <div><a href="{{ invoice.issuer_url }}">{{ invoice.issuer_url }}</a></div>
+      {% endif %}
+      {% if invoice.issuer_email %}
+        <div><a href="mailto:{{ invoice.issuer_email }}">{{ invoice.issuer_email }}</a></div>
+      {% endif %}
+      {% if invoice.issuer_phone %}
+        <div>{{ invoice.issuer_phone }}</div>
+      {% endif %}
+    </td>
+  </tr>
+</table>
+
+<table class="title">
+  <tr>
+    <td>
+      <h1>TAX INVOICE</h1>
+      <div class="billto">
+        <div class="name">{{ invoice.billing_name }}</div>
+        {% if invoice.billing_vat_number %}
+          <div>VAT ID: {{ invoice.billing_vat_number }}</div>
+        {% endif %}
+        <pre class="address">{{ invoice.billing_address }}</pre>
+        {% if invoice.billing_country %}
+          <div>{{ invoice.billing_country.name }}</div>
+        {% endif %}
+      </div>
+    </td>
+    <td class="meta">
+      <div class="meta-row"><strong>Invoice Date</strong>: {{ invoice.issue_date|date:"j M Y" }}</div>
+      <div class="meta-row"><strong>Invoice Number</strong>: {{ invoice.invoice_number }}</div>
+    </td>
+  </tr>
+</table>
+
+<table class="items">
+  <thead>
+    <tr>
+      <th style="width:55%">Description</th>
+      <th style="width:25%">VAT / GST</th>
+      <th class="right" style="width:20%">Amount {{ invoice.currency_symbol }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        {{ invoice.quantity }} QGIS certification credit{{ invoice.quantity|pluralize }}
+        à {{ invoice.unit_price }} {{ invoice.currency_symbol }} each
+      </td>
+      <td>
+        {% if invoice.tax_rate %}
+          {{ invoice.tax_rate }}%
+        {% else %}
+          VAT / GST free
+        {% endif %}
+      </td>
+      <td class="right">{{ invoice.subtotal }}</td>
+    </tr>
+    {% if invoice.tax_rate %}
+      <tr>
+        <td></td>
+        <td>Tax ({{ invoice.tax_rate }}%)</td>
+        <td class="right">{{ invoice.tax_amount }}</td>
+      </tr>
+    {% endif %}
+    <tr>
+      <td></td>
+      <td>Subtotal</td>
+      <td class="right">{{ invoice.subtotal }}</td>
+    </tr>
+    <tr class="total">
+      <td></td>
+      <td>TOTAL {{ invoice.currency_symbol }}</td>
+      <td class="right">{{ invoice.total }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="paid-note">
+  Invoice already paid through credit card on {{ invoice.issue_date|date:"M j, Y" }}.
+</div>
+
+<div class="due-date">Due Date: {{ invoice.due_date|date:"j M Y" }}</div>
+
+{% if invoice.issuer_bank_details %}
+  <div class="payment-details">
+    <div class="label">Payment Details for Bank Transfer:</div>
+    <pre>{{ invoice.issuer_bank_details }}</pre>
+  </div>
+{% endif %}
+
+<div class="footer-notes">
+  <div>Please use invoice number as payment description</div>
+  <div>Educational services are tax exempt in Switzerland</div>
+</div>
+
+<div class="closing">
+  Thank you for collaborating with {{ invoice.issuer_name|default:"us" }} on your QGIS training!
+</div>
+
+</body>
+</html>

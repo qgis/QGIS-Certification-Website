@@ -3,12 +3,12 @@ import logging
 from decimal import Decimal
 
 from base.models.project import Project
+from certification.invoice_utils import create_and_send_invoice
 from certification.mixins import ActiveCertifyingOrganisationRequiredMixin
 from certification.models.certifying_organisation import CertifyingOrganisation
 from certification.models.credits_order import CreditsOrder
 from certification.utilities import PayrexxService
 from django.conf import settings
-from django.core.mail import send_mail
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -79,13 +79,32 @@ class PayrexxTopUpView(ActiveCertifyingOrganisationRequiredMixin, TemplateView):
       credit{'s' if total_credits > 1 else ''} \
       for {organisation.name}"
 
-        payrexx = PayrexxService()
-
         # Create a new CreditsOrder instance
         credits_order = CreditsOrder.objects.create(
             organisation=organisation,
             credits_requested=total_credits,
         )
+
+        if settings.DEBUG:
+            # Dev shortcut: skip the Payrexx round-trip, assume the payment
+            # succeeded, issue credits and email the invoice straight away
+            # so the flow can be exercised without real card processing.
+            organisation.organisation_credits = (
+                organisation.organisation_credits or 0
+            ) + total_credits
+            organisation.save()
+            credits_order.credits_issued = True
+            credits_order.save()
+            create_and_send_invoice(
+                credits_order,
+                payrexx_transaction={'id': f'DEBUG-{credits_order.pk}'},
+            )
+            return redirect(
+                'certifyingorganisation-detail',
+                slug=self.organisation_slug,
+            )
+
+        payrexx = PayrexxService()
 
         redirect_url = request.build_absolute_uri(
             reverse(
@@ -159,14 +178,9 @@ class PayrexxWebhookView(View):
         credits_order.credits_issued = True
         credits_order.save()
 
-        # Step 5: Send email to organisation owners
-        organisation_owners = organisation.organisation_owners.all()
-        send_mail(
-            subject=f"QGIS Certification: Credits Top Up for {organisation.name}",
-            message=f"Your organisation has been credited with {credits_order.credits_requested} credits.",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[owner.email for owner in organisation_owners],
-        )
+        # Step 5: Generate and email the invoice (PDF attached)
+        create_and_send_invoice(
+            credits_order, payrexx_transaction=verified_transation)
 
         # Step 6: Respond 200 OK
         return HttpResponse("Credits updated with success!", status=200)

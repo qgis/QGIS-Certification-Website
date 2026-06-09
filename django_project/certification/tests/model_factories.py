@@ -18,6 +18,8 @@ from certification.models import (
     CertifyingOrganisationCertificate,
     Checklist, OrganisationChecklist, ExternalReviewer,
 )
+from certification.models.credits_order import CreditsOrder
+from certification.models.invoice import Invoice
 from core.model_factories import UserF
 from base.tests.model_factories import ProjectF
 
@@ -206,3 +208,27 @@ class ExternalReviewerF(factory.django.DjangoModelFactory):
     email = factory.Sequence(
         lambda n: 'email%s@email.com' % n
     )
+
+
+class CreditsOrderF(factory.django.DjangoModelFactory):
+    class Meta:
+        model = CreditsOrder
+
+    organisation = factory.SubFactory(CertifyingOrganisationF)
+    credits_requested = 5
+
+
+class InvoiceF(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Invoice
+
+    credits_order = factory.SubFactory(CreditsOrderF)
+    invoice_number = factory.Sequence(lambda n: 'QGIS-2026-%04d' % (n + 1))
+    billing_name = 'Test organisation'
+    billing_address = 'Test address'
+    quantity = 5
+    unit_price = '10.00'
+    currency = 'EUR'
+    subtotal = '50.00'
+    tax_amount = '0.00'
+    total = '50.00'

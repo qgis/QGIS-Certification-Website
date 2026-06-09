@@ -57,6 +57,12 @@ class CertifyingOrganisationForm(forms.ModelForm):
 
     logo = forms.ImageField(widget=FileUploadInput, required=False)
 
+    vat_number = forms.CharField(
+        required=False,
+        max_length=50,
+        label='VAT or company registration number',
+    )
+
     # noinspection PyClassicStyleClass.
     class Meta:
         model = CertifyingOrganisation
@@ -67,6 +73,7 @@ class CertifyingOrganisationForm(forms.ModelForm):
             'address',
             'country',
             'organisation_phone',
+            'vat_number',
             'logo',
             'owner_message',
             'organisation_owners',
@@ -91,6 +98,7 @@ class CertifyingOrganisationForm(forms.ModelForm):
                 Field('address', css_class='form-control'),
                 Field('country', css_class='form-control'),
                 Field('organisation_phone', css_class='form-control'),
+                Field('vat_number', css_class='form-control'),
                 Field('logo', css_class='form-control'),
                 Field('owner_message', css_class='form-control'),
                 Field('organisation_owners', css_class='is-fullwidth'),

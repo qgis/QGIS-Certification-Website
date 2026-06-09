@@ -19,6 +19,7 @@ from certification.models.checklist import Checklist
 from certification.models.organisation_checklist import OrganisationChecklist
 from certification.models.external_reviewer import ExternalReviewer
 from certification.models.credits_order import CreditsOrder
+from certification.models.invoice import Invoice
 
 
 class CertificateAdmin(admin.ModelAdmin):
@@ -155,8 +156,9 @@ class CertifyingOrganisationAdmin(SimpleHistoryAdmin):
     """Certifying organisation admin model."""
 
     filter_horizontal = ('organisation_owners',)
-    search_fields = ['name']
-    list_display = ('name', 'project', 'country', 'approved', 'rejected')
+    search_fields = ['name', 'vat_number']
+    list_display = (
+        'name', 'project', 'country', 'vat_number', 'approved', 'rejected')
     list_filter = ('country', 'approved', 'rejected', 'status')
     inlines = (CertifyingOrganisationCertificateAdminInline, )
     history_list_display = ['status', 'remarks']
@@ -196,6 +198,20 @@ class ExternalReviewerAdmin(admin.ModelAdmin):
     )
 
 
+class InvoiceAdmin(admin.ModelAdmin):
+    list_display = (
+        'invoice_number', 'issue_date', 'billing_name', 'total', 'currency',
+    )
+    search_fields = (
+        'invoice_number', 'billing_name', 'billing_vat_number',
+        'payment_reference',
+    )
+    list_filter = ('issue_date', 'currency')
+    readonly_fields = tuple(
+        f.name for f in Invoice._meta.fields if f.name != 'id'
+    )
+
+
 class CreditsOrderAdmin(admin.ModelAdmin):
     list_display = (
         'organisation',
@@ -224,3 +240,4 @@ admin.site.register(Checklist, ChecklistAdmin)
 admin.site.register(OrganisationChecklist, OrganisationChecklistAdmin)
 admin.site.register(ExternalReviewer, ExternalReviewerAdmin)
 admin.site.register(CreditsOrder, CreditsOrderAdmin)
+admin.site.register(Invoice, InvoiceAdmin)
