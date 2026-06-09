@@ -96,10 +96,10 @@ class Migration(migrations.Migration):
             name="invoice_number_prefix",
             field=models.CharField(
                 blank=True,
-                default="QGIS",
+                default="QGIS-Cert",
                 help_text=(
-                    "Prefix used in invoice numbers, e.g. 'QGIS' -> "
-                    "'QGIS-2026-0001'."
+                    "Prefix used in invoice numbers, e.g. 'QGIS-Cert' -> "
+                    "'QGIS-Cert-26-0001'."
                 ),
                 max_length=20,
             ),

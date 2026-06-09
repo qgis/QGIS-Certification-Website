@@ -214,10 +214,10 @@ class Project(models.Model):
     )
 
     invoice_number_prefix = models.CharField(
-        help_text=_("Prefix used in invoice numbers, e.g. 'QGIS' -> 'QGIS-2026-0001'."),
+        help_text=_("Prefix used in invoice numbers, e.g. 'QGIS-Cert' -> 'QGIS-Cert-26-0001'."),
         max_length=20,
         blank=True,
-        default="QGIS",
+        default="QGIS-Cert",
     )
 
     invoice_tax_rate = models.DecimalField(

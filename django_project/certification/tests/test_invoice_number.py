@@ -17,11 +17,8 @@ from certification.tests.model_factories import (
 
 class InvoiceNumberGenerationTest(TestCase):
     def setUp(self):
-        # Pre-create the shared 'qgis' project once via the public `create`
-        # classmethod (which dedupes by name). All factory-generated
-        # sub-objects will then reuse this project instance.
-        self.project = ProjectF.create(invoice_number_prefix='QGIS')
-        self.project.invoice_number_prefix = 'QGIS'
+        self.project = ProjectF.create(invoice_number_prefix='QGIS-Cert')
+        self.project.invoice_number_prefix = 'QGIS-Cert'
         self.project.save()
         self.organisation = CertifyingOrganisationF.create(project=self.project)
 
@@ -34,24 +31,24 @@ class InvoiceNumberGenerationTest(TestCase):
             return_value=mock.Mock(year=2026),
         ):
             number = Invoice.generate_number(self.project)
-        self.assertTrue(number.startswith('QGIS-2026-'))
+        self.assertTrue(number.startswith('QGIS-Cert-26-'))
         self.assertTrue(number.endswith('-0001'))
 
     def test_sequence_increments_per_year(self):
         InvoiceF.create(
             credits_order=self._make_order(),
-            invoice_number='QGIS-2026-0001',
+            invoice_number='QGIS-Cert-26-0001',
         )
         InvoiceF.create(
             credits_order=self._make_order(),
-            invoice_number='QGIS-2026-0002',
+            invoice_number='QGIS-Cert-26-0002',
         )
         with mock.patch(
             'certification.models.invoice.timezone.now',
             return_value=mock.Mock(year=2026),
         ):
             number = Invoice.generate_number(self.project)
-        self.assertEqual(number, 'QGIS-2026-0003')
+        self.assertEqual(number, 'QGIS-Cert-26-0003')
 
     def test_falls_back_to_default_prefix_when_blank(self):
         self.project.invoice_number_prefix = ''
@@ -61,19 +58,19 @@ class InvoiceNumberGenerationTest(TestCase):
             return_value=mock.Mock(year=2026),
         ):
             number = Invoice.generate_number(self.project)
-        self.assertTrue(number.startswith('INV-2026-'))
+        self.assertTrue(number.startswith('QGIS-Cert-26-'))
 
     def test_year_resets_sequence(self):
         InvoiceF.create(
             credits_order=self._make_order(),
-            invoice_number='QGIS-2025-0009',
+            invoice_number='QGIS-Cert-25-0009',
         )
         with mock.patch(
             'certification.models.invoice.timezone.now',
             return_value=mock.Mock(year=2026),
         ):
             number = Invoice.generate_number(self.project)
-        self.assertEqual(number, 'QGIS-2026-0001')
+        self.assertEqual(number, 'QGIS-Cert-26-0001')
 
     def test_persisted_invoice_uses_today_date(self):
         invoice = InvoiceF.create(credits_order=self._make_order())

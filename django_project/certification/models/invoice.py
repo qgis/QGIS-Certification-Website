@@ -86,12 +86,12 @@ class Invoice(models.Model):
     def generate_number(cls, project):
         """Return the next sequential invoice number for the given project.
 
-        Format: ``{PREFIX}-{YYYY}-{NNNN}``. Uses ``select_for_update`` so two
+        Format: ``{PREFIX}-{YY}-{NNNN}``. Uses ``select_for_update`` so two
         concurrent callers cannot allocate the same number.
         """
-        prefix = (project.invoice_number_prefix or 'INV').strip()
-        year = timezone.now().year
-        search_prefix = f'{prefix}-{year}-'
+        prefix = (project.invoice_number_prefix or 'QGIS-Cert').strip()
+        year = timezone.now().year % 100
+        search_prefix = f'{prefix}-{year:02d}-'
 
         with transaction.atomic():
             last = (
