@@ -48,14 +48,14 @@
                     </div>
                     <div class="column">
                         <button type="submit" class="button is-success is-fullwidth" id="buy" disabled>
-                            PAY WITH PAYREXX
+                            PAY WITH STRIPE
                         </button>
                     </div>
                 </div>
             </div>
         </form>
     </div>
-    {% comment %} {% include "stripe.html" %} {% endcomment %}
+    {% include "stripe.html" %}
 
     <script>
 
@@ -104,7 +104,7 @@
         updateTotal(this)
     });
 
-    {% comment %} $payButton.click(function (e) {
+    $payButton.click(function (e) {
        e.preventDefault();
        let creditAmount = $creditAmount.val();
        if (!creditAmount) {
@@ -118,9 +118,9 @@
            alert('error calculating total payment');
        }
        window.location = `{% url 'checkout' %}?unit=${creditAmount}&total=${totalToPay}&org=${org}`;
-    }); {% endcomment %}
+    });
 
-    {% comment %} function stripeSourceHandler(source) {
+    function stripeSourceHandler(source) {
         // Insert the source ID into the form so it gets submitted to the
         // server
         $('<input>').attr({
@@ -129,7 +129,7 @@
             name: 'stripe-source-id'
         }).appendTo($form).val(source.id);
         $form.submit();
-    } {% endcomment %}
+    }
 
     </script>
 {% endblock %}
