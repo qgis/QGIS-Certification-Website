@@ -11,9 +11,10 @@ from PIL import Image
 import re
 from decimal import Decimal
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.http import (
-    Http404, HttpResponse, HttpResponseRedirect, FileResponse,
+    Http404, HttpRequest, HttpResponse, HttpResponseRedirect, FileResponse,
     HttpResponseForbidden
 )
 from django.views.generic import (
@@ -21,8 +22,8 @@ from django.views.generic import (
 from django.conf import settings
 from django.urls import reverse
 from django.db import IntegrityError
-from django.core.exceptions import ValidationError
-from django.shortcuts import render
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.shortcuts import get_object_or_404, render
 from django.utils.translation import gettext as _
 from braces.views import LoginRequiredMixin
 from djstripe.enums import PaymentIntentStatus
@@ -47,6 +48,7 @@ from ..models import (
     CourseAttendee
 )
 from ..forms import CertificateForm
+from ..mixins import CourseEditPermissionMixin, user_can_manage_organisation
 from base.models.project import Project
 from helpers.notification import send_notification
 
@@ -62,8 +64,16 @@ class CertificateMixin(object):
 
 
 class CertificateCreateView(
-    LoginRequiredMixin, CertificateMixin, CreateView):
-    """Create view for Certificate."""
+    LoginRequiredMixin, CourseEditPermissionMixin,
+        CertificateMixin, CreateView):
+    """Create view for Certificate.
+
+    Each success mints a genuine, publicly verifiable QGIS certificate and
+    spends the organisation's purchased credits, so it needs the same
+    permission check as the rest of the course views.
+    generate_all_certificate already checked both permission and balance;
+    this single-certificate path checked neither.
+    """
 
     context_object_name = 'certificate'
     template_name = 'certificate/create.html'
@@ -95,11 +105,9 @@ class CertificateCreateView(
 
         context = super(
             CertificateCreateView, self).get_context_data(**kwargs)
-        context['course'] = Course.objects.get(slug=self.course_slug)
-        context['attendee'] = Attendee.objects.get(pk=self.pk)
-        context['certificate_type'] = CertificateType.objects.get(
-            pk=self.certificate_type_pk
-        )
+        context['course'] = self.course
+        context['attendee'] = self.attendee
+        context['certificate_type'] = self.certificate_type
         return context
 
     def get_form_kwargs(self):
@@ -109,16 +117,26 @@ class CertificateCreateView(
         :rtype: dict
         """
 
+        # organisation_slug and certifying_organisation are set by
+        # CourseEditPermissionMixin.dispatch(). The course and attendee are
+        # resolved within that organisation rather than by identifier alone,
+        # so that rights over one organisation cannot be used to issue a
+        # certificate against another one's course or attendee.
         kwargs = super(CertificateCreateView, self).get_form_kwargs()
         self.project_slug = 'qgis'
-        self.organisation_slug = self.kwargs.get('organisation_slug', None)
         self.course_slug = self.kwargs.get('course_slug', None)
         self.certificate_type_pk = self.kwargs.get('certificate_type_pk', None)
         self.pk = self.kwargs.get('pk', None)
-        self.course = Course.objects.get(slug=self.course_slug)
-        self.attendee = Attendee.objects.get(pk=self.pk)
-        self.certificate_type = CertificateType.objects.get(
-            pk=self.certificate_type_pk)
+        self.course = get_object_or_404(
+            Course,
+            slug=self.course_slug,
+            certifying_organisation=self.certifying_organisation)
+        self.attendee = get_object_or_404(
+            Attendee,
+            pk=self.pk,
+            certifying_organisation=self.certifying_organisation)
+        self.certificate_type = get_object_or_404(
+            CertificateType, pk=self.certificate_type_pk)
         kwargs.update({
             'user': self.request.user,
             'course': self.course,
@@ -138,17 +156,17 @@ class CertificateCreateView(
 
         We check that there is no referential integrity error when saving."""
 
+        # The balance itself is enforced by CertificateForm.clean(), which
+        # refuses the form outright when there are not enough credits, so by
+        # the time we get here the subtraction cannot go negative.
+        organisation = self.certifying_organisation
+
         try:
             super(CertificateCreateView, self).form_valid(form)
 
             # Update organisation credits every time a certificate is issued.
-            organisation = \
-                CertifyingOrganisation.objects.get(
-                    slug=self.organisation_slug)
-            remaining_credits = \
-                organisation.organisation_credits - \
-                organisation.project.certificate_credit
-            organisation.organisation_credits = remaining_credits
+            cost = organisation.project.certificate_credit
+            organisation.organisation_credits -= cost
             organisation.save()
 
             return HttpResponseRedirect(self.get_success_url())
@@ -496,13 +514,36 @@ def certificate_pdf_view(request, **kwargs):
             raise Http404()
 
 
-def download_certificates_zip(request, **kwargs):
-    """Download all certificates in a course as one zip file."""
+@login_required
+def download_certificates_zip(
+        request: HttpRequest, **kwargs: object) -> HttpResponse:
+    """Download all certificates in a course as one zip file.
+
+    A single certificate is meant to be publicly verifiable by its ID, but
+    handing out a whole cohort is a different thing: organisation and course
+    slugs are listed on public pages, so with no check at all this turned a
+    per-certificate verification feature into a bulk export of every
+    attendee's name and course history across the whole site.
+
+    :param request: The incoming request.
+    :type request: HttpRequest
+
+    :returns: A zip file of the paid certificates for this course.
+    :rtype: HttpResponse
+    """
 
     project_slug = 'qgis'
     course_slug = kwargs.pop('course_slug')
-    course = Course.objects.get(slug=course_slug)
     organisation_slug = kwargs.pop('organisation_slug')
+    organisation = get_object_or_404(
+        CertifyingOrganisation, slug=organisation_slug)
+
+    if not user_can_manage_organisation(request.user, organisation):
+        raise PermissionDenied(
+            _('You do not have permission to download these certificates.'))
+
+    course = get_object_or_404(
+        Course, slug=course_slug, certifying_organisation=organisation)
 
     certificates = Certificate.objects.filter(course=course)
 
@@ -540,29 +581,61 @@ def download_certificates_zip(request, **kwargs):
     return response
 
 
-def update_paid_status(request, **kwargs):
-    """View to update the is_paid status of certificate in a course."""
+@login_required
+def update_paid_status(request: HttpRequest, **kwargs: object) -> HttpResponse:
+    """View to update the is_paid status of certificate in a course.
+
+    Marking a certificate paid spends the organisation's credits, which are
+    bought with real money, so the caller has to be someone entitled to
+    manage that organisation. The course and attendee are looked up within
+    the organisation named in the URL rather than by slug and pk alone -
+    otherwise a user who legitimately manages organisation A could act on
+    organisation B's course by pairing the two identifiers.
+
+    :param request: HTTP request object
+    :type request: HttpRequest
+
+    :param kwargs: Keyword arguments from the URL
+    :type kwargs: dict
+
+    :returns: The confirmation page, or a redirect to the course detail page.
+    :rtype: HttpResponse
+    """
 
     project_slug = 'qgis'
     organisation_slug = kwargs.pop('organisation_slug')
     course_slug = kwargs.pop('course_slug')
     attendee_pk = kwargs.pop('pk')
-    course = Course.objects.get(slug=course_slug)
-    attendee = Attendee.objects.get(pk=attendee_pk)
-    project = Project.objects.get(slug=project_slug)
+    organisation = get_object_or_404(
+        CertifyingOrganisation, slug=organisation_slug)
+
+    if not user_can_manage_organisation(request.user, organisation):
+        raise PermissionDenied(
+            _('You do not have permission to modify this organisation.'))
+
+    course = get_object_or_404(
+        Course, slug=course_slug, certifying_organisation=organisation)
+    attendee = get_object_or_404(
+        Attendee, pk=attendee_pk, certifying_organisation=organisation)
+    project = get_object_or_404(Project, slug=project_slug)
     url = reverse('course-detail', kwargs={
         'organisation_slug': organisation_slug,
         'slug': course_slug
     })
 
     if request.method == 'POST':
+        remaining_credits = (
+            (organisation.organisation_credits or 0) -
+            project.certificate_credit
+        )
+        if remaining_credits < 0:
+            return HttpResponseForbidden(
+                _('You do not have enough credits to pay for this '
+                  'certificate.'))
+
         queryset = \
             Certificate.objects.filter(course=course, attendee=attendee)
         queryset.update(is_paid=True)
-        organisation = \
-            CertifyingOrganisation.objects.get(slug=organisation_slug)
-        remaining_credits = \
-            organisation.organisation_credits - project.certificate_credit
         organisation.organisation_credits = remaining_credits
         organisation.save()
         return HttpResponseRedirect(url)
@@ -1487,6 +1560,10 @@ class CreateCheckoutSessionView(LoginRequiredMixin, TemplateView):
 
     template_name = "checkout.html"
 
+    # An upper bound on a single purchase, so that a crafted "unit" cannot ask
+    # Stripe for an absurd line item.
+    maximum_credits = 100000
+
     def get_context_data(self, **kwargs):
         """
         Creates and returns a Stripe Checkout Session
@@ -1495,17 +1572,37 @@ class CreateCheckoutSessionView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         org_id = self.request.GET.get('org', None)
-        unit = int(self.request.GET.get('unit', '0'))
-        total = int(self.request.GET.get('total', '0')) * 100
-        unit_amount = int(total / unit) if unit > 0 else 0
+
+        # Only the number of credits is taken from the client. The price used
+        # to come from a "total" query parameter as well, which the top-up
+        # page worked out in JavaScript - so the buyer set their own price.
+        # "unit=10000&total=1" gave int(100 / 10000) = 0 cents per credit,
+        # and the credits_quantity metadata below is what the success handler
+        # credits the organisation with.
+        try:
+            unit = int(self.request.GET.get('unit', '0'))
+        except (TypeError, ValueError):
+            raise Http404()
+
+        if unit <= 0 or unit > self.maximum_credits:
+            raise Http404()
 
         try:
             org = CertifyingOrganisation.objects.get(id=org_id)
         except CertifyingOrganisation.DoesNotExist:
             raise Http404()
 
-        if unit == 0 or total == 0:
+        # Credits are spent by the organisation, so buying them is an act on
+        # that organisation and needs the same check as any other.
+        if not user_can_manage_organisation(self.request.user, org):
+            raise PermissionDenied(
+                _('You may only buy credits for your own organisation.'))
+
+        project = org.project
+        unit_amount = int(Decimal(project.credit_cost or 0) * 100)
+        if unit_amount <= 0:
             raise Http404()
+        total = unit_amount * unit
 
         description = f'Top up credits for {org.name}'
 
