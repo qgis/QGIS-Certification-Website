@@ -59,8 +59,7 @@ from .views import (  # Certifying Organisation.; Course Type.; Course Convener.
     HomepageView,
     OrganisationCertificateCreateView,
     OrganisationCertificateDetailView,
-    PayrexxTopUpView,
-    PayrexxWebhookView,
+    TopUpView,
     PendingCertifyingOrganisationListView,
     TrainingCenterCreateView,
     TrainingCenterDeleteView,
@@ -324,7 +323,7 @@ urlpatterns = [
     ),
     url(
         r"^certifyingorganisation/(?P<organisation_slug>[\w-]+)/top-up/$",
-        view=PayrexxTopUpView.as_view(),
+        view=TopUpView.as_view(),
         name="top-up",
     ),
     url(
@@ -459,7 +458,7 @@ urlpatterns = [
         name="checkout-success",
     ),
     # Payrexx webhook
-    url(r"^payrexx-hook/$", view=PayrexxWebhookView.as_view(), name="payrexx-webhook"),
+    # url(r"^payrexx-hook/$", view=PayrexxWebhookView.as_view(), name="payrexx-webhook"),
     # Documentation
     url(r"^docs/$", view=docs_overview, name="docs-overview"),
     url(r"^docs/cert-manager/$", view=docs_cert_manager, name="docs-cert-manager"),
