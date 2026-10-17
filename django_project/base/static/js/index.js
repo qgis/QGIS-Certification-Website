@@ -1,4 +1,5 @@
-require("../style/scss/style.scss");
+// require("../style/custom.style.scss");
+require("../theme/scss/style.scss");
 
 import 'datatables.net';
 import 'datatables.net-dt';
