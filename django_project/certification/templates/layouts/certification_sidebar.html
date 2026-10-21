@@ -1,16 +1,6 @@
 {% load static i18n %}
 <nav id="sidebar" class="sidebar">
   <ul class="content-wrapper">
-      <li>
-        <a 
-        class="button is-success is-medium has-tooltip-bottom has-tooltip-arrow" 
-        data-tooltip="Sign up for Certification!"
-        href="{% url 'certifyingorganisation-create' %}">
-          <i class="fas fa-certificate"></i>
-          {% trans "Sign Up!" %}
-        </a>
-      </li>
-      <hr/>
     {% if user.is_staff or user in the_project.certification_managers.all %}
       {% url 'certification-management-view' as management_url %}
       <li class="{% if request.path == management_url %}is-active{% endif %}">
